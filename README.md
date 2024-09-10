@@ -15,7 +15,6 @@ Welcome to the **ft_transcendence** project! This project involves creating a dy
   - [User Account](#user-account)
   - [Chat](#chat)
   - [Game](#game)
-- [Submission and Peer-Evaluation](#submission-and-peer-evaluation)
 
 ## Preamble
 
