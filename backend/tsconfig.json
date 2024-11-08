@@ -12,7 +12,6 @@
 	  "experimentalDecorators": true,
 	  "emitDecoratorMetadata": true
 	},
-	"include": ["**/*"],
+	"include": ["**/*", "./types/passport-oauth2.d.ts"],
 	"exclude": ["node_modules", "**/*.spec.ts"]
   }
-  

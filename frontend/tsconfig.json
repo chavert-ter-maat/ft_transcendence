@@ -20,7 +20,7 @@
     "noEmit": true,
     "jsx": "react-jsx"
   },
-  "include": [
-    "src"
-  ]
+	"include": ["**/*", "./src/types/global.d.ts"],
+	"exclude": ["node_modules", "**/*.spec.ts", "src/components/UserPage.tsx", "./src/Auth.ts"]
+
 }
