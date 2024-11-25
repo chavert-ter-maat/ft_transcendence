@@ -1,4 +1,4 @@
-// src/users/user.model.ts
+// users/user.model.ts
 import { Column, Model, Table } from 'sequelize-typescript';
 
 @Table({ tableName: 'Users' })

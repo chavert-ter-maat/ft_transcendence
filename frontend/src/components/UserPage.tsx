@@ -7,9 +7,9 @@ const UserPage: React.FC = () => {
     // Fetch user data after authentication
     const fetchUserData = async () => {
       try {
-        const response = await fetch('/user');
+        const response = await fetch('/user'); // Make sure this endpoint exists in your backend
         if (response.ok) {
-          const userData = await response.text();
+          const userData = await response.json(); // Expecting JSON response
           setUser(userData); // Store the user profile or any relevant data
         }
       } catch (error) {
@@ -23,7 +23,10 @@ const UserPage: React.FC = () => {
   return (
     <div>
       {user ? (
-        <div dangerouslySetInnerHTML={{ __html: user }} />
+        <div>
+          <h1>User Profile</h1>
+          <pre>{JSON.stringify(user, null, 2)}</pre> {/* Display user data in a readable format */}
+        </div>
       ) : (
         <p>Loading user data...</p>
       )}

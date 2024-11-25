@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from '../axios';
+import axios from '../axios'; // Ensure axios is configured correctly
 import { useNavigate } from 'react-router-dom';
 
 const Login: React.FC = () => {
@@ -10,9 +10,7 @@ const Login: React.FC = () => {
   // Redirect to the backend's OAuth login endpoint for 42 authentication
   const handleOAuthLogin = (): void => {
     console.log("Redirecting to OAuth login...");
-    // Redirect the user to the backend's OAuth login route
-    // window.location.href = 'https://api.intra.42.fr/oauth/authorize';
-    window.location.href = 'http://localhost:5001/auth/42';
+    window.location.href = 'https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-6a82107a985091e0ed77ece2b5e0682df3923737883bc68b85034d6228791d4a&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fuserpage&response_type=code'; // Correct route for OAuth login
   };
 
   // Handle traditional login using username and password
