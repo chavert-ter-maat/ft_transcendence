@@ -23,4 +23,13 @@ export class UsersService {
 	async updateTwoFaSecret(email: string, secret): Promise<[number]> {
 		return await this.userRepository.update({ secretKey: secret }, { where: { email } });
 	}
+
+	async updateIsActiveTwoFa(email: string, value): Promise<[number]> {
+		return await this.userRepository.update({ isActiveTwoFa: value }, { where: { email } });
+
+	}
+
+	async resetTwoFaSecret(email: string): Promise<[number]> {
+		return await this.userRepository.update({ isActiveTwoFa: false, secretKey: null }, { where: { email } });
+	}
 }

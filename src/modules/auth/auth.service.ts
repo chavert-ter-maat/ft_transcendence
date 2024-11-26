@@ -79,7 +79,7 @@ export class AuthService {
 		const url = speakeasy.otpauthURL({ secret: secret.ascii, label: `ft_transcendence: ${email}` });
 
 		console.log(url)
-		
+
 		try {
 			const qrCodeUrl = await QRCode.toDataURL(url);
 			return qrCodeUrl;
@@ -90,9 +90,22 @@ export class AuthService {
 
 	}
 
+	async deleteTwoFaSecret(email: string): Promise<[number]> {
+		const updateCount = await this.userService.resetTwoFaSecret(email);
+		return updateCount;
+	}
+
 	async verifyTwoFa(email: string, token: string): Promise<any> {
 		const user = await this.userService.findOneByEmail(email);
-		if (!user || !user.secretKey) {
+		if (!user) {
+			console.log("User is not validated");
+			return null;
+		} else if (!user.secretKey) {
+			console.log("2fa secret key is not set");
+			return null;
+		}
+		else if (!user.isActiveTwoFa) {
+			console.log("2fa is disabled");
 			return null;
 		}
 
@@ -102,10 +115,20 @@ export class AuthService {
 			token: token,
 		});
 
-		console.log("isvalidtoken", isValidToken)
 		if (isValidToken) {
 			return user;
 		}
 		return null;
+	}
+
+	async enableTwoFa(email: string): Promise<any> {
+		const updateCount = await this.userService.updateIsActiveTwoFa(email, true);
+		console.log("update count:", updateCount)
+		return updateCount
+	}
+
+	async disableTwoFa(email: string): Promise<any> {
+		const updateCount = await this.userService.updateIsActiveTwoFa(email, false);
+		return updateCount
 	}
 }

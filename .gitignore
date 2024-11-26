@@ -91,4 +91,3 @@ Thumbs.db
 # postgres volume
 pgdata
 pgdata/*
-*/pgdata/*

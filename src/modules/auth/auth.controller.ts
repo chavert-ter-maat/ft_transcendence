@@ -1,7 +1,8 @@
-import { Controller, Body, Post, Get, UseGuards, Request } from '@nestjs/common';
+import { Controller, Body, Post, Get, Delete, UseGuards, Request } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { UserDto } from '../users/dto/user.dto';
+import { User } from '../users/user.entity';
 
 @Controller('auth')
 export class AuthController {
@@ -17,15 +18,16 @@ export class AuthController {
 	async signUp(@Body() user: UserDto) {
 		return await this.authService.create(user);
 	}
-	// @Post('twofa/enable')
-	// async enableTwoFa(@Request() req) {
-	// 	return this.authService.enableTwoFa(req.user.email);
-	// }
 
-	// @Post('twofa/disable')
-	// async disableTwoFa(@Request() req) {
-	// 	return this.authService.disableTwoFa(req.user.email);
-	// }
+	@Post('twofa/enable')
+	async enableTwoFa(@Body() req) {
+		return this.authService.enableTwoFa(req.email);
+	}
+
+	@Post('twofa/disable')
+	async disableTwoFa(@Body() req) {
+		return this.authService.disableTwoFa(req.email);
+	}
 
 	@Get('twofa/secret')
 	async getTwoFaSecret(@Body() req: UserDto) {
@@ -33,9 +35,14 @@ export class AuthController {
 		return secret
 	}
 
+	@Delete('twofa/secret')
+	async deleteTwoFaSecret(@Body() req: UserDto) {
+		const secret = await this.authService.deleteTwoFaSecret(req.email);
+		return secret
+	}
+
 	@Post('twofa/verify')
 	async verifyTwoFa(@Body() req) {
 		return this.authService.verifyTwoFa(req.email, req.token);
 	}
-
 }
