@@ -5,4 +5,4 @@ to start:
 docker compose up
 
 to completelty remove:
-and docker compose down && ./cleanup.sh && docker system prune
+docker compose down && ./cleanup.sh && docker system prune
