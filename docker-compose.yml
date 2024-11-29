@@ -1,0 +1,87 @@
+services:
+  server:
+    build: src_server #mepmepmep
+    container_name: jojo_server_interface
+    pull_policy: never
+    ports:
+      - "3000:3000"
+      - "5001:5001"
+    # volumes:
+    #   - backend_datas_is_shit:/usr/src/app
+    # environment:
+    #   - POSTGRES_HOST=${POSTGRES_HOST}
+    #   - POSTGRES_PORT=${POSTGRES_PORT}
+    #   - POSTGRES_USER=${POSTGRES_USER}
+    #   - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    #   - POSTGRES_DB=${POSTGRES_DB}
+    env_file:
+      - .env
+    networks:
+      - docker_communication_network
+    depends_on:
+      - db
+
+#   backend:
+#     image: backend_comp
+#     build: src_init_backend/.
+#     pull_policy: never
+#     volumes:
+#       - backend_init:/postgress_interface
+#     environment:
+#        PORT: 3000
+#        POSTGRES_USER: example_user
+#        PGUSER: postgres
+#        PGHOST: postgres
+#        PGDATABASE: postgres
+#        PGPASSWORD: example_whatup
+#        PGPORT: 3333
+#     ports:
+#       - 3000:3000
+    # depends_on:
+    #   - db
+
+  db:
+    image: postgres #:latest
+    restart: always
+    environment:
+      - POSTGRES_DB=${DB_NAME} #this was it 
+      - POSTGRES_USER=${DB_USERNAME}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    # volumes:
+    #   - pgdata:/var/lib/postgresql/data
+    # env_file:
+    #   - .env
+    ports:
+      - "5432:5432"
+    networks:
+      - docker_communication_network
+
+# volumes:
+  # pgdata:
+  #   driver: local
+  #   driver_opts:
+  #     type: none
+  #     device: /home/jzeeuw-v/goinfre/postgres4
+  #     o: bind
+  # backend_datas_is_shit:
+  #   driver: local
+  #   driver_opts:
+  #     type: none
+  #     device: /home/jzeeuw-v/Desktop/transcendance_trials/docker_struggles/src_backend
+  #     o: bind
+  # backend_init:
+  #   driver: local
+  #   driver_opts:
+  #     type: none
+  #     device: /home/jzeeuw-v/Desktop/transcendance_trials/docker_struggles/src_init_backend/backend2
+  #     o: bind
+  # frontend_data:
+  #   driver: local
+  #   driver_opts:
+  #     type: none
+  #     device: /home/jzeeuw-v/Desktop/transcendance_trials/git_trans/frontend/react-my-app
+  #     o: bind
+
+networks:
+  docker_communication_network:
+    driver: bridge

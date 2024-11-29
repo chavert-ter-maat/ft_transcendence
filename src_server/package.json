@@ -1,0 +1,32 @@
+{
+	"name": "transcendence",
+	"version": "1.0.0",
+	"private": true,
+	"scripts": {
+		"start": "concurrently \"npm run start:frontend\" \"npm run start:backend\"",
+		"start:frontend": "cd frontend && npm start",
+		"start:backend": "cd backend && npm start",
+		"build": "concurrently \"npm run build:frontend\" \"npm run build:backend\"",
+		"build:frontend": "cd frontend && npm install && npm run build",
+		"build:backend": "cd backend && npm install && npm run build"
+	},
+	"devDependencies": {
+		"concurrently": "^9.0.1"
+	},
+	"dependencies": {
+		"@nestjs/common": "9.0.0",
+		"@nestjs/core": "9.0.0",
+		"nestjs-sequelize": "1.0.0",
+		"sequelize": "6.30.0",
+		"sequelize-typescript": "2.1.0",
+		"@nestjs/sequelize": "^10.0.1",
+		"@types/express": "^5.0.0",
+		"@types/passport": "^1.0.17",
+		"dotenv": "^16.4.5",
+		"express": "^4.21.1",
+		"passport": "^0.7.0",
+		"passport-oauth2": "^1.8.0",
+		"pg": "^8.13.1",
+		"pg-hstore": "^2.3.4"
+	}
+}
