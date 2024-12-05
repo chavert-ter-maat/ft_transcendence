@@ -77,7 +77,7 @@ function sleep(ms: number) {
 @Controller('messages')
 export class MessageController {
 	private notify_users:		string[] = ["Server_administrator"];
-	
+
 	constructor( private readonly MessageService: MessageService, private online_users: OnlineUsers ) {	}
 
 	remove_user(user: string): void
@@ -211,5 +211,11 @@ export class MessageController {
 	async remove_user_from_chat(@Body() add_user : AddUser): Promise<{ message: string }> {
 		this.add_users([await this.MessageService.remove_user(add_user.chatname, add_user.creator, add_user.add_user), add_user.chatname]);
 		return { message: add_user.chatname + "_" + add_user.creator + "_" + add_user.add_user};
+	}
+
+	@Post("ban_user")
+	async ban_user_from_chat(@Body() ban_user : AddUser): Promise<{ message: string }> {
+		this.add_users([await this.MessageService.ban_user(ban_user.chatname, ban_user.creator, ban_user.add_user), ban_user.chatname]);
+		return { message: ban_user.chatname + "_" + ban_user.creator + "_" + ban_user.add_user};
 	}
 }

@@ -16,6 +16,7 @@ interface ChatAtributes {
 	chatname:		string;
 	creator:		string;
 	admins:			string[];
+	banned_users:	string[];
 	messages:		message_stamp[];
 	user_stamps:	user_stamp[];
 	muted_users:	MutedUser[];
@@ -51,6 +52,12 @@ export class Chat extends Model<ChatAtributes> implements ChatAtributes {
 		allowNull: true,
 	})
 	public admins!: string[];
+
+	@Column({
+		type: DataType.ARRAY(DataType.STRING),
+		allowNull: true,
+	})
+	public banned_users!: string[];
 
 	@Column({
 		type: DataType.ARRAY(DataType.JSON),

@@ -189,6 +189,18 @@ const Chat: React.FC = () =>  {
 		);
 	}
 
+	function ButtonBanUser() {
+		function handleClick() {
+			banUser(sel_user_state);
+			console.log("ban user:" + sel_user_state);
+		}
+		return (
+			<button onClick={handleClick} className={"App-chat_name_button"}>
+				{"Ban."}
+			</button>
+		);
+	}
+
 	function ButtonGoToEditChat() {
 		function handleClick() {
 			console.log("Edit this chat:" + chat_name);
@@ -383,6 +395,27 @@ const Chat: React.FC = () =>  {
 			const response = await axios.post('/messages/remove_user',
 				{chatname: chat_name,  creator: user.name, add_user: username});
 			console.log("User removed:" + response.data.message);
+			setLoaded(false);
+			loaded = false;
+			loading = false;
+			return true;
+		} catch (err: any) {
+			if (!err?.response) {
+				console.log('No server response.');
+			} else if (err.response?.status === 409) {
+				console.log('User exists, please login.'); // login?
+			} else {
+				console.log('You no admin.'); // not able to login or blocked
+			}
+			return false;
+		}
+	}
+
+	const banUser = async (username: string): Promise<boolean> => {
+		try {
+			const response = await axios.post('/messages/ban_user',
+				{chatname: chat_name,  creator: user.name, add_user: username});
+			console.log("User banned:" + response.data.message);
 			setLoaded(false);
 			loaded = false;
 			loading = false;
@@ -747,6 +780,7 @@ const Chat: React.FC = () =>  {
 						<ButtonBlockUser/>
 						<ButtonRemoveUser/>
 						<ButtonGoAddAdmin/>
+						<ButtonBanUser/>
 						</header>
 					</div>
 				);

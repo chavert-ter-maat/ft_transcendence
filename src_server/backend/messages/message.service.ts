@@ -143,6 +143,8 @@ export class MessageService {
 		const add_user = await this.check_block(username, add_username);
 		if (!add_user)
 			throw new NotFoundException("User not found");
+		if (existingChat.banned_users.includes(add_user.username))
+			throw new UnauthorizedException("User banned");
 		const existingChatUser = await this.userChat.findOne({
 			where: { chatname: existingChat.chatname },
 			include: [{
@@ -191,7 +193,7 @@ export class MessageService {
 			name_: "Server_administrator", user_: "App-message_someone_else",
 			timestamp: Date(), pic_: "b"};
 		const newChat = await this.userChat.create(
-			{ chatname: dm_chat_name, creator: username, admins: [], messages: [first_message],
+			{ chatname: dm_chat_name, creator: username, admins: [], banned_users: [], messages: [first_message],
 			user_stamps: [{name_: username, admin_: false, timestamp: Date()}, {name_: chatname, admin_: false, timestamp: Date()}],
 			muted_users: [], password: "", public: false, DM: true, last_edit: Date()} as any);
 		await (newChat as any).addUser(user);
@@ -230,7 +232,7 @@ export class MessageService {
 				name_: "Server_administrator", user_: "App-message_someone_else",
 				timestamp: Date(), pic_: "b"};
 			const newChat = await this.userChat.create(
-				{ chatname, creator: username, admins: [username], messages: [first_message],
+				{ chatname, creator: username, admins: [username], banned_users: [], messages: [first_message],
 				user_stamps: [{name_: username, admin_: true, timestamp: Date()}], muted_users: [],
 				password: "", public: false, DM: false, last_edit: Date()} as any);
 			await (newChat as any).addUser(user);
@@ -246,11 +248,31 @@ export class MessageService {
 		return ([]);
 	}
 
+	async ban_user(chatname: string, username: string, add_username: string): Promise<user_stamp []> {
+		const existingChat = await this.get_chat_with_permissions(username, chatname);
+		if (existingChat && existingChat.creator != add_username)
+		{
+			existingChat.banned_users.push(add_username);
+			existingChat.changed("banned_users", true);
+			existingChat.save();
+			if (await this.leave_chat(chatname, add_username, username))
+				return (existingChat.user_stamps);
+		}
+		return ([]);
+	}
+
 	async add_user(chatname: string, username: string, add_username: string): Promise<user_stamp []> {
 		const existingChat = await this.get_chat_with_permissions(username, chatname);
 		if (existingChat)
+		{
+			if (existingChat.creator == username && existingChat.banned_users.includes(add_username))
+			{
+				existingChat.banned_users =  existingChat.banned_users.filter((users) => users != add_username);
+				existingChat.save();
+			}
 			if (await this.add_user_internal(existingChat, add_username, username))
 				return (existingChat.user_stamps);
+		}
 		return ([]);
 	}
 
