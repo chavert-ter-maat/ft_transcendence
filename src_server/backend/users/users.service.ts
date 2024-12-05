@@ -14,7 +14,7 @@ export class UsersService {
     const hashedPassword = await bcrypt.hash(password, 10);
     
     // This will handle TypeScript error for missing properties in User
-    await this.userModel.create({ username, password: hashedPassword } as any);
+    await this.userModel.create({ username, password: hashedPassword, muted_users: [], blocked_users: [] } as any);
   }
 
   async login(username: string, password: string): Promise<void> {

@@ -1,13 +1,18 @@
-// src/users/user.model.ts
 import { Column, Model, Table, BelongsToMany, HasMany, DataType } from 'sequelize-typescript';
-// import { Optional } from 'sequelize-typescript'; 
 import { Chat } from '../messages/message.model';
 import { UserChat } from '../messages/userchat.model';
 
+interface BlockUser {
+	username:		string;
+	timestamp:		number;
+	forever:		boolean;
+}
+
 interface UserAttributes {
-	id:			number;
-	username:	string;
-	password:	string;
+	id:				number;
+	username:		string;
+	password:		string;
+	blocked_users:	BlockUser[];
   }
   
 
@@ -32,6 +37,12 @@ export class User extends Model<UserAttributes> implements UserAttributes{
 		allowNull:		false,
 	})
 	public password!: string;
+
+	@Column({
+		type:			DataType.ARRAY(DataType.JSON),
+		allowNull:		false,
+	})
+	public blocked_users!: BlockUser[];
 
 	@BelongsToMany(() => Chat, { 
 		through: () => UserChat,

@@ -1,5 +1,6 @@
 import { Body, Controller, Get, Post, Param } from '@nestjs/common';
 import { MessageService } from './message.service';
+import { OnlineUsers } from '../online_users';
 
 interface message_stamp { message_: string, name_: string, user_ : string, timestamp: string, pic_: string };
 
@@ -11,6 +12,8 @@ interface UserName {
 interface NewChat {
 	chatname:	string;
 	creator:	string;
+	password:	string;
+	DM:			boolean;
 }
 
 interface AddUser {
@@ -19,10 +22,36 @@ interface AddUser {
 	add_user:	string;
 }
 
+interface MakePublic {
+	chatname:	string;
+	creator:	string;
+	password_chat:	string;
+}
+
+interface AddBlock {
+	add_user:	string;
+	creator:	string;
+	minutes:	string;
+}
+
+interface AddMute {
+	chatname:	string;
+	add_user:	string;
+	creator:	string;
+	minutes:	string;
+}
+
 interface SelectChat {
 	username:	string;
 	password:	string;
 	chatname:	string;
+}
+
+interface GetMessagesInt {
+	username:	string;
+	password:	string;
+	chatname:	string;
+	offset:		number;
 }
 
 interface AddMessageToSelectChat {
@@ -31,12 +60,12 @@ interface AddMessageToSelectChat {
 	chatname:	string;
 	message_: 	string;
 	name_: 		string;
-	user_ : 	string;
+	user_:	 	string;
 	timestamp: 	string;
 	pic_: 		string;
 }
 
-interface chat_stamp	{ name_: string, unread_: number, timestamp: string, users: string[], index: number};
+interface chat_stamp	{ name_: string, unread_: number, timestamp: string, users: string[], index: number, DM: boolean};
 interface message_stamp	{ message_: string, name_: string, user_ : string, timestamp: string, pic_: string };
 interface user_stamp	{ name_: string, admin_: boolean, timestamp: string };
 
@@ -47,10 +76,9 @@ function sleep(ms: number) {
 // limits number of clients?
 @Controller('messages')
 export class MessageController {
-	// private	connected_users:	string[] = []; //disconnection is too long
 	private notify_users:		string[] = ["Server_administrator"];
-
-	constructor(private readonly MessageService: MessageService) {	}
+	
+	constructor( private readonly MessageService: MessageService, private online_users: OnlineUsers ) {	}
 
 	remove_user(user: string): void
 	{
@@ -64,26 +92,29 @@ export class MessageController {
 		}
 	}
 
-	add_users(relevant_users: user_stamp[]): void
+	add_users( user_input: [user_stamp[], string]): string
 	{
 		console.log("adding users:");
-		console.log(relevant_users);
+		console.log(user_input[0]);
 		let i_ru: number = 0;
-		while (i_ru < relevant_users.length)
+		const online_relevant_users = this.online_users.find_online_users_by_channel(user_input[1]);
+		while (i_ru < user_input[0].length)
 		{
-				console.log(relevant_users[i_ru] + "is online");
-				if (!this.notify_users.includes(relevant_users[i_ru].name_))
+				console.log(user_input[0][i_ru] + "is online");
+				if (!this.notify_users.includes(user_input[0][i_ru].name_)
+					&& online_relevant_users.find((value) => value.username == user_input[0][i_ru].name_))
 				{
-					console.log(relevant_users[i_ru] + "is added");
-					this.notify_users.push(relevant_users[i_ru].name_);
+					console.log(user_input[0][i_ru] + "is added");
+					this.notify_users.push(user_input[0][i_ru].name_);
 				}
 			i_ru++;
 		}
 		console.log("result");
 		console.log(this.notify_users);
+		return (user_input[1]);
 	}
 
-	async check_notification(sleep_ms: number, username: string): Promise<boolean>
+	async check_notification(sleep_ms: number, username: string): Promise<boolean> // might have to protect from unauthroized usage
 	{
 		if (this.notify_users && this.notify_users.includes(username))
 			return (true);
@@ -92,66 +123,93 @@ export class MessageController {
 		return (false);
 	}
 
-  @Get()
-  async get_nothing(): Promise<{ message: string }> {
-    return { message: 'Jojo!' };
-  }
-
 	@Post('apply_for_update')
-		async apply_for_update(@Body() username: UserName): Promise<{ notification: boolean }> {
+	async apply_for_update(@Body() user: SelectChat): Promise<{ notification: boolean }> {
+		this.online_users.add_online_user(user.username, user.chatname)
 		for (let i = 0; i < 4; i++)
 		{
-			const update = await this.check_notification(250, username.username);
+			const update = await this.check_notification(250, user.username);
 			if (update)
 			{
-				console.log(username.username + "update?" + update);
-				this.remove_user(username.username);
+				console.log(user.username + "update?" + update);
+				this.remove_user(user.username);
 				return {notification : true};
 			}
 		}
+		this.online_users.remove_disconnected_users(Date.now() - 10000);
 		return { notification: false };
 	}
 
-  @Post('get_chats')
-  async get_chats(@Body() username: UserName): Promise<{ array: chat_stamp []}> {
-    return { array: await this.MessageService.get_chats_from_db(username.username) };
-  }
-
-  @Post('get_users')
-  async get_users(@Body() username: SelectChat): Promise<{ array: user_stamp []}> {
-    return { array: await this.MessageService.get_users_from_db(username.username, username.chatname) };
-  }
-
-  @Post('get_messages')
-  async get_messages(@Body() chatSelected: SelectChat): Promise<{ array: message_stamp []}> {
-    return { array: await this.MessageService.get_messages_from_db(chatSelected.username, chatSelected.chatname) };
-  }
-
-  @Post()
-  async post_shit(@Body() username: UserName): Promise<{ message: string }> {
-	return { message: username.username};
-  }
-  @Post("new")
-  async post_new_chat(@Body() newchat : NewChat): Promise<{ message: string }> {
-	await this.MessageService.new_chat(newchat.chatname, newchat.creator);
-	return { message: newchat.chatname + "_" + newchat.creator};
-  }
-  @Post("add_user")
-  async add_user_to_chat(@Body() add_user : AddUser): Promise<{ message: string }> {
-	const added = await this.MessageService.add_user(add_user.chatname, add_user.creator, add_user.add_user);
-	if (added) // && this.connected_users.includes(add_user.add_user))
-	{
-		if (!this.notify_users.includes(add_user.add_user))
-			this.notify_users.push(add_user.add_user);
-		if (!this.notify_users.includes(add_user.creator))
-			this.notify_users.push(add_user.creator);
+	@Post('get_chats')
+	async get_chats(@Body() username: UserName): Promise<{ array: chat_stamp []}> {
+		return { array: await this.MessageService.get_chats_from_db(username.username) };	
 	}
-	return { message: add_user.chatname + "_" + add_user.creator + "_" + add_user.add_user};
-  }
-  @Post("new_message")
-  async new_message(@Body() newmessage : AddMessageToSelectChat): Promise<{ message: string }> {
-	let message: message_stamp = {message_: newmessage.message_, name_: newmessage.name_, user_: newmessage.user_, timestamp: newmessage.timestamp, pic_: newmessage.pic_};
-	this.add_users(await this.MessageService.new_message(newmessage.username, newmessage.chatname, message));
-	return { message: newmessage.username + "_" + newmessage.chatname + "_" + message.message_};
-  }
+
+	@Post('get_users')
+	async get_users(@Body() username: SelectChat): Promise<{ array: user_stamp [], admin_: boolean, creator_: boolean }> {
+		return ( await this.MessageService.get_users_from_db(username.username, username.chatname) );	
+	}
+
+	@Post('get_messages')
+	async get_messages(@Body() chatSelected: GetMessagesInt): Promise<{ array: message_stamp []}> {
+		return { array: await this.MessageService.get_messages_from_db(chatSelected.username, chatSelected.chatname, chatSelected.password, chatSelected.offset) };	
+	}
+
+	@Post("new")
+	async post_new_chat(@Body() newchat : NewChat): Promise<{ message: string }> {
+		if (!newchat.DM)
+			this.add_users([await this.MessageService.new_chat(newchat.chatname, newchat.creator, newchat.password), newchat.chatname]);
+		else
+			newchat.chatname = this.add_users( await this.MessageService.new_dm(newchat.chatname, newchat.creator, newchat.password) );
+		return { message: newchat.chatname};
+	}
+
+	@Post("add_user")
+	async add_user_to_chat(@Body() add_user : AddUser): Promise<{ message: string }> {
+		this.add_users([await this.MessageService.add_user(add_user.chatname, add_user.creator, add_user.add_user), add_user.chatname]);
+		return { message: add_user.chatname + "_" + add_user.creator + "_" + add_user.add_user};
+	}
+
+	@Post("leave_chat")
+	async leave_chat(@Body() add_user : SelectChat): Promise<{ message: string }> {
+		this.add_users([await this.MessageService.leave_chat(add_user.chatname, add_user.username, add_user.password), add_user.chatname]);
+		return { message: add_user.chatname + "_" + add_user.username + "_" + add_user.password};
+	}
+
+	@Post("add_admin")
+	async add_admin_to_chat(@Body() add_user : AddUser): Promise<{ message: string }> {
+		this.add_users([await this.MessageService.add_admin(add_user.chatname, add_user.creator, add_user.add_user), add_user.chatname]);
+		return { message: add_user.chatname + "_" + add_user.creator + "_" + add_user.add_user};
+	}
+
+	@Post("new_message")
+	async new_message(@Body() newmessage : AddMessageToSelectChat): Promise<{ message: string }> {
+		let message: message_stamp = {message_: newmessage.message_, name_: newmessage.name_, user_: newmessage.user_, timestamp: newmessage.timestamp, pic_: newmessage.pic_};
+		this.add_users([await this.MessageService.new_message(newmessage.username, newmessage.chatname, message), newmessage.chatname]);
+		return { message: newmessage.username + "_" + newmessage.chatname + "_" + message.message_};
+	}
+
+	@Post("make_public")
+	async make_public(@Body() add_user : MakePublic): Promise<{ message: string }> {
+		this.add_users([await this.MessageService.make_public(add_user.chatname, add_user.creator, add_user.password_chat), add_user.chatname]);
+		return { message: add_user.chatname + "_" + add_user.creator + "_" + add_user.password_chat};
+	}
+
+	@Post("add_mute")
+	async add_mute(@Body() mute_user : AddMute): Promise<{ message: string }> {
+		this.add_users([await this.MessageService.add_mute(mute_user.chatname, mute_user.add_user, mute_user.creator, mute_user.minutes), ""]);
+		return { message: mute_user.add_user + "_" + mute_user.creator + "_" + mute_user.minutes};
+	}
+
+	@Post("add_block")
+	async add_block(@Body() bock_user : AddBlock): Promise<{ message: string }> {
+		this.add_users([await this.MessageService.add_block(bock_user.add_user, bock_user.creator, bock_user.minutes), ""]);
+		return { message: bock_user.add_user + "_" + bock_user.creator + "_" + bock_user.minutes};
+	}
+
+	@Post("remove_user")
+	async remove_user_from_chat(@Body() add_user : AddUser): Promise<{ message: string }> {
+		this.add_users([await this.MessageService.remove_user(add_user.chatname, add_user.creator, add_user.add_user), add_user.chatname]);
+		return { message: add_user.chatname + "_" + add_user.creator + "_" + add_user.add_user};
+	}
 }

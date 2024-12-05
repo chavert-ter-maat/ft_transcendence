@@ -8,6 +8,7 @@ import { UsersService } from './users/users.service';
 import { MessageController } from './messages/message.controller';
 import { MessageService } from './messages/message.service';
 import * as dotenv from 'dotenv';
+import { OnlineUsers } from './online_users';
 
 dotenv.config();
 
@@ -31,7 +32,7 @@ dotenv.config();
 		SequelizeModule.forFeature([User, Chat, UserChat ]),
 	  ],
   controllers: [UsersController, MessageController],
-  providers: [UsersService, MessageService],
+  providers: [UsersService, MessageService, OnlineUsers],
 })
 
 export class AppModule {}
