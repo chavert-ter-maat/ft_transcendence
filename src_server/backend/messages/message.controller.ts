@@ -94,23 +94,23 @@ export class MessageController {
 
 	add_users( user_input: [user_stamp[], string]): string
 	{
-		console.log("adding users:");
-		console.log(user_input[0]);
+		//console.log("adding users:");
+		//console.log(user_input[0]);
 		let i_ru: number = 0;
 		const online_relevant_users = this.online_users.find_online_users_by_channel(user_input[1]);
 		while (i_ru < user_input[0].length)
 		{
-				console.log(user_input[0][i_ru] + "is online");
+				//console.log(user_input[0][i_ru] + "is online");
 				if (!this.notify_users.includes(user_input[0][i_ru].name_)
 					&& online_relevant_users.find((value) => value.username == user_input[0][i_ru].name_))
 				{
-					console.log(user_input[0][i_ru] + "is added");
+					//console.log(user_input[0][i_ru] + "is added");
 					this.notify_users.push(user_input[0][i_ru].name_);
 				}
 			i_ru++;
 		}
-		console.log("result");
-		console.log(this.notify_users);
+		//console.log("result");
+		//console.log(this.notify_users);
 		return (user_input[1]);
 	}
 
@@ -131,7 +131,7 @@ export class MessageController {
 			const update = await this.check_notification(250, user.username);
 			if (update)
 			{
-				console.log(user.username + "update?" + update);
+				//console.log(user.username + "update?" + update);
 				this.remove_user(user.username);
 				return {notification : true};
 			}

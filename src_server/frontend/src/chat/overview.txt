@@ -1,0 +1,36 @@
+5 switch cases
+userState => username, password, chatname, switch_state, loaded?
+
+// Overview page: Overview.tsx
+	add chat form
+	add dm form
+	show all chats and go to chats
+
+// Chat view: 
+	message form
+	next/prev page button
+	edit chat button
+	show messages
+	go back to overview
+
+// Login chat
+	password form
+	go back to overview
+
+// Edit view:
+	add user form
+	set public form
+	leave chat button
+	show all users and edit users
+	go back to chat
+
+// User view:
+	Time input
+	Kick
+	Block
+	Mute
+	Ban
+	Admin
+	go back to chat/edit
+
+
