@@ -19,7 +19,7 @@
 
 .App-chat_name {
 	background-color: var(--user_message_background_color);
-	width: 55%;
+	width: 50%;
 	margin-top: 1%;
 	padding-top: 1%;
 	padding-left: 5%;
@@ -34,7 +34,7 @@
 
 .App-chat_name_timestamp {
 	background-color: var(--user_message_background_color);
-	width: 60%;
+	width: 50%;
 	padding-left: 5%;
 	padding-right: 5%;
 	padding-bottom: 1%;

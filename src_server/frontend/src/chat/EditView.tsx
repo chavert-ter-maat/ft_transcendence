@@ -139,7 +139,7 @@ export const EditView: React.FC<EditViewProps> = ({ logged_in_user, setLoaded, s
 				<button onClick={() => addBlock(logged_in_user.selected_user, input1.state)} className={"App-chat_name_button"}> Block user. </button>
 				<button onClick={() => removeUser(logged_in_user.selected_user)} className={"App-chat_name_button"}> Remove user. </button>
 				<button onClick={() => addNewAdmin(logged_in_user.selected_user)} className={"App-chat_name_button"}> Make admin. </button>
-				<button onClick={() => banUser(logged_in_user.selected_user)} className={"App-chat_name_button"}> ban user. </button>
+				<button onClick={() => banUser(logged_in_user.selected_user)} className={"App-chat_name_button"}> Ban user. </button>
 				</header>
 			</div>
 		);
