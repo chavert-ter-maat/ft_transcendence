@@ -1,15 +1,13 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { SequelizeModule } from '@nestjs/sequelize';
-import { AuthModule } from './auth/auth.module'; // Replace with your actual auth module path
-import { UserModule } from './users/user.module'; // Replace with your actual users module path
-import { User } from './users/user.model'; // Import your User model
-import { OauthToken } from './auth/oauth-token.model'; // Import OAuth Token model
+import { AuthModule } from './auth/auth.module';
+import { User } from './auth/auth.model';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
-      isGlobal: true, // Makes environment variables available globally
+      isGlobal: true,
     }),
 
     SequelizeModule.forRoot({
@@ -20,11 +18,11 @@ import { OauthToken } from './auth/oauth-token.model'; // Import OAuth Token mod
       password: process.env.DB_PASSWORD || 'password',
       database: process.env.DB_NAME || 'database',
       autoLoadModels: true,
-      synchronize: true, // Automatically sync models with the database
+      synchronize: false, // Sync models with database
+      models: [User],
     }),
 
-    AuthModule,
-    UserModule,
+    AuthModule, // Import UserModule here
   ],
 })
 export class AppModule {}

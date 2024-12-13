@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "esnext", // Consider esnext if you target modern browsers
     "lib": [
       "dom",
       "dom.iterable",
@@ -20,7 +20,6 @@
     "noEmit": true,
     "jsx": "react-jsx"
   },
-	"include": ["**/*", "./src/types/global.d.ts"],
-	"exclude": ["node_modules", "**/*.spec.ts", "src/components/UserPage.tsx", "./src/Auth.ts"]
-
+  "include": ["src/**/*", "src/types/global.d.ts"], // Ensure src is the primary inclusion
+  "exclude": ["node_modules", "**/*.spec.ts"] // Avoid excluding components like UserPage
 }

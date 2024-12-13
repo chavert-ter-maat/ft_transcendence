@@ -59,7 +59,7 @@ const AuthComponent = (): JSX.Element => {
     }
   
     try {
-      const response = await axios.post<{ access_token: string }>('http://localhost:5001/auth/callback', { code });
+      const response = await axios.post<{ access_token: string }>('http://localhost:3000/auth/callback', { code });
   
       if (response.data.access_token) {
         localStorage.setItem('access_token', response.data.access_token);
