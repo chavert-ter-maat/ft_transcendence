@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+const urlParams = new URLSearchParams(window.location.search);
+
 const AuthCallback: React.FC = () => {
   const navigate = useNavigate();
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
+    
     const token = urlParams.get('token');
     const error = urlParams.get('error');
 
@@ -17,12 +19,15 @@ const AuthCallback: React.FC = () => {
       return;
     }
 
+    console.log("rerender: " + token);
     if (token) {
       localStorage.setItem('authToken', token);
+      console.log('Authentication successful. Redirecting to user page...');
+      console.log('localStorage.getItem(authToken):', localStorage.getItem('authToken'));
       navigate('/userpage');
     } else {
       setError('No authentication token received');
-      console.log('No authentication token received');
+      console.log('No authentication token received blabla');
       setTimeout(() => navigate('/login'), 3000);
     }
   }, [navigate]);
