@@ -2,7 +2,7 @@ import { Column, Model, Table, BelongsTo, DataType, HasMany, BelongsToMany } fro
 import { User } from '../users/user.model';
 import { UserChat } from './userchat.model'; 
 
-interface message_stamp { message_: string, name_: string, user_ : string, timestamp: string, pic_: string };
+interface message_stamp { message_: string, name_: string, user_ : string, timestamp: string, pic_: string, key_: number };
 interface user_stamp	{ name_: string, admin_: boolean, timestamp: string };
 
 interface MutedUser {

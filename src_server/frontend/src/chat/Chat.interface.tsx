@@ -1,26 +1,27 @@
 import React from 'react';
 
 export interface message_stamp	{
-	message_: string,
-	name_: string,
-	user_ : string,
-	timestamp: string,
-	pic_: string
+	message_:	string,
+	name_:		string,
+	user_ :		string,
+	timestamp:	string,
+	pic_:		string,
+	key_:		number
 };
 
 export interface chat_stamp	{
-	name_: string,
-	unread_: number,
-	timestamp: string,
-	users: string[],
-	index: number,
-	DM: boolean
+	name_:		string,
+	unread_:	number,
+	timestamp:	string,
+	users:		string[],
+	index:		number,
+	DM:			boolean
 };
 
 export interface user_stamp	{
-	name_: string,
-	admin_: boolean,
-	timestamp: string
+	name_:		string,
+	admin_:		boolean,
+	timestamp:	string
 };
 
 export interface UserStats {

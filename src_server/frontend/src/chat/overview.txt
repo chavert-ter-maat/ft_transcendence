@@ -33,4 +33,17 @@ userState => username, password, chatname, switch_state, loaded?
 	Admin
 	go back to chat/edit
 
+// keeps loaded stuff fo too long -> in between login and logout, also between loading
+// blocking is kept? muting is percistant through deleting chat, not the case
+// check mute/block behaviour, looks fine?
+// ban is buggy
+
+//things that might slip through 
+	sql injection protection
+
+//things to change:
+	keep the database outside of docker?
+	
+
+
 

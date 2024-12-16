@@ -2,7 +2,47 @@ import logo from './8589-screaming-cat.png';
 import './App.css';
 import React from 'react';
 import axios from '../axios';
-import { UserStats, ChatOverviewProps } from './Chat.interface';
+import { UserStats, ChatOverviewProps, chat_stamp } from './Chat.interface';
+
+interface ChatStamp_int {
+	chatey:			chat_stamp;
+	logged_in_user:	UserStats;
+	setLoaded:		React.Dispatch<React.SetStateAction<boolean>>;
+	setSwitch:		React.Dispatch<React.SetStateAction<number>>;
+  }
+
+function CHATSTAMP_RENDER({chatey, logged_in_user, setLoaded, setSwitch}: ChatStamp_int ): React.ReactElement {
+	let buttonname: string = chatey.name_;
+	// console.log(chatey.name_);
+	if (chatey.DM)
+		buttonname = chatey.name_.replace("_" + logged_in_user.username, "");
+	return (
+		<div>
+			<li className={"App-chat_name"}>{buttonname}</li>
+			<button onClick={() => GoToChat(logged_in_user, setLoaded, setSwitch, chatey.name_)} className={"App-chat_name_button"}> Go to </button>
+			<li className={"App-chat_name_timestamp"}>{chatey.timestamp}</li>
+		</div>
+	);
+}
+
+interface	ChatStampList_int {
+	chats:			chat_stamp[];
+	logged_in_user:	UserStats;
+	setLoaded:		React.Dispatch<React.SetStateAction<boolean>>;
+	setSwitch:		React.Dispatch<React.SetStateAction<number>>;
+}
+
+function CHATSTAMP_LIST( {chats, logged_in_user, setLoaded, setSwitch} : ChatStampList_int ) {
+	return (
+		<section>
+			<h2>{"All chats:"}</h2>
+			{chats.map(chat =>
+				<CHATSTAMP_RENDER key={chat.name_} chatey={chat} logged_in_user={logged_in_user} setLoaded={setLoaded} setSwitch={setSwitch}/>
+			).reverse()}
+		</section>
+	);
+}
+
 
 export const addNewChat = async (logged_in_user: UserStats, DM: boolean): Promise<number> => {
 	try {
@@ -45,8 +85,6 @@ const GoToChat = (	logged_in_user: UserStats,
 }
 
 export const ChatOverviewPage: React.FC<ChatOverviewProps> = ({ logged_in_user, chats_input, setLoaded, setSwitch, input1, input2 }) => {
-	let	chats_jsx : any = [];
-
 	async function	addChat(event: any) {
 		console.log("input is:" + input1.state + ", chatname:" + logged_in_user.chatname);
 		if (input1.state !== "")
@@ -69,16 +107,6 @@ export const ChatOverviewPage: React.FC<ChatOverviewProps> = ({ logged_in_user, 
 		event.preventDefault();
 	}
 
-	chats_input.forEach(function (chatey, index) {
-		let buttonname: string = chatey.name_;
-		if (chatey.DM)
-			buttonname = chatey.name_.replace("_" + logged_in_user.username, ""); // might be buggy if _ is allowed in username
-		chats_jsx.push(<li className={"App-chat_name"} key={index}>{buttonname}</li>);
-		chats_jsx.push(<button onClick={() => GoToChat(logged_in_user, setLoaded, setSwitch, chatey.name_)} className={"App-chat_name_button"}> Go to </button>);
-		chats_jsx.push(<li className={"App-chat_name_timestamp"} key={index}>{chatey.timestamp}</li>);
-	});
-	chats_input.reverse(); // weird shit
-
 	return (
 		<div className="App">
 			<header className="App-header">
@@ -94,7 +122,7 @@ export const ChatOverviewPage: React.FC<ChatOverviewProps> = ({ logged_in_user, 
 			</form>
 			</header>
 			<ol>
-				{chats_jsx.map((chat_jsx : any) => <>{chat_jsx}</>)}
+				<CHATSTAMP_LIST chats={chats_input} logged_in_user={logged_in_user} setSwitch={setSwitch} setLoaded={setLoaded}/>
 			</ol>
 		</div>
 	);

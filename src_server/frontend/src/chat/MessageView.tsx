@@ -20,16 +20,59 @@ export const GoToChatOverview = (	logged_in_user: UserStats,
 	logged_in_user.loading = false;
 }
 
-export const MessagesView: React.FC<MessagesViewProps> = ({ logged_in_user, messages_input, setLoaded, setSwitch, input1 }) => {
-	let	messages_jsx : any = [];
+interface MessageStamp_int { 
+	messagey:		message_stamp;
+	logged_in_user:	UserStats;
+  }
 
+function MESSAGE_RENDER({messagey, logged_in_user}: MessageStamp_int ): React.ReactElement {
+	let	style:	string;
+	let img:	string;
+	// console.log(messagey.key_);
+	if (logged_in_user.username === messagey.name_)
+	{
+		style = "App-message_Jojo";
+		img = a;
+	}
+	else
+	{
+		style = "App-message_someone_else";
+		img = b;
+	}
+	return (
+		<div>
+			<li className={style + "_user"}>{messagey.name_}</li>
+			<img src={img} className={style +"_pic"} alt={""}/>
+			<li className={style}>{messagey.message_}</li>
+			<li className={style + "_timestamp"}>{messagey.timestamp}</li>
+		</div>
+	);
+}
+
+interface MessageList_int {
+	messages:		message_stamp[];
+	logged_in_user:	UserStats;
+}
+
+function MESSAGE_LIST( {messages, logged_in_user} : MessageList_int ) {
+	return (
+		<section>
+			<h2>{"All messages:"}</h2>
+			{messages.map(message =>
+				<MESSAGE_RENDER key={message.key_} messagey={message} logged_in_user={logged_in_user} />
+			).reverse()}
+		</section>
+	);
+}
+
+export const MessagesView: React.FC<MessagesViewProps> = ({ logged_in_user, messages_input, setLoaded, setSwitch, input1 }) => {
 	const addNewMessage = async (): Promise<boolean> => {
 		try {
 			//console.log("Chat added:" + logged_in_user.username + "_" + logged_in_user.chatname);
 			await axios.post('/messages/new_message',
 				{username: logged_in_user.username,  password: logged_in_user.chat_password, chatname: logged_in_user.chatname,
 					message_: input1.state, name_: logged_in_user.username,
-					user_: "App-message_" + logged_in_user.username, timestamp: Date(), pic_: "a"});
+					user_: "App-message_" + logged_in_user.username, timestamp: Date(), pic_: "a", key_: 0});
 			//console.log("Chat added:" + response.data.message);
 			return true;
 		} catch (err: any) {
@@ -76,27 +119,10 @@ export const MessagesView: React.FC<MessagesViewProps> = ({ logged_in_user, mess
 		//console.log("Edit this chat:" + logged_in_user.chatname);
 		setSwitch(2);
 		setLoaded(false);
+		input1.setState("");
 		logged_in_user.loaded = false;
 		logged_in_user.loading = false;
 	}
-
-	messages_input.forEach(function (messagey, index) {
-		if (messagey.name_ === logged_in_user.username)
-		{
-			messages_jsx.push(<li className={"App-message_Jojo_user"} key={index}>{messagey.name_}</li>);
-			messages_jsx.push(<img src={a} className={"App-message_Jojo_pic"} alt={""}/>);
-			messages_jsx.push(<li className={"App-message_Jojo"} key={index}>{messagey.message_}</li>);
-			messages_jsx.push(<li className={"App-message_Jojo_timestamp"} key={index}>{messagey.timestamp}</li>);
-		}
-		else
-		{
-			messages_jsx.push(<li className={"App-message_someone_else_user"} key={index}>{messagey.name_}</li>);
-			messages_jsx.push(<img src={b} className={"App-message_someone_else_pic"} alt={""}/>);
-			messages_jsx.push(<li className={"App-message_someone_else"} key={index}>{messagey.message_}</li>);
-			messages_jsx.push(<li className={"App-message_someone_else_timestamp"} key={index}>{messagey.timestamp}</li>);
-		}
-	});
-	messages_input.reverse();
 
 	// return message view:
 	return (
@@ -114,7 +140,7 @@ export const MessagesView: React.FC<MessagesViewProps> = ({ logged_in_user, mess
 			<button onClick={() => GoToNextPage()}> Go to next page. </button>
 			</header>
 			<ol>
-				{messages_jsx.map((message_jsx : any) => <>{message_jsx}</>)}
+				<MESSAGE_LIST messages={messages_input} logged_in_user={logged_in_user}/>
 			</ol>
 		</div>
 	);

@@ -35,6 +35,7 @@ let switchy_var:	number	= 0;
 let loaded_var:		boolean	= false;
 let reload_var:		boolean = true;
 let	reloading:		boolean = false;
+let	just_started:	boolean = true;
 
 const Chat: React.FC = () =>  {
 	const state = useLocation().state as {username: string};
@@ -48,9 +49,15 @@ const Chat: React.FC = () =>  {
 	const [switchy_state, setSwitch]	= useState(switchy_var);
 	const [input_state, setInput]		= useState(input_var);
 	const [input_state2, setInput2]		= useState(input_var2);
-	const [loaded_state, setLoaded]		= useState(loaded_var);
+	const [, setLoaded]					= useState(loaded_var);
 	const [reload_state, setReload]		= useState(reload_var);
 	const [password_state, setPassword]	= useState(password_var);
+
+	if (just_started)
+	{
+		just_started = false;
+		setLoaded(false);
+	}
 
 	//console.log("With states: " + logged_in_user.username + " state:" + switchy_state + " userstats: " + logged_in_user);
 

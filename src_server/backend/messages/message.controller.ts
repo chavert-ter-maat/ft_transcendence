@@ -2,7 +2,7 @@ import { Body, Controller, Get, Post, Param } from '@nestjs/common';
 import { MessageService } from './message.service';
 import { OnlineUsers } from '../online_users';
 
-interface message_stamp { message_: string, name_: string, user_ : string, timestamp: string, pic_: string };
+interface message_stamp { message_: string, name_: string, user_ : string, timestamp: string, pic_: string, key_: number };
 
 interface UserName {
 	username:	string;
@@ -66,7 +66,7 @@ interface AddMessageToSelectChat {
 }
 
 interface chat_stamp	{ name_: string, unread_: number, timestamp: string, users: string[], index: number, DM: boolean};
-interface message_stamp	{ message_: string, name_: string, user_ : string, timestamp: string, pic_: string };
+interface message_stamp	{ message_: string, name_: string, user_ : string, timestamp: string, pic_: string, key_: number };
 interface user_stamp	{ name_: string, admin_: boolean, timestamp: string };
 
 function sleep(ms: number) {
@@ -184,7 +184,7 @@ export class MessageController {
 
 	@Post("new_message")
 	async new_message(@Body() newmessage : AddMessageToSelectChat): Promise<{ message: string }> {
-		let message: message_stamp = {message_: newmessage.message_, name_: newmessage.name_, user_: newmessage.user_, timestamp: newmessage.timestamp, pic_: newmessage.pic_};
+		let message: message_stamp = {message_: newmessage.message_, name_: newmessage.name_, user_: newmessage.user_, timestamp: newmessage.timestamp, pic_: newmessage.pic_, key_: 0};
 		this.add_users([await this.MessageService.new_message(newmessage.username, newmessage.chatname, message), newmessage.chatname]);
 		return { message: newmessage.username + "_" + newmessage.chatname + "_" + message.message_};
 	}

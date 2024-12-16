@@ -2,7 +2,17 @@ import logo from './8589-screaming-cat.png';
 import './App.css';
 import React from 'react';
 import axios from '../axios';
-import { UserStats, UsersViewProps } from './Chat.interface';
+import { UserStats, UsersViewProps, user_stamp } from './Chat.interface';
+
+interface UserStamp_int {
+	usery:			user_stamp;
+	logged_in_user:	UserStats;
+  }
+
+interface	UserStampList_int {
+	users:			user_stamp[];
+	logged_in_user:	UserStats;
+}
 
 export const GoBackToChat = (	logged_in_user: UserStats,
 		setLoaded: React.Dispatch<React.SetStateAction<boolean>>,
@@ -19,7 +29,33 @@ export const GoBackToChat = (	logged_in_user: UserStats,
 }
 
 export const UsersView: React.FC<UsersViewProps> = ({ logged_in_user, users_input, setLoaded, setSwitch, input1, password1 }) => {
-	let	users_jsx : any = [];
+	function USERSTAMP_RENDER({usery, logged_in_user}: UserStamp_int ): React.ReactElement {
+		// console.log(usery.name_);
+		if (usery.name_ !== logged_in_user.username)
+			return (
+				<div>
+					<li className={"App-chat_name"}>{usery.name_}</li>
+					<button onClick={() => ButtonGoAddMuteOrBlock(usery.name_)} className={"App-chat_name_button"}> Edit user. </button>
+				</div>
+			)
+		else
+			return (
+				<div>
+					<li className={"App-chat_name"}>{usery.name_}</li>
+				</div>
+		)
+	}
+
+	function USERSTAMP_LIST( {users, logged_in_user} : UserStampList_int ) {
+		return (
+			<section>
+				<h2>{"All chats:"}</h2>
+				{users.map(user =>
+					<USERSTAMP_RENDER key={user.name_} usery={user} logged_in_user={logged_in_user}/>
+				).reverse()}
+			</section>
+		);
+	}
 
 	function ButtonGoAddMuteOrBlock(username: string) {
 		logged_in_user.selected_user = username;
@@ -111,12 +147,6 @@ export const UsersView: React.FC<UsersViewProps> = ({ logged_in_user, users_inpu
 			logged_in_user.loading = false;
 	}
 
-	users_input.forEach(function (usery, index) {
-		users_jsx.push(<li className={"App-chat_name"} key={index}>{usery.name_}</li>);
-		if (usery.name_ !== logged_in_user.username)
-			users_jsx.push( <button onClick={() => ButtonGoAddMuteOrBlock(usery.name_)} className={"App-chat_name_button"}> Edit user. </button> );
-	});
-
 	if (logged_in_user.page_creator && logged_in_user.page_admin)
 		{
 			return (
@@ -127,16 +157,16 @@ export const UsersView: React.FC<UsersViewProps> = ({ logged_in_user, users_inpu
 					<button onClick={() => GoBackToChat(logged_in_user, setLoaded, setSwitch, input1.setState, password1.setState)} className={"App-chat_name_button"}> Go to chat. </button>
 					<button onClick={() => LeaveChat()}> Leave this chat. </button>
 					<form onSubmit={addUser}>
-						<input type="text" placeholder="Enter username" value={input1.state} onChange={(e) => input1.setState(e.target.value)} />
+						<input type="text" placeholder="Enter username to add to chat" value={input1.state} onChange={(e) => input1.setState(e.target.value)} />
 						<input type="submit" value="Add user" />
 					</form>
 					<form onSubmit={setPublic}>
-						<input type="password" placeholder="Enter password" value={password1.state} onChange={(e) => password1.setState(e.target.value)} />
+						<input type="password" placeholder="Enter password to chat" value={password1.state} onChange={(e) => password1.setState(e.target.value)} />
 						<input type="submit" value="Set public, with password." />
 					</form>
 					</header>
 					<ol>
-						{users_jsx.map((user_jsx : any) => <>{user_jsx}</>)}
+						<USERSTAMP_LIST users={users_input} logged_in_user={logged_in_user}/>
 					</ol>
 				</div>
 			);
@@ -151,12 +181,12 @@ export const UsersView: React.FC<UsersViewProps> = ({ logged_in_user, users_inpu
 				<button onClick={() => GoBackToChat(logged_in_user, setLoaded, setSwitch, input1.setState, password1.setState)}> Go to chat. </button>
 				<button onClick={() => LeaveChat()}> Leave this chat. </button>
 				<form onSubmit={addUser}>
-					<input type="text" placeholder="Enter username" value={input1.state} onChange={(e) => input1.setState(e.target.value)} />
+					<input type="text" placeholder="Enter username to add to chat" value={input1.state} onChange={(e) => input1.setState(e.target.value)} />
 					<input type="submit" value="Add user" />
 				</form>
 				</header>
 				<ol>
-					{users_jsx.map((user_jsx : any) => <>{user_jsx}</>)}
+					<USERSTAMP_LIST users={users_input} logged_in_user={logged_in_user}/>
 				</ol>
 			</div>
 		);
@@ -172,7 +202,7 @@ export const UsersView: React.FC<UsersViewProps> = ({ logged_in_user, users_inpu
 				<button onClick={() => LeaveChat()}> Leave this chat. </button>
 				</header>
 				<ol>
-					{users_jsx.map((user_jsx : any) => <>{user_jsx}</>)}
+					<USERSTAMP_LIST users={users_input} logged_in_user={logged_in_user}/>
 				</ol>
 			</div>
 		);

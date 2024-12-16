@@ -3,16 +3,17 @@ import React, { useState } from 'react';
 import axios from '../axios';
 import { useNavigate } from 'react-router-dom';
 
-interface UserName {
-	username: string;
-	password: string;
-  }
+// interface UserName {
+// 	username: string;
+// 	password: string;
+//   }
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const navigate = useNavigate();
 
+	console.log("reload");
   const handleOAuthLogin = (): void => {
     console.log("OAuth 2.0 login would happen here.");
   };

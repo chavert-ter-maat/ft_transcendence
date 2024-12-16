@@ -4,7 +4,7 @@ import { Chat } from './message.model';
 import { User } from '../users/user.model';
 
 interface chat_stamp	{ name_: string, unread_: number, timestamp: string, users: string[], index: number, DM: boolean};
-interface message_stamp	{ message_: string, name_: string, user_ : string, timestamp: string, pic_: string };
+interface message_stamp	{ message_: string, name_: string, user_ : string, timestamp: string, pic_: string, key_: number };
 interface user_stamp	{ name_: string, admin_: boolean, timestamp: string };
 
 @Injectable()
@@ -13,12 +13,20 @@ export class MessageService {
 		@InjectModel(Chat) private userChat: typeof Chat,
 	) {}
 
+	check_bad_input(input_str: string): Boolean {
+		if (input_str === "")
+			return (true);
+		if (input_str.trim() == "")
+			return (true);
+		return (false);
+	}
+
 	async get_user(username: string): Promise <User | null>{
 		const user = await User.findOne({ where: { username } })
 		return user;
 	}
 
-	async check_block(username: string, get_user: string): Promise <User | null>{
+	async check_block(username: string, get_user: string): Promise <User | null>{ //humm
 		const user = await User.findOne({ where: { username: get_user } })
 		if (user){
 			if (user.blocked_users.findIndex((usery) => (usery.username == username)) != -1)
@@ -31,6 +39,8 @@ export class MessageService {
 		const user = await this.get_user(username);
 		if (!user)
 			return null;
+		// if (this.check_bad_input(chatname))
+		// 	return (null);
 		const existingChat = await this.userChat.findOne({
 			where: { chatname },
 			include: [{
@@ -43,6 +53,8 @@ export class MessageService {
 	}
 
 	async get_chat_with_permissions(username: string, chatname: string): Promise<Chat | null> {
+		if (this.check_bad_input(username) || this.check_bad_input(chatname))
+			return (null);
 		const existingChat = await this.get_chat_without_permissions(username, chatname);
 		if (existingChat && existingChat.admins && existingChat.admins.includes(username))
 			return (existingChat);
@@ -101,6 +113,8 @@ export class MessageService {
 	}
 
 	async get_messages_from_db(username: string, chatname: string, password: string, offset: number): Promise<message_stamp []> {
+		if (this.check_bad_input(username) || this.check_bad_input(chatname))
+			throw new ConflictException('Invalid input.');
 		const user = await User.findOne({ where: { username } })
 		if (!user)
 			throw new UnauthorizedException("not logged in");
@@ -165,6 +179,8 @@ export class MessageService {
 	}
 
 	async new_dm(chatname: string, username: string, password: string): Promise<[user_stamp [], string]> {
+		if (this.check_bad_input(username) || this.check_bad_input(chatname))
+			throw new ConflictException('Invalid input.');
 		const user = await this.get_user(username);
 		if (!user)
 			throw new ConflictException('Not signed in.');
@@ -191,7 +207,7 @@ export class MessageService {
 		}
 		let first_message: message_stamp = {message_: "start of chat",
 			name_: "Server_administrator", user_: "App-message_someone_else",
-			timestamp: Date(), pic_: "b"};
+			timestamp: Date(), pic_: "b", key_: 0};
 		const newChat = await this.userChat.create(
 			{ chatname: dm_chat_name, creator: username, admins: [], banned_users: [], messages: [first_message],
 			user_stamps: [{name_: username, admin_: false, timestamp: Date()}, {name_: chatname, admin_: false, timestamp: Date()}],
@@ -202,6 +218,18 @@ export class MessageService {
 	}
 
 	async new_chat(chatname: string, username: string, password: string): Promise<user_stamp []> {
+		//prevent similaily displayed chatnames
+		chatname = chatname.trim();
+		let trimmed_sring: string = chatname;
+		while (1)
+		{
+			trimmed_sring = chatname.replace("  "," ");
+			if (trimmed_sring == chatname)
+				break ;
+			chatname = trimmed_sring;
+		}
+		if (this.check_bad_input(username) || this.check_bad_input(chatname))
+			throw new ConflictException('Invalid input.');
 		const user = await this.get_user(username);
 		if (!user)
 			throw new ConflictException('Not signed in.');
@@ -230,7 +258,7 @@ export class MessageService {
 		{
 			let first_message: message_stamp = {message_: "start of chat",
 				name_: "Server_administrator", user_: "App-message_someone_else",
-				timestamp: Date(), pic_: "b"};
+				timestamp: Date(), pic_: "b", key_: 0};
 			const newChat = await this.userChat.create(
 				{ chatname, creator: username, admins: [username], banned_users: [], messages: [first_message],
 				user_stamps: [{name_: username, admin_: true, timestamp: Date()}], muted_users: [],
@@ -241,6 +269,8 @@ export class MessageService {
 	}
 
 	async remove_user(chatname: string, username: string, add_username: string): Promise<user_stamp []> {
+		if (this.check_bad_input(username) || this.check_bad_input(chatname) || this.check_bad_input(add_username))
+			throw new ConflictException('Invalid input.');
 		const existingChat = await this.get_chat_with_permissions(username, chatname);
 		if (existingChat && existingChat.creator != add_username)
 			if (await this.leave_chat(chatname, add_username, username))
@@ -249,6 +279,8 @@ export class MessageService {
 	}
 
 	async ban_user(chatname: string, username: string, add_username: string): Promise<user_stamp []> {
+		if (this.check_bad_input(username) || this.check_bad_input(chatname) || this.check_bad_input(add_username))
+			throw new ConflictException('Invalid input.');
 		const existingChat = await this.get_chat_with_permissions(username, chatname);
 		if (existingChat && existingChat.creator != add_username)
 		{
@@ -262,6 +294,8 @@ export class MessageService {
 	}
 
 	async add_user(chatname: string, username: string, add_username: string): Promise<user_stamp []> {
+		if (this.check_bad_input(username) || this.check_bad_input(chatname) || this.check_bad_input(add_username))
+			throw new ConflictException('Invalid input.');
 		const existingChat = await this.get_chat_with_permissions(username, chatname);
 		if (existingChat)
 		{
@@ -277,10 +311,12 @@ export class MessageService {
 	}
 
 	async leave_chat(chatname: string, username: string, password: string): Promise<user_stamp []> {
+		if (this.check_bad_input(username) || this.check_bad_input(chatname))
+			throw new ConflictException('Invalid input.');
 		const user = await this.get_user(username);
 		if (!user)
 			throw new UnauthorizedException("Not logged in");
-		const existingChat = await this.get_chat_without_permissions(username, chatname);
+		const existingChat = await this.get_chat_without_permissions(username, chatname); //user can be banned
 		if (existingChat) {
 			existingChat.admins = existingChat.admins.filter((admin) => admin != username);
 			existingChat.user_stamps = existingChat.user_stamps.filter((userstamp) => userstamp.name_ != username)
@@ -314,6 +350,8 @@ export class MessageService {
 	}
 
 	async add_admin(chatname: string, username: string, add_username: string): Promise<user_stamp []> {
+		if (this.check_bad_input(username) || this.check_bad_input(chatname) || this.check_bad_input(add_username))
+			throw new ConflictException('Invalid input.');
 		const existingChat = await this.get_chat_with_permissions(username, chatname);
 		if (existingChat) {
 			existingChat.admins.push(add_username);
@@ -331,9 +369,12 @@ export class MessageService {
 	}
 
 	async new_message(username: string, chatname: string, message: message_stamp): Promise<user_stamp []> {
+		if (this.check_bad_input(username) || this.check_bad_input(chatname))
+			throw new ConflictException('Invalid input.');
 		const existingChat = await this.get_chat_without_permissions(username, chatname);
 		if (existingChat && !(await this.filter_mute(existingChat, username)))
 		{
+			message.key_ = existingChat.messages.length;
 			existingChat.messages.push(message);
 			existingChat.last_edit = Date();
 			existingChat.changed('messages', true);
@@ -345,6 +386,8 @@ export class MessageService {
 	}
 
 	async make_public(chatname: string, username: string, password_chat: string): Promise<user_stamp []> {
+		if (this.check_bad_input(username) || this.check_bad_input(chatname))
+			throw new ConflictException('Invalid input.');
 		const existingChat = await this.get_chat_with_permissions(username, chatname);
 		if (existingChat && existingChat.creator == username)
 		{
@@ -361,6 +404,8 @@ export class MessageService {
 	}
 
 	async add_mute(chatname: string, add_user: string, username: string, minutes: string): Promise<user_stamp []> { //-> migrate to chat
+		if (this.check_bad_input(username) || this.check_bad_input(chatname) || this.check_bad_input(add_user))
+			throw new ConflictException('Invalid input.');
 		const chat = await this.get_chat_with_permissions(username, chatname);
 		if (!chat)
 			throw new UnauthorizedException("Not logged in.");
@@ -384,6 +429,8 @@ export class MessageService {
 	}
 
 	async add_block(add_user: string, username: string, minutes: string): Promise<user_stamp []> {
+		if (this.check_bad_input(username) || this.check_bad_input(add_user))
+			throw new ConflictException('Invalid input.');
 		const user = await this.get_user(username);
 		if (!user)
 			throw new UnauthorizedException("Not logged in.");

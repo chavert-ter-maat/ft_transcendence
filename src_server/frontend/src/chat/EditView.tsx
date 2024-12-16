@@ -128,18 +128,18 @@ export const EditView: React.FC<EditViewProps> = ({ logged_in_user, setLoaded, s
 				<img src={logo} className="App-logo" alt="logo" />
 				<h2>Mute or block: {logged_in_user.selected_user}</h2>
 				<p>For amount of minutes. (-1 for indefinite, 0 to revoke block)</p>
-				<button onClick={() => GoBackToChat(logged_in_user, setLoaded, setSwitch, input1.setState, password1.setState)}> Go to chat. </button>
+				<button onClick={() => GoBackToChat(logged_in_user, setLoaded, setSwitch, input1.setState, password1.setState)} className={"App-chat_name_button"}> Go to chat. </button>
 				<input
 					type="number"
 					placeholder="Enter minutes"
 					value={input1.state}
 					onChange={(e) => input1.setState(e.target.value)}
 				/>
-				<button onClick={() => addMute(logged_in_user.selected_user, input1.state)} className={"App-chat_name_button"}> Mute user. </button>
-				<button onClick={() => addBlock(logged_in_user.selected_user, input1.state)} className={"App-chat_name_button"}> Block user. </button>
-				<button onClick={() => removeUser(logged_in_user.selected_user)} className={"App-chat_name_button"}> Remove user. </button>
-				<button onClick={() => addNewAdmin(logged_in_user.selected_user)} className={"App-chat_name_button"}> Make admin. </button>
-				<button onClick={() => banUser(logged_in_user.selected_user)} className={"App-chat_name_button"}> Ban user. </button>
+				<button onClick={() => addMute(logged_in_user.selected_user, input1.state)}> Mute user. </button>
+				<button onClick={() => addBlock(logged_in_user.selected_user, input1.state)}> Block user. </button>
+				<button onClick={() => removeUser(logged_in_user.selected_user)}> Remove user. </button>
+				<button onClick={() => addNewAdmin(logged_in_user.selected_user)}> Make admin. </button>
+				<button onClick={() => banUser(logged_in_user.selected_user)}> Ban user. </button>
 				</header>
 			</div>
 		);
