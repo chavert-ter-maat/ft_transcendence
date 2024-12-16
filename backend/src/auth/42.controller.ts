@@ -16,14 +16,12 @@ import {
 export class FortyTwoController {
   constructor(private authService: AuthService) { }
 
-  // Route for 42 login redirection
   @Get('42')
-  @UseGuards(FortyTwoAuthGuard) // Custom guard to handle OAuth flow
+  @UseGuards(FortyTwoAuthGuard) 
   async redirectToFortyTwo() {
     // return 'Redirecting to 42 for authentication';
   }
 
-  // Route for username/password login
   @Post('login')
   async usernamePasswordLogin(
     @Body() body: { username: string; password: string },
@@ -36,18 +34,17 @@ export class FortyTwoController {
   @UseGuards(FortyTwoAuthGuard)
   async callback(@Req() req, @Res() res) {
     const user = req.user; // OAuth user data returned by Passport
-    console.log('Authenticated user:', user); // Log to check OAuth data
-
-    // Save OAuth tokens and user data to the database
+    console.log('Authenticated user:', user); 
+  
     await this.authService.saveOAuthTokens(user);
-
+  
     // Generate JWT and return it to the client
-    const token = await this.authService.signIn(user);
-
-    // Use the frontend URL for redirection
-    const frontendUrl = `${process.env.FRONTEND_URL}/userpage`;
-
-    // Include the token as a query parameter
-    return res.redirect(`${frontendUrl}?token=${token}`);
+    try {
+      const token = await this.authService.signIn(user);
+      return res.redirect(`${process.env.FRONTEND_URL}/auth/42/callback?token=${token}`);
+    } catch (error) {
+      console.error('Error during token generation:', error);
+      return res.status(500).send('Internal Server Error');
+    }
   }
-}
+}  

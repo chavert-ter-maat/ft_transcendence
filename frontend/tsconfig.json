@@ -1,11 +1,7 @@
 {
   "compilerOptions": {
-    "target": "esnext", // Consider esnext if you target modern browsers
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "target": "esnext",
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -20,6 +16,6 @@
     "noEmit": true,
     "jsx": "react-jsx"
   },
-  "include": ["src/**/*", "src/types/global.d.ts"], // Ensure src is the primary inclusion
-  "exclude": ["node_modules", "**/*.spec.ts"] // Avoid excluding components like UserPage
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "**/*.spec.ts"]
 }

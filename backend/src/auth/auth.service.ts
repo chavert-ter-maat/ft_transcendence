@@ -45,16 +45,14 @@ export class AuthService {
     return { accessToken, username: user.username };
   }
 
-  // Sign in a user directly using validated user data (for JWT creation)
   async signIn(user: User): Promise<AuthResult> {
     const payload = { sub: user.userId, username: user.username };
     const accessToken = this.jwtService.sign(payload);
     return { accessToken, username: user.username };
   }
 
-  // Save OAuth tokens to the database
   async saveOAuthTokens(user: any): Promise<void> {
-    console.log('Saving OAuth tokens:', user); // Log user data for debugging
+    console.log('Saving OAuth tokens:', user); 
 
     const {
       username,

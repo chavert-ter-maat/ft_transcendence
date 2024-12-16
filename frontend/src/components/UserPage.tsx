@@ -1,30 +1,22 @@
-import React, { useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
 
 const UserPage: React.FC = () => {
-  const location = useLocation();
-  const navigate = useNavigate();
+  const [token, setToken] = useState<string | null>(null);
 
   useEffect(() => {
-    const searchParams = new URLSearchParams(location.search);
-    const token = searchParams.get('token');
-
-    if (token) {
-      // If token exists, log in the user
-      localStorage.setItem('token', token); // Store token in local storage
-
-      // Redirect to the user page after successful login
-      navigate('/userpage');
-    } else {
-      // If no token, redirect to login page
-      navigate('/login');
-    }
-  }, [location, navigate]);
+    // Retrieve the token from localStorage
+    const storedToken = localStorage.getItem('authToken');
+    setToken(storedToken);
+  }, []);
 
   return (
-    <div>
-      <h1>User Page</h1>
-      {/* Display user details */}
+    <div style={{ textAlign: 'center', marginTop: '50px' }}>
+      <h1>Welcome to the User Page!</h1>
+      {token ? (
+        <p>Your token: <code>{token}</code></p>
+      ) : (
+        <p>No token found. Please ensure you are logged in.</p>
+      )}
     </div>
   );
 };

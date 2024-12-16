@@ -20,7 +20,7 @@ dotenv.config();
     JwtModule.register({
       global: true,
       secret: process.env.JWT_SECRET, // This should now properly load from .env
-      signOptions: { expiresIn: '1d' },
+      signOptions: { expiresIn: '20d' },
     }),
     PassportModule,
   ],
