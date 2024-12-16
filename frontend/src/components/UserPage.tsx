@@ -1,22 +1,19 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const UserPage: React.FC = () => {
-  const [token, setToken] = useState<string | null>(null);
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    // Retrieve the token from localStorage
-    const storedToken = localStorage.getItem('authToken');
-    setToken(storedToken);
-  }, []);
+  const handleLogout = () => {
+    localStorage.removeItem('authToken');
+    navigate('/login');
+  };
 
   return (
-    <div style={{ textAlign: 'center', marginTop: '50px' }}>
-      <h1>Welcome to the User Page!</h1>
-      {token ? (
-        <p>Your token: <code>{token}</code></p>
-      ) : (
-        <p>No token found. Please ensure you are logged in.</p>
-      )}
+    <div style={{ padding: '20px' }}>
+      <h1>Welcome to Your User Page</h1>
+      <p>You are successfully authenticated!</p>
+      <button onClick={handleLogout}>Logout</button>
     </div>
   );
 };

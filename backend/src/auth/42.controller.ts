@@ -12,14 +12,15 @@ import {
   UseGuards,
 } from '@nestjs/common';
 
-@Controller('auth')
+@Controller('auth')  // Remove 'api' prefix since it's now global
 export class FortyTwoController {
   constructor(private authService: AuthService) { }
 
   @Get('42')
   @UseGuards(FortyTwoAuthGuard) 
-  async redirectToFortyTwo() {
-    // return 'Redirecting to 42 for authentication';
+  async fortyTwoAuth() {
+    // The guard will handle the redirect
+    return;
   }
 
   @Post('login')
@@ -33,18 +34,18 @@ export class FortyTwoController {
   @Get('42/callback')
   @UseGuards(FortyTwoAuthGuard)
   async callback(@Req() req, @Res() res) {
-    const user = req.user; // OAuth user data returned by Passport
-    console.log('Authenticated user:', user); 
-  
-    await this.authService.saveOAuthTokens(user);
-  
-    // Generate JWT and return it to the client
     try {
-      const token = await this.authService.signIn(user);
-      return res.redirect(`${process.env.FRONTEND_URL}/auth/42/callback?token=${token}`);
+      console.log('Callback received:', req.user);
+      const user = req.user;
+      
+      await this.authService.saveOAuthTokens(user);
+      const { accessToken } = await this.authService.signIn(user);
+      
+      const redirectUrl = `${process.env.FRONTEND_URL}/auth/42/callback?token=${accessToken}`;
+      return res.redirect(redirectUrl);
     } catch (error) {
-      console.error('Error during token generation:', error);
-      return res.status(500).send('Internal Server Error');
+      console.error('Callback error:', error);
+      return res.redirect(`${process.env.FRONTEND_URL}/login?error=authentication_failed`);
     }
   }
-}  
+}

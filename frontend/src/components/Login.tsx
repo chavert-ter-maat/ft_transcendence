@@ -7,11 +7,12 @@ const Login: React.FC = () => {
   const [password, setPassword] = useState<string>('');
   const navigate = useNavigate();
 
+  const fortyTwoLoginUrl = `https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-a5bd312a93c816bff99a2b38516ad438f718452a8e8a1935968b23c7517f509b&redirect_uri=http%3A%2F%2Flocalhost%3A4000%2Fapi%2Fauth%2F42%2Fcallback&response_type=code`;
+
   // Redirect to the backend's OAuth login endpoint for 42 authentication
   const handleOAuthLogin = (): void => {
     console.log("Redirecting to OAuth login...");
-  window.location.href = 'https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-12ca287f464e3d8e0a7a045c0fd9ecae51d23fe9e061f85b80a957bc60dc2e42&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fauth%2F42%2Fcallback&response_type=code';
-
+    window.location.href = fortyTwoLoginUrl;
   };
 
   // Handle traditional login using username and password

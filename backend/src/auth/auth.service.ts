@@ -13,7 +13,7 @@ export class AuthService {
     // private readonly userService: UsersService, // Make sure you still have this service if needed
     private readonly jwtService: JwtService,
   ) {}
-
+  
   // Create a new user with hashed password
   async createUser(username: string, password: string): Promise<User> {
     const salt = await bcrypt.genSalt(10);

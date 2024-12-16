@@ -2,7 +2,7 @@
 import axios from 'axios';
 
 const instance = axios.create({
-  baseURL: 'http://localhost:3000', // Use the same port for backend
+  baseURL: 'http://localhost:4000', // Use the same port for backend
   headers: {
     'Content-Type': 'application/json',
   },
