@@ -10,11 +10,24 @@ type AuthResult = { accessToken: string; username: string };
 @Injectable()
 export class AuthService {
   constructor(
-    // private readonly userService: UsersService, // Make sure you still have this service if needed
+    // private readonly userService: UsesService, // Make sure you still have this service if needed
     private readonly jwtService: JwtService,
   ) {}
+
+  // async getMe(userId: number): Promise<Partial<User>> {
+  //   const user = await User.findOne({
+  //     where: { id: userId },
+  //     attributes: ['id', 'username', 'email'], // Return only safe fields
+  //   });
+
   
-  // Create a new user with hashed password
+  //   if (!user) {
+  //     throw new Error('User not found');
+  //   }
+  
+  //   return user;
+  // }
+  
   async createUser(username: string, password: string): Promise<User> {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
@@ -22,12 +35,10 @@ export class AuthService {
     return user;
   }
 
-  // Fetch a user by their username
   async findUserByName(username: string): Promise<User | undefined> {
     return User.findOne({ where: { username } });
   }
 
-  // Authenticate a user with their username and password
   async authenticate(input: AuthInput): Promise<AuthResult> {
     const user = await this.findUserByName(input.username);
     if (!user) {

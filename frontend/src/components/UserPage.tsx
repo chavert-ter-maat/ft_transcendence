@@ -6,6 +6,7 @@ const UserPage: React.FC = () => {
 
   const handleLogout = () => {
     localStorage.removeItem('authToken');
+    console
     navigate('/login');
   };
 

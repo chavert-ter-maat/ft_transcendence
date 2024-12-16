@@ -5,10 +5,8 @@ import { Sequelize } from 'sequelize-typescript';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // Add global prefix
   app.setGlobalPrefix('api');
 
-  // Enable CORS with specific configuration
   app.enableCors({
     origin: process.env.FRONTEND_URL,
     credentials: true,

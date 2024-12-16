@@ -24,7 +24,7 @@ export class AuthController {
   }
 
   @Get('protected')
-  @UseGuards(JwtAuthGuard) // Apply the JwtAuthGuard here
+  @UseGuards(JwtAuthGuard)
   protectedRoute(@Req() req) {
     return { message: 'Access granted', user: req.user };
   }
@@ -40,14 +40,19 @@ export class AuthController {
     return this.authService.findUserByName(username);
   }
 
+  // @Get('me')
+  // @UseGuards(JwtAuthGuard)
+  // async getMe(@Req() req) {
+  //   const user = req.user; // Extracted from the JWT payload by JwtAuthGuard
+  //   return this.authService.getMe(user.userId); // Fetch user details from the database
+  // }
+
   @Get('42')
   @UseGuards(FortyTwoAuthGuard)
   async fortyTwoAuth() {
-    // The guard will handle the redirect
     return;
   }
 
-  // Callback route after successful OAuth authentication
   @Get('42/callback')
   @UseGuards(FortyTwoAuthGuard)
   async callback(@Req() req, @Res() res) {

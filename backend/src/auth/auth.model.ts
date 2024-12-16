@@ -12,7 +12,7 @@ export class User extends Model<User> {
   @PrimaryKey
   @AutoIncrement
   @Column(DataType.INTEGER)
-  userId: number; // Primary key for the user model
+  userId: number;
 
   @Column(DataType.STRING)
   username: string;
@@ -21,14 +21,14 @@ export class User extends Model<User> {
   password: string;
 
   @Column(DataType.STRING)
-  oauthToken: string; // OAuth Access Token
+  oauthToken: string;
 
   @Column(DataType.STRING)
-  oauthRefreshToken: string; // OAuth Refresh Token
+  oauthRefreshToken: string;
 
   @Column(DataType.DATE)
-  oauthExpiresAt: Date; // Expiration Date for OAuth Access Token
+  oauthExpiresAt: Date;
 
   @Column(DataType.STRING)
-  provider: string; // OAuth Provider (e.g., '42')
+  provider: string;
 }
