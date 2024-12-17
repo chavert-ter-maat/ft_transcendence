@@ -2,11 +2,11 @@
 import axios from 'axios';
 
 const instance = axios.create({
-  baseURL: 'http://localhost:4000', // Use the same port for backend
+  baseURL: 'http://localhost:4000',
   headers: {
     'Content-Type': 'application/json',
   },
-  withCredentials: true, // Ensures cookies are included if needed
+  withCredentials: true,
 });
 
 instance.interceptors.request.use((config) => {

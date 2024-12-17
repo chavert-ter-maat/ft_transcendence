@@ -9,7 +9,7 @@ import {
   Res,
 } from '@nestjs/common';
 import { JwtAuthGuard } from './guards/42-auth.guards';
-import { FortyTwoAuthGuard } from './guards/passport.guard'; // Correct import for FortyTwoAuthGuard
+import { FortyTwoAuthGuard } from './guards/passport.guard';
 import { AuthService } from './auth.service';
 
 @Controller('auth')
