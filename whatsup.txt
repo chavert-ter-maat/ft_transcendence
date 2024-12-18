@@ -1,0 +1,27 @@
+Should be protected
+http://localhost:4000/api/messages
+
+FortyTwoStrategy does allow to acces but does not protected
+FortyTwoAuthGuard does not allow acces but does protect. It also redirects everytime. 
+
+so i think either FortyTwoAuthGuard or FortyTwoStrategy is misconfigured or 
+there has to be a third which does not try to log in through intra but just checks if logged in.
+FortyTwoStrategy looks like its supposed to do that. but it does not protect.
+
+*FortyTwoStrategy looks like it's unused/untested in the code
+
+
+uninformed brabbling
+
+as i see it now FortyTwoAuthGuard is to login to intra. and then FortyTwoStrategy
+should be used to verify if its logged in. redirecting through every call will be a major
+hicup in the chat. if necessary it can be changed but don't think it's necessary?
+for the current axios its also an hicup probably the same one. might just be reconfiguring axios
+
+looks like axios doesn't expect what FortyTwoAuthGuard is doing at the moment. So one of the two
+has to be altered i think at the moment.
+
+
+in AuthCallback my testcase is: seems like its an accurate test case
+	// console.log(axios.get("/api/auth/unprotected_hoi"));
+	// console.log(axios.get("/api/auth/hoi"));
