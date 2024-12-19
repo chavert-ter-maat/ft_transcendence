@@ -18,7 +18,7 @@ import { User } from './auth/auth.model';
       password: process.env.DB_PASSWORD || 'password',
       database: process.env.DB_NAME || 'database',
       autoLoadModels: true,
-      synchronize: false,
+      synchronize: true,
       models: [User],
     }),
 

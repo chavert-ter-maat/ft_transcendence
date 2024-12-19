@@ -9,6 +9,7 @@ interface User {
   oauthToken: string;
   oauthRefreshToken: string;
   provider: string;
+  displayName: string; // Assuming you added displayName to the User model
 }
 
 const UserPage: React.FC = () => {
@@ -16,6 +17,8 @@ const UserPage: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>('');
+  const [newDisplayName, setNewDisplayName] = useState<string>(''); // State for the new display name
+  const [successMessage, setSuccessMessage] = useState<string>('');
 
   // Fetch user data when the component mounts
   useEffect(() => {
@@ -52,6 +55,40 @@ const UserPage: React.FC = () => {
     navigate('/login');
   };
 
+  const handleDisplayNameChange = async () => {
+    if (!newDisplayName) {
+      setError('Display name cannot be empty');
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('authToken');
+      if (!token) {
+        setError('No auth token found');
+        return;
+      }
+
+      const response = await axios.put(
+        'http://localhost:4000/api/auth/set-display-name',
+        { displayName: newDisplayName },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (user) {
+        setUser({ ...user, displayName: newDisplayName }); // Update local user state
+      }
+      setSuccessMessage('Display name updated successfully');
+      setNewDisplayName(''); // Reset the input field
+    } catch (err) {
+      setError('Failed to update display name');
+      console.error(err);
+    }
+  };
+
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -69,6 +106,15 @@ const UserPage: React.FC = () => {
           <p><strong>Username:</strong> {user.username}</p>
           <p><strong>Email:</strong> {user.email}</p>
           <p><strong>Provider:</strong> {user.provider}</p>
+          <p><strong>Display Name:</strong> {user.displayName}</p>
+          <input
+            type="text"
+            value={newDisplayName}
+            onChange={(e) => setNewDisplayName(e.target.value)}
+            placeholder="Enter new display name"
+          />
+          <button onClick={handleDisplayNameChange}>Change Display Name</button>
+          {successMessage && <p style={{ color: 'green' }}>{successMessage}</p>}
         </div>
       ) : (
         <p>No user data found</p>

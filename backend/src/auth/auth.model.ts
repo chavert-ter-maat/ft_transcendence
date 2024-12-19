@@ -14,24 +14,66 @@ export class User extends Model<User> {
   @Column(DataType.INTEGER)
   userId: number;
 
-  @Column(DataType.STRING)
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+    unique: true,
+  })
   username: string;
 
-  @Column(DataType.STRING)
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+  })
   password: string;
 
-  @Column(DataType.STRING)
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+  })
   oauthToken: string;
 
-  @Column(DataType.STRING)
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+  })
   oauthRefreshToken: string;
 
-  @Column(DataType.DATE)
+  @Column({
+    type: DataType.DATE,
+    allowNull: true,
+  })
   oauthExpiresAt: Date;
 
-  @Column(DataType.STRING)
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
+  provider: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
   email: string;
 
-  @Column(DataType.STRING)
-  provider: string;
+  @Column({
+    type: DataType.STRING,
+    allowNull: true, // Display name is optional
+  })
+  displayName: string; // New column added here
+
+  @Column({
+    type: DataType.DATE,
+    allowNull: false,
+    defaultValue: DataType.NOW,
+  })
+  createdAt: Date;
+
+  @Column({
+    type: DataType.DATE,
+    allowNull: false,
+    defaultValue: DataType.NOW,
+  })
+  updatedAt: Date;
 }
