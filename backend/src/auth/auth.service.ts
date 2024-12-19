@@ -13,7 +13,7 @@ export class AuthService {
   async getUserInfo(userId: number): Promise<Partial<User>> {
     const user = await User.findOne({
       where: { userId },
-      attributes: ['userId', 'email', 'username', 'provider', 'oauthToken', 'oauthRefreshToken', 'avatar'],
+      attributes: ['userId', 'email', 'username', 'provider', 'oauthToken', 'oauthRefreshToken', 'avatar', 'displayName'], // Include displayName
     });
     if (!user) {
       throw new UnauthorizedException('User not found');

@@ -10,7 +10,7 @@ interface User {
   oauthRefreshToken: string;
   provider: string;
   displayName: string;
-  avatarUrl?: string; // Add avatarUrl field to the User model
+  avatar?: string; // Add avatar field to the User model
 }
 
 const UserPage: React.FC = () => {
@@ -102,6 +102,7 @@ const UserPage: React.FC = () => {
         setError('Please upload an image file');
         return;
       }
+      console.log('Selected file:', file);
       setAvatar(file);
     }
   };
@@ -134,8 +135,8 @@ const UserPage: React.FC = () => {
       );
 
       // Update the user object with the new avatar URL
-      if (response.data.avatarUrl && user) {
-        setUser({ ...user, avatarUrl: response.data.avatarUrl });
+      if (response.data.avatar && user) {
+        setUser({ ...user, avatar: response.data.avatar });
       }
 
       setSuccessMessage('Avatar updated successfully');
@@ -164,11 +165,11 @@ const UserPage: React.FC = () => {
           <p><strong>Email:</strong> {user.email}</p>
           <p><strong>Provider:</strong> {user.provider}</p>
           <p><strong>Display Name:</strong> {user.displayName}</p>
-
+          
           {/* Display avatar if exists */}
-          {user.avatarUrl ? (
+          {user.avatar ? (
             <img
-              src={`http://localhost:4000/${user.avatarUrl}`} // Assuming the backend serves the avatar image
+              src={`http://localhost:4000/${user.avatar}`} // Assuming the backend serves the avatar image
               alt="Avatar"
               style={{ width: '100px', height: '100px', borderRadius: '50%' }}
             />
@@ -176,7 +177,6 @@ const UserPage: React.FC = () => {
             <p>No avatar set</p>
           )}
 
-          {/* Update Display Name */}
           <div>
             <input
               type="text"
@@ -187,7 +187,6 @@ const UserPage: React.FC = () => {
             <button onClick={handleDisplayNameChange}>Change Display Name</button>
           </div>
 
-          {/* Upload Avatar */}
           <div>
             <input type="file" onChange={handleAvatarChange} />
             <button onClick={handleAvatarUpload}>Upload Avatar</button>

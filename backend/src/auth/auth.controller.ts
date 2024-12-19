@@ -59,7 +59,7 @@ export class AuthController {
       const updatedUser = await this.authService.updateUserAvatar(userId, file);
 
       // Return the avatar URL in the response
-      return { avatarUrl: updatedUser.avatar }; // Returning the avatar URL to be used on the front-end
+      return { avatar: updatedUser.avatar }; // Returning the avatar URL to be used on the front-end
     } catch (error) {
       throw new Error(`Failed to upload avatar: ${error.message}`);
     }
