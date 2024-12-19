@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from '../axios';
 
 const urlParams = new URLSearchParams(window.location.search);
 
@@ -25,13 +24,7 @@ const AuthCallback: React.FC = () => {
       localStorage.setItem('authToken', token);
       console.log('Authentication successful. Redirecting to user page...');
       console.log('localStorage.getItem(authToken):', localStorage.getItem('authToken'));
-	//   navigate('/chat', {state: {username: "jzeeuw-v"} }); //username should change to login username
-		// console.log(axios.get("/api/auth/unprotected_hoi"));
-		// console.log(axios.get("/api/auth/hoi"));
-		// console.log(axios.get("/api/auth/strategy_hoi"));
       navigate('/userpage');
-		//   navigate('/chat', {state: {username: "jzeeuw-v"} }); //username should change to login username
-
     } else {
       setError('No authentication token received');
       console.log('No authentication token received blabla');

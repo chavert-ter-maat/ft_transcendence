@@ -1,10 +1,50 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import axios from '../axios';
-import { GoToChatOverview } from '../chat/MessageView';
+
+interface User {
+  userId: number;
+  username: string;
+  email: string;
+  oauthToken: string;
+  oauthRefreshToken: string;
+  provider: string;
+}
 
 const UserPage: React.FC = () => {
   const navigate = useNavigate();
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string>('');
+
+  // Fetch user data when the component mounts
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const token = localStorage.getItem('authToken');
+        if (!token) {
+          setError('No auth token found');
+          return;
+        }
+
+        const response = await axios.get('http://localhost:4000/api/auth/userInfo', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        // Assuming the response is the user object directly
+        setUser(response.data); // Ensure to set the whole response
+      } catch (err) {
+        setError('Failed to fetch user data');
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserData();
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem('authToken');
@@ -13,22 +53,32 @@ const UserPage: React.FC = () => {
   };
 
   const handlegototchats = () => {
-    navigate('/chat', {state: {username: "jzeeuw-v"} });
+	if (user)
+    	navigate('/chat', {state: {username: user.username} });
   };
 
-//   navigate('/chat', {state: {username: "jzeeuw-v"} });
-	// console.log(axios.get("/api/messages"));
-	//this works now after altering the validate function, looks like it though.
-	// it does not 
-	console.log(axios.get("/api/auth/unprotected_hoi"));
-	console.log(axios.get("/api/auth/hoi"));
-	console.log(axios.get("/api/auth/strategy_hoi"));
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
 
   return (
     <div style={{ padding: '20px' }}>
       <h1>Welcome to Your User Page</h1>
-      <p>You are successfully authenticated!</p>
-      <button onClick={handleLogout}>Logout.</button>
+      {user ? (
+        <div>
+          <p><strong>User ID:</strong> {user.userId}</p>
+          <p><strong>Username:</strong> {user.username}</p>
+          <p><strong>Email:</strong> {user.email}</p>
+          <p><strong>Provider:</strong> {user.provider}</p>
+        </div>
+      ) : (
+        <p>No user data found</p>
+      )}
+      <button onClick={handleLogout}>Logout</button>
 	  <button onClick={handlegototchats}>Got to chats.</button>
     </div>
   );

@@ -6,7 +6,6 @@ import {
   AutoIncrement,
   DataType,
   BelongsToMany,
-  
 } from 'sequelize-typescript';
 import { Chat } from '../messages/message.model';
 import { UserChat } from '../messages/userchat.model';
@@ -17,23 +16,12 @@ interface BlockUser {
 	forever:		boolean;
 }
 
-// interface UserAttributes {
-// 	id:				number;
-// 	username:		string;
-// 	password:		string;
-// 	oauthToken:		string;
-// 	oauthRefreshToken:	string;
-// 	oauthExpiresAt:		string;
-// 	provider:			string;
-// 	blocked_users:	BlockUser[];
-//   }
-
 @Table
-export class User extends Model<User> { //UserAttributes
+export class User extends Model<User> {
   @PrimaryKey
   @AutoIncrement
   @Column(DataType.INTEGER)
-  id: number;
+  userId: number;
 
   @Column(DataType.STRING)
   username: string;
@@ -51,14 +39,17 @@ export class User extends Model<User> { //UserAttributes
   oauthExpiresAt: Date;
 
   @Column(DataType.STRING)
+  email: string;
+
+  @Column(DataType.STRING)
   provider: string;
 
-  	@Column({
+  @Column({
 		type:			DataType.ARRAY(DataType.JSON),
 		allowNull:		false,
 	})
 	public blocked_users!: BlockUser[];
-
+  
 	@BelongsToMany(() => Chat, { 
 		through: () => UserChat,
 		foreignKey: 'userId',

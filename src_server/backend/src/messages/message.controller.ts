@@ -3,6 +3,7 @@ import { MessageService } from './message.service';
 import { OnlineUsers } from 'src/online_users';
 import { FortyTwoAuthGuard } from '../auth/guards/passport.guard'; // Correct import for FortyTwoAuthGuard
 import { FortyTwoStrategy } from 'src/auth/strategies/42.strategy';
+import { JwtAuthGuard } from 'src/auth/guards/42-auth.guards';
 
 interface message_stamp { message_: string, name_: string, user_ : string, timestamp: string, pic_: string, key_: number };
 
@@ -126,11 +127,11 @@ export class MessageController {
 	}
 
 	@Get()
-	@UseGuards(FortyTwoAuthGuard)
+	@UseGuards(JwtAuthGuard)
 	getHello(): string { return "hello there" }
 
 	@Post('apply_for_update')
-	@UseGuards(FortyTwoAuthGuard)
+	@UseGuards(JwtAuthGuard)
 	async apply_for_update(@Body() user: SelectChat): Promise<{ notification: boolean }> {
 		this.online_users.add_online_user(user.username, user.chatname)
 		for (let i = 0; i < 4; i++)
@@ -148,25 +149,25 @@ export class MessageController {
 	}
 
 	@Post('get_chats')
-	@UseGuards(FortyTwoAuthGuard)
+	@UseGuards(JwtAuthGuard)
 	async get_chats(@Body() username: UserName): Promise<{ array: chat_stamp []}> {
 		return { array: await this.MessageService.get_chats_from_db(username.username) };	
 	}
 
 	@Post('get_users')
-	@UseGuards(FortyTwoAuthGuard)
+	@UseGuards(JwtAuthGuard)
 	async get_users(@Body() username: SelectChat): Promise<{ array: user_stamp [], admin_: boolean, creator_: boolean }> {
 		return ( await this.MessageService.get_users_from_db(username.username, username.chatname) );	
 	}
 
 	@Post('get_messages')
-	@UseGuards(FortyTwoAuthGuard)
+	@UseGuards(JwtAuthGuard)
 	async get_messages(@Body() chatSelected: GetMessagesInt): Promise<{ array: message_stamp []}> {
 		return { array: await this.MessageService.get_messages_from_db(chatSelected.username, chatSelected.chatname, chatSelected.password, chatSelected.offset) };	
 	}
 
 	@Post("new")
-	@UseGuards(FortyTwoAuthGuard)
+	@UseGuards(JwtAuthGuard)
 	async post_new_chat(@Body() newchat : NewChat): Promise<{ message: string }> {
 		if (!newchat.DM)
 			this.add_users([await this.MessageService.new_chat(newchat.chatname, newchat.creator, newchat.password), newchat.chatname]);
@@ -176,28 +177,28 @@ export class MessageController {
 	}
 
 	@Post("add_user")
-	@UseGuards(FortyTwoAuthGuard)
+	@UseGuards(JwtAuthGuard)
 	async add_user_to_chat(@Body() add_user : AddUser): Promise<{ message: string }> {
 		this.add_users([await this.MessageService.add_user(add_user.chatname, add_user.creator, add_user.add_user), add_user.chatname]);
 		return { message: add_user.chatname + "_" + add_user.creator + "_" + add_user.add_user};
 	}
 
 	@Post("leave_chat")
-	@UseGuards(FortyTwoAuthGuard)
+	@UseGuards(JwtAuthGuard)
 	async leave_chat(@Body() add_user : SelectChat): Promise<{ message: string }> {
 		this.add_users([await this.MessageService.leave_chat(add_user.chatname, add_user.username, add_user.password), add_user.chatname]);
 		return { message: add_user.chatname + "_" + add_user.username + "_" + add_user.password};
 	}
 
 	@Post("add_admin")
-	@UseGuards(FortyTwoAuthGuard)
+	@UseGuards(JwtAuthGuard)
 	async add_admin_to_chat(@Body() add_user : AddUser): Promise<{ message: string }> {
 		this.add_users([await this.MessageService.add_admin(add_user.chatname, add_user.creator, add_user.add_user), add_user.chatname]);
 		return { message: add_user.chatname + "_" + add_user.creator + "_" + add_user.add_user};
 	}
 
 	@Post("new_message")
-	@UseGuards(FortyTwoAuthGuard)
+	@UseGuards(JwtAuthGuard)
 	async new_message(@Body() newmessage : AddMessageToSelectChat): Promise<{ message: string }> {
 		let message: message_stamp = {message_: newmessage.message_, name_: newmessage.name_, user_: newmessage.user_, timestamp: newmessage.timestamp, pic_: newmessage.pic_, key_: 0};
 		this.add_users([await this.MessageService.new_message(newmessage.username, newmessage.chatname, message), newmessage.chatname]);
@@ -205,35 +206,35 @@ export class MessageController {
 	}
 
 	@Post("make_public")
-	@UseGuards(FortyTwoAuthGuard)
+	@UseGuards(JwtAuthGuard)
 	async make_public(@Body() add_user : MakePublic): Promise<{ message: string }> {
 		this.add_users([await this.MessageService.make_public(add_user.chatname, add_user.creator, add_user.password_chat), add_user.chatname]);
 		return { message: add_user.chatname + "_" + add_user.creator + "_" + add_user.password_chat};
 	}
 
 	@Post("add_mute")
-	@UseGuards(FortyTwoAuthGuard)
+	@UseGuards(JwtAuthGuard)
 	async add_mute(@Body() mute_user : AddMute): Promise<{ message: string }> {
 		this.add_users([await this.MessageService.add_mute(mute_user.chatname, mute_user.add_user, mute_user.creator, mute_user.minutes), ""]);
 		return { message: mute_user.add_user + "_" + mute_user.creator + "_" + mute_user.minutes};
 	}
 
 	@Post("add_block")
-	@UseGuards(FortyTwoAuthGuard)
+	@UseGuards(JwtAuthGuard)
 	async add_block(@Body() bock_user : AddBlock): Promise<{ message: string }> {
 		this.add_users([await this.MessageService.add_block(bock_user.add_user, bock_user.creator, bock_user.minutes), ""]);
 		return { message: bock_user.add_user + "_" + bock_user.creator + "_" + bock_user.minutes};
 	}
 
 	@Post("remove_user")
-	@UseGuards(FortyTwoAuthGuard)
+	@UseGuards(JwtAuthGuard)
 	async remove_user_from_chat(@Body() add_user : AddUser): Promise<{ message: string }> {
 		this.add_users([await this.MessageService.remove_user(add_user.chatname, add_user.creator, add_user.add_user), add_user.chatname]);
 		return { message: add_user.chatname + "_" + add_user.creator + "_" + add_user.add_user};
 	}
 
 	@Post("ban_user")
-	@UseGuards(FortyTwoAuthGuard)
+	@UseGuards(JwtAuthGuard)
 	async ban_user_from_chat(@Body() ban_user : AddUser): Promise<{ message: string }> {
 		this.add_users([await this.MessageService.ban_user(ban_user.chatname, ban_user.creator, ban_user.add_user), ban_user.chatname]);
 		return { message: ban_user.chatname + "_" + ban_user.creator + "_" + ban_user.add_user};

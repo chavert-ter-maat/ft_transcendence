@@ -5,6 +5,7 @@ RUN npm install
 RUN npm install sequelize@6.30.0 sequelize-typescript@2.1.0
 RUN npm install @nestjs/core@9.0.0 @nestjs/common@9.0.0 nestjs-sequelize@1.0.0
 RUN npm install pg pg-hstore
+RUN npm install @nestjs/jwt passport-jwt
 COPY . .
 RUN npm run build
 # COPY . data

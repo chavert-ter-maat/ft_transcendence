@@ -47,8 +47,8 @@ export class MessageService {
 			where: { chatname },
 			include: [{
 				model: User,
-				where: { id: user?.id },
-				attributes: ['id']
+				where: { userId: user?.userId },
+				attributes: ['userId']
 			}]
 		});
 		return (existingChat);
@@ -70,8 +70,8 @@ export class MessageService {
 		const chats = await this.userChat.findAll({
 			include: [{
 				model: User,
-				where: { id: user?.id },
-				attributes: ['id']
+				where: { userId: user?.userId },
+				attributes: ['userId']
 			}]
 		});
 		let chat_overview: chat_stamp [] = [];
@@ -165,8 +165,8 @@ export class MessageService {
 			where: { chatname: existingChat.chatname },
 			include: [{
 				model: User,
-				where: { id: add_user?.id },
-				attributes: ['id']
+				where: { userId: add_user?.userId },
+				attributes: ['userId']
 			}]
 		});
 		if (existingChatUser)
