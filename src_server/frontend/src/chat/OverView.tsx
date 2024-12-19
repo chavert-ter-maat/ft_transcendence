@@ -3,6 +3,7 @@ import './App.css';
 import React from 'react';
 import axios from '../axios';
 import { UserStats, ChatOverviewProps, chat_stamp } from './Chat.interface';
+import { useNavigate } from 'react-router-dom';
 
 interface ChatStamp_int {
 	chatey:			chat_stamp;
@@ -85,6 +86,8 @@ const GoToChat = (	logged_in_user: UserStats,
 }
 
 export const ChatOverviewPage: React.FC<ChatOverviewProps> = ({ logged_in_user, chats_input, setLoaded, setSwitch, input1, input2 }) => {
+	const navigate = useNavigate();
+
 	async function	addChat(event: any) {
 		console.log("input is:" + input1.state + ", chatname:" + logged_in_user.chatname);
 		if (input1.state !== "")
@@ -109,7 +112,7 @@ export const ChatOverviewPage: React.FC<ChatOverviewProps> = ({ logged_in_user, 
 
 	const handlegotouserpage = () => {
 		// if (user)
-		React.navigate('/userpage');
+		navigate('/userpage');
 	  };
 
 	return (
