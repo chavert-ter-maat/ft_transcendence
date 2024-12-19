@@ -30,5 +30,8 @@ export class User extends Model<User> {
   oauthExpiresAt: Date;
 
   @Column(DataType.STRING)
+  email: string;
+
+  @Column(DataType.STRING)
   provider: string;
 }

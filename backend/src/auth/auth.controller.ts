@@ -16,36 +16,21 @@ import { AuthService } from './auth.service';
 export class AuthController {
   constructor(private authService: AuthService) {}
 
-  @Post('login')
-  async usernamePasswordLogin(
-    @Body() body: { username: string; password: string },
-  ) {
-    return this.authService.authenticate(body);
-  }
-
   @Get('protected')
   @UseGuards(JwtAuthGuard)
   protectedRoute(@Req() req) {
     return { message: 'Access granted', user: req.user };
   }
 
-  @Post('create')
-  async createUser(@Body() body: { username: string; password: string }) {
-    const { username, password } = body;
-    return this.authService.createUser(username, password);
+  @UseGuards(JwtAuthGuard)
+  @Get('userInfo')
+  async getUserInfo(@Req() req) {
+    const userId = req.user.userId; 
+    if (typeof userId !== 'number') {
+      throw new Error('User ID is invalid');
+    }
+    return this.authService.getUserInfo(userId);
   }
-
-  @Get(':username')
-  async findUser(@Param('username') username: string) {
-    return this.authService.findUserByName(username);
-  }
-
-  // @Get('me')
-  // @UseGuards(JwtAuthGuard)
-  // async getMe(@Req() req) {
-  //   const user = req.user; // Extracted from the JWT payload by JwtAuthGuard
-  //   return this.authService.getMe(user.userId); // Fetch user details from the database
-  // }
 
   @Get('42')
   @UseGuards(FortyTwoAuthGuard)
@@ -59,10 +44,13 @@ export class AuthController {
     try {
       console.log('Callback received:', req.user);
       const user = req.user;
-
-      await this.authService.saveOAuthTokens(user);
-      const { accessToken } = await this.authService.signIn(user);
-
+  
+      // Save the OAuth tokens and ensure the user is created in the database
+      const savedUser = await this.authService.saveToDatabase(user);
+      
+      // Generate the access token using the saved user's userId
+      const { accessToken } = await this.authService.signIn(savedUser);
+  
       const redirectUrl = `${process.env.FRONTEND_URL}/auth/42/callback?token=${accessToken}`;
       return res.redirect(redirectUrl);
     } catch (error) {

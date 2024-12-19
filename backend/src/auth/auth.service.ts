@@ -1,98 +1,79 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User } from 'src/auth/auth.model'; // Import the User model
-// import { UsersService } from 'src/users/users.service'; // Assuming you're still using UsersService
 import * as bcrypt from 'bcrypt'; // Import bcrypt to compare hashed passwords
 
-type AuthInput = { username: string; password: string };
-type AuthResult = { accessToken: string; username: string };
+type AuthInput = { email: string; password: string };  // Change username to email
+type AuthResult = { accessToken: string; email: string };  // Change username to email
 
 @Injectable()
 export class AuthService {
   constructor(
-    // private readonly userService: UsesService, // Make sure you still have this service if needed
     private readonly jwtService: JwtService,
   ) {}
 
-  // async getMe(userId: number): Promise<Partial<User>> {
-  //   const user = await User.findOne({
-  //     where: { id: userId },
-  //     attributes: ['id', 'username', 'email'], // Return only safe fields
-  //   });
+  async getUserInfo(userId: number): Promise<Partial<User>> {
+    const user = await User.findOne({
+      where: { userId },
+      attributes: ['userId', 'email', 'username', 'provider', 'oauthToken', 'oauthRefreshToken'],  // Add all attributes you want
+    });
+  
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+  
+    return user;
+  }
+  
 
-  
-  //   if (!user) {
-  //     throw new Error('User not found');
-  //   }
-  
-  //   return user;
-  // }
-  
-  async createUser(username: string, password: string): Promise<User> {
+  async createUser(email: string, password: string): Promise<User> {  // Change username to email
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
-    const user = await User.create({ username, password: hashedPassword });
+    const user = await User.create({ email, password: hashedPassword });  // Change username to email
     return user;
   }
 
-  async findUserByName(username: string): Promise<User | undefined> {
-    return User.findOne({ where: { username } });
-  }
-
-  async authenticate(input: AuthInput): Promise<AuthResult> {
-    const user = await this.findUserByName(input.username);
-    if (!user) {
-      throw new UnauthorizedException('Invalid credentials');
-    }
-
-    const isPasswordValid = await bcrypt.compare(input.password, user.password);
-    if (!isPasswordValid) {
-      throw new UnauthorizedException('Invalid credentials');
-    }
-
-    const payload = { username: user.username, sub: user.userId };
-    const accessToken = this.jwtService.sign(payload);
-
-    return { accessToken, username: user.username };
-  }
-
   async signIn(user: User): Promise<AuthResult> {
-    const payload = { sub: user.userId, username: user.username };
-    const accessToken = this.jwtService.sign(payload);
-    return { accessToken, username: user.username };
-  }
-
-  async saveOAuthTokens(user: any): Promise<void> {
-    console.log('Saving OAuth tokens:', user); 
-
-    const {
-      username,
-      oauthToken = null,
-      oauthRefreshToken = null,
-      oauthExpiresAt = null,
-      provider = '42',
-    } = user;
-
-    if (!username) {
-      throw new Error('Username is required to save OAuth tokens.');
+    if (!user.userId) {
+      throw new Error('User ID is missing');
     }
 
-    const existingUser = await User.findOne({ where: { username } });
+    const payload = { userId: user.userId, email: user.email };  // Change username to email
+    const accessToken = this.jwtService.sign(payload);
 
-    if (existingUser) {
-      existingUser.oauthToken = oauthToken;
-      existingUser.oauthRefreshToken = oauthRefreshToken;
-      existingUser.oauthExpiresAt = oauthExpiresAt;
-      existingUser.provider = provider;
-      await existingUser.save();
-    } else {
-      await User.create({
-        username,
+    return { accessToken, email: user.email };  // Change username to email
+  }
+
+  async saveToDatabase(user: any): Promise<User> {
+    console.log('Saving OAuth tokens:', user); 
+  
+    const { email, username, oauthToken = null, oauthRefreshToken = null, oauthExpiresAt = null, provider = '42' } = user;  // Change username to email
+  
+    if (!email) {  // Change username to email
+      throw new Error('Email is required to save OAuth tokens.');
+    }
+  
+    let existingUser = await User.findOne({ where: { email } });  // Check for email
+
+    if (!existingUser) {
+      // Create the user if it doesn't exist
+      existingUser = await User.create({
+        email, 
+        username,  // Save username as well
         oauthToken,
         oauthRefreshToken,
         oauthExpiresAt,
         provider,
       });
+    } else {
+      // Update the user if already exists
+      existingUser.oauthToken = oauthToken;
+      existingUser.oauthRefreshToken = oauthRefreshToken;
+      existingUser.oauthExpiresAt = oauthExpiresAt;
+      existingUser.provider = provider;
+      await existingUser.save();
     }
+  
+    return existingUser;  // Return the user with the userId
   }
 }
