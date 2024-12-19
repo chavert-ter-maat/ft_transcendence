@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { SequelizeModule } from '@nestjs/sequelize';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 import { AuthModule } from './auth/auth.module';
 import { User } from './auth/auth.model';
 
@@ -20,6 +22,12 @@ import { User } from './auth/auth.model';
       autoLoadModels: true,
       synchronize: true,
       models: [User],
+    }),
+
+    // Serve static files (avatars in this case)
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'uploads'),
+      serveRoot: '/uploads',  // URL path for serving static files
     }),
 
     AuthModule,

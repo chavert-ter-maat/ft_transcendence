@@ -71,6 +71,12 @@ export class User extends Model<User> {
   createdAt: Date;
 
   @Column({
+    type: DataType.STRING,
+    allowNull: true, // Avatar field is optional
+  })
+  avatar: string; // Add avatar field
+
+  @Column({
     type: DataType.DATE,
     allowNull: false,
     defaultValue: DataType.NOW,

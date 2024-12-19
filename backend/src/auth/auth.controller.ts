@@ -9,7 +9,14 @@ import {
   Res,
   Put,
   UnauthorizedException,
+  UseInterceptors,
+  UploadedFile,
+  BadRequestException,
 } from '@nestjs/common';
+import * as fs from 'fs'; // Import the fs module for file system operations
+import * as path from 'path'; // Import the path module to work with file paths
+import { v4 as uuidv4 } from 'uuid'; // Import uuid for generating unique file names
+import { FileInterceptor } from '@nestjs/platform-express';
 import { JwtAuthGuard } from './guards/42-auth.guards';
 import { FortyTwoAuthGuard } from './guards/passport.guard'; // Correct import for FortyTwoAuthGuard
 import { AuthService } from './auth.service';
@@ -39,6 +46,23 @@ export class AuthController {
   @UseGuards(FortyTwoAuthGuard)
   async fortyTwoAuth() {
     return;
+  }
+
+  @Post('upload-avatar')
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FileInterceptor('avatar'))
+  async uploadAvatar(@UploadedFile() file, @Req() req): Promise<any> {
+    try {
+      const userId = req.user.userId;
+      
+      // Handle the avatar upload and get the avatar URL
+      const updatedUser = await this.authService.updateUserAvatar(userId, file);
+
+      // Return the avatar URL in the response
+      return { avatarUrl: updatedUser.avatar }; // Returning the avatar URL to be used on the front-end
+    } catch (error) {
+      throw new Error(`Failed to upload avatar: ${error.message}`);
+    }
   }
 
   @Put('set-display-name')

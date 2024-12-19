@@ -9,7 +9,8 @@ interface User {
   oauthToken: string;
   oauthRefreshToken: string;
   provider: string;
-  displayName: string; // Assuming you added displayName to the User model
+  displayName: string;
+  avatarUrl?: string; // Add avatarUrl field to the User model
 }
 
 const UserPage: React.FC = () => {
@@ -17,8 +18,9 @@ const UserPage: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>('');
-  const [newDisplayName, setNewDisplayName] = useState<string>(''); // State for the new display name
+  const [newDisplayName, setNewDisplayName] = useState<string>('');
   const [successMessage, setSuccessMessage] = useState<string>('');
+  const [avatar, setAvatar] = useState<File | null>(null); // State to store avatar image
 
   // Fetch user data when the component mounts
   useEffect(() => {
@@ -36,8 +38,7 @@ const UserPage: React.FC = () => {
           },
         });
 
-        // Assuming the response is the user object directly
-        setUser(response.data); // Ensure to set the whole response
+        setUser(response.data);
       } catch (err) {
         setError('Failed to fetch user data');
         console.error(err);
@@ -68,7 +69,7 @@ const UserPage: React.FC = () => {
         return;
       }
 
-      const response = await axios.put(
+      await axios.put(
         'http://localhost:4000/api/auth/set-display-name',
         { displayName: newDisplayName },
         {
@@ -79,12 +80,68 @@ const UserPage: React.FC = () => {
       );
 
       if (user) {
-        setUser({ ...user, displayName: newDisplayName }); // Update local user state
+        setUser({ ...user, displayName: newDisplayName });
       }
       setSuccessMessage('Display name updated successfully');
-      setNewDisplayName(''); // Reset the input field
+      setNewDisplayName('');
     } catch (err) {
       setError('Failed to update display name');
+      console.error(err);
+    }
+  };
+
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files ? e.target.files[0] : null;
+    if (file) {
+      // Simple file validation (optional)
+      if (file.size > 5000000) { // Example: 5MB max size
+        setError('File size exceeds 5MB');
+        return;
+      }
+      if (!file.type.startsWith('image/')) {
+        setError('Please upload an image file');
+        return;
+      }
+      setAvatar(file);
+    }
+  };
+
+  const handleAvatarUpload = async () => {
+    if (!avatar) {
+      setError('Please select an avatar image');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('avatar', avatar);
+
+    try {
+      const token = localStorage.getItem('authToken');
+      if (!token) {
+        setError('No auth token found');
+        return;
+      }
+
+      const response = await axios.post(
+        'http://localhost:4000/api/auth/upload-avatar',
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+
+      // Update the user object with the new avatar URL
+      if (response.data.avatarUrl && user) {
+        setUser({ ...user, avatarUrl: response.data.avatarUrl });
+      }
+
+      setSuccessMessage('Avatar updated successfully');
+      setAvatar(null); // Clear the avatar after upload
+    } catch (err) {
+      setError('Failed to upload avatar');
       console.error(err);
     }
   };
@@ -107,18 +164,41 @@ const UserPage: React.FC = () => {
           <p><strong>Email:</strong> {user.email}</p>
           <p><strong>Provider:</strong> {user.provider}</p>
           <p><strong>Display Name:</strong> {user.displayName}</p>
-          <input
-            type="text"
-            value={newDisplayName}
-            onChange={(e) => setNewDisplayName(e.target.value)}
-            placeholder="Enter new display name"
-          />
-          <button onClick={handleDisplayNameChange}>Change Display Name</button>
+
+          {/* Display avatar if exists */}
+          {user.avatarUrl ? (
+            <img
+              src={`http://localhost:4000/${user.avatarUrl}`} // Assuming the backend serves the avatar image
+              alt="Avatar"
+              style={{ width: '100px', height: '100px', borderRadius: '50%' }}
+            />
+          ) : (
+            <p>No avatar set</p>
+          )}
+
+          {/* Update Display Name */}
+          <div>
+            <input
+              type="text"
+              value={newDisplayName}
+              onChange={(e) => setNewDisplayName(e.target.value)}
+              placeholder="Enter new display name"
+            />
+            <button onClick={handleDisplayNameChange}>Change Display Name</button>
+          </div>
+
+          {/* Upload Avatar */}
+          <div>
+            <input type="file" onChange={handleAvatarChange} />
+            <button onClick={handleAvatarUpload}>Upload Avatar</button>
+          </div>
+
           {successMessage && <p style={{ color: 'green' }}>{successMessage}</p>}
         </div>
       ) : (
         <p>No user data found</p>
       )}
+
       <button onClick={handleLogout}>Logout</button>
     </div>
   );
