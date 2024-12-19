@@ -107,6 +107,11 @@ export const ChatOverviewPage: React.FC<ChatOverviewProps> = ({ logged_in_user, 
 		event.preventDefault();
 	}
 
+	const handlegotouserpage = () => {
+		// if (user)
+		React.navigate('/userpage');
+	  };
+
 	return (
 		<div className="App">
 			<header className="App-header">
@@ -120,6 +125,7 @@ export const ChatOverviewPage: React.FC<ChatOverviewProps> = ({ logged_in_user, 
 				<input type="text" value={input2.state} onChange={(e) => input2.setState(e.target.value)} />
 				<input type="submit" value="Add direct message to user" />
 			</form>
+			<button onClick={handlegotouserpage}>Got to user page.</button>
 			</header>
 			<ol>
 				<CHATSTAMP_LIST chats={chats_input} logged_in_user={logged_in_user} setSwitch={setSwitch} setLoaded={setLoaded}/>
