@@ -3,7 +3,7 @@ import './App.css';
 import React from 'react';
 import axios from '../axios';
 import { UserStats, ChatOverviewProps, chat_stamp } from './Chat.interface';
-import { useNavigate } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom';
 
 interface ChatStamp_int {
 	chatey:			chat_stamp;
@@ -86,7 +86,7 @@ const GoToChat = (	logged_in_user: UserStats,
 }
 
 export const ChatOverviewPage: React.FC<ChatOverviewProps> = ({ logged_in_user, chats_input, setLoaded, setSwitch, input1, input2 }) => {
-	const navigate = useNavigate();
+	// const navigate = useNavigate();
 
 	async function	addChat(event: any) {
 		console.log("input is:" + input1.state + ", chatname:" + logged_in_user.chatname);
@@ -110,10 +110,9 @@ export const ChatOverviewPage: React.FC<ChatOverviewProps> = ({ logged_in_user, 
 		event.preventDefault();
 	}
 
-	const handlegotouserpage = () => {
-		// if (user)
-		navigate('/userpage');
-	  };
+	// const handlegotouserpage = () => {
+	// 	navigate('/userpage');
+	//   };
 
 	return (
 		<div className="App">
@@ -128,7 +127,7 @@ export const ChatOverviewPage: React.FC<ChatOverviewProps> = ({ logged_in_user, 
 				<input type="text" value={input2.state} onChange={(e) => input2.setState(e.target.value)} />
 				<input type="submit" value="Add direct message to user" />
 			</form>
-			<button onClick={handlegotouserpage}>Got to user page.</button>
+			{/* <button onClick={handlegotouserpage}>Got to user page.</button> */}
 			</header>
 			<ol>
 				<CHATSTAMP_LIST chats={chats_input} logged_in_user={logged_in_user} setSwitch={setSwitch} setLoaded={setLoaded}/>
