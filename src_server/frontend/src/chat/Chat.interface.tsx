@@ -1,4 +1,5 @@
 import React from 'react';
+import { User } from '../global.interface';
 
 export interface message_stamp	{
 	message_:	string,
@@ -37,6 +38,7 @@ export interface UserStats {
 	page_admin:		boolean;
 	page_creator:	boolean;
 	selected_user:	string;
+	user?:			User;
 }
 
 export interface StringState {

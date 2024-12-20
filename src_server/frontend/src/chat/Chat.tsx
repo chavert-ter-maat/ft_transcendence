@@ -8,6 +8,7 @@ import { MessagesView } from './MessageView';
 import { UsersView } from './UsersView';
 import { LoginView } from './LoginView';
 import { EditView } from './EditView';
+import { User } from '../global.interface';
 
 let messages_input:	message_stamp[]	= [];
 let	chats_input:	chat_stamp[]	= [];
@@ -38,12 +39,18 @@ let	reloading:		boolean = false;
 let	just_started:	boolean = true;
 
 const Chat: React.FC = () =>  {
-	const state = useLocation().state as {username: string};
+	//might have to be an fetch for the user data
+	const state = useLocation().state as {user: User};
 
 	if (state)
-		logged_in_user.username = state.username;
-	else
-		logged_in_user.username = "not_logged_in";
+	{
+		logged_in_user.username = state.user.username;
+		logged_in_user.user = state.user;
+	}
+	if (!logged_in_user.user)
+		throw new Error("No user");
+		
+	// }
 	//console.log("Logged in as: " + logged_in_user.username);
 
 	const [switchy_state, setSwitch]	= useState(switchy_var);

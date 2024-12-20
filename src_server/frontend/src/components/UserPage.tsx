@@ -1,21 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { User } from "../global.interface";
 
-interface User {
-  userId: number;
-  username: string;
-  email: string;
-  oauthToken: string;
-  oauthRefreshToken: string;
-  provider: string;
-  displayName: string;
-  avatar?: string; // Add avatar field to the User model
-	imageType: string;
-	imageName?: string;
-	imageData?: ArrayBuffer;
-	imageString?: string;
-}
+// interface User {
+//   userId: number;
+//   username: string;
+//   email: string;
+//   oauthToken: string;
+//   oauthRefreshToken: string;
+//   provider: string;
+//   displayName: string;
+//   avatar?: string; // Add avatar field to the User model
+// 	imageType: string;
+// 	imageName?: string;
+// 	imageData?: ArrayBuffer;
+// 	imageString?: string;
+// }
 
 const UserPage: React.FC = () => {
   const navigate = useNavigate();
@@ -160,7 +161,7 @@ const UserPage: React.FC = () => {
 
 	const handlegototchats = () => {
 		if (user)
-			navigate('/chat', {state: {username: user.username} });
+			navigate('/chat', {state: {user: user} });
 	};
 
   return (

@@ -87,6 +87,8 @@ const GoToChat = (	logged_in_user: UserStats,
 
 export const ChatOverviewPage: React.FC<ChatOverviewProps> = ({ logged_in_user, chats_input, setLoaded, setSwitch, input1, input2 }) => {
 	// const navigate = useNavigate();
+	if (!logged_in_user.user)
+		throw new Error("No user");
 
 	async function	addChat(event: any) {
 		console.log("input is:" + input1.state + ", chatname:" + logged_in_user.chatname);
@@ -117,8 +119,9 @@ export const ChatOverviewPage: React.FC<ChatOverviewProps> = ({ logged_in_user, 
 	return (
 		<div className="App">
 			<header className="App-header">
-			<img src={logo} className="App-logo" alt="logo" />
-			<h2>{logged_in_user.username}</h2>
+			<img	src={"data:image/png;base64, " + logged_in_user.user.imageString}
+              alt={logged_in_user.user.imageName} className="App-logo"	/>
+			<h2>{logged_in_user.user.username + "}aka{" + logged_in_user.user.displayName}</h2>
 			<form onSubmit={addChat}>
 				<input type="text" value={input1.state} onChange={(e) => input1.setState(e.target.value)} />
 				<input type="submit" value="Add chat" />
