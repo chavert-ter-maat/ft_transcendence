@@ -18,33 +18,93 @@ interface BlockUser {
 
 @Table
 export class User extends Model<User> {
-  @PrimaryKey
-  @AutoIncrement
-  @Column(DataType.INTEGER)
-  userId: number;
+	@PrimaryKey
+	@AutoIncrement
+	@Column(DataType.INTEGER)
+	userId: number;
 
-  @Column(DataType.STRING)
-  username: string;
+	@Column({
+		type: DataType.STRING,
+		allowNull: false,
+		unique: true,
+	})
+	username: string;
 
-  @Column(DataType.STRING)
-  password: string;
+	@Column({
+		type: DataType.STRING,
+		allowNull: true,
+	})
+	password: string;
 
-  @Column(DataType.STRING)
-  oauthToken: string;
+	@Column({
+		type: DataType.STRING,
+		allowNull: true,
+	})
+	oauthToken: string;
 
-  @Column(DataType.STRING)
-  oauthRefreshToken: string;
+	@Column({
+		type: DataType.STRING,
+		allowNull: true,
+	})
+	oauthRefreshToken: string;
 
-  @Column(DataType.DATE)
-  oauthExpiresAt: Date;
+	@Column({
+		type: DataType.DATE,
+		allowNull: true,
+	})
+	oauthExpiresAt: Date;
 
-  @Column(DataType.STRING)
-  email: string;
+	@Column({
+		type: DataType.STRING,
+		allowNull: false,
+	})
+	provider: string;
 
-  @Column(DataType.STRING)
-  provider: string;
+	@Column({
+		type: DataType.STRING,
+		allowNull: false,
+	})
+	email: string;
 
-  @Column({
+	@Column({
+		type: DataType.STRING,
+		allowNull: true, // Display name is optional
+	})
+	displayName: string; // New column added here
+
+	@Column({
+		type: DataType.DATE,
+		allowNull: false,
+		defaultValue: DataType.NOW,
+	})
+	createdAt: Date;
+
+	@Column({
+		type: DataType.STRING,
+		allowNull: true, // Avatar field is optional
+	})
+	avatar: string; // Add avatar field
+
+	@Column({
+		type: DataType.DATE,
+		allowNull: false,
+		defaultValue: DataType.NOW,
+	})
+	updatedAt: Date;
+
+  	@Column(DataType.STRING)
+	imageType: string;
+
+	@Column(DataType.STRING)
+	imageName: string;
+
+	@Column(DataType.BLOB)
+	imageData: ArrayBuffer;
+
+	@Column(DataType.STRING)
+	imageString: string;
+
+	@Column({
 		type:			DataType.ARRAY(DataType.JSON),
 		allowNull:		false,
 	})

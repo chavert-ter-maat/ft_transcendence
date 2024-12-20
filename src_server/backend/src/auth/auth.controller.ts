@@ -7,8 +7,12 @@ import {
   UseGuards,
   Param,
   Res,
+  UnauthorizedException,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
 import { JwtAuthGuard } from './guards/42-auth.guards';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { FortyTwoAuthGuard } from './guards/passport.guard'; // Correct import for FortyTwoAuthGuard
 import { AuthService } from './auth.service';
 
@@ -36,6 +40,41 @@ export class AuthController {
   @UseGuards(FortyTwoAuthGuard)
   async fortyTwoAuth() {
     return;
+  }
+
+  @Post('upload-avatar')
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FileInterceptor('avatar'))
+  async uploadAvatar(@UploadedFile() file, @Req() req): Promise<any> {
+    try {
+      const userId = req.user.userId;
+      
+      // Handle the avatar upload and get the avatar URL
+      const updatedUser = await this.authService.updateUserAvatar(userId, file);
+
+      // Return the avatar URL in the response
+      return { avatar: updatedUser.avatar }; // Returning the avatar URL to be used on the front-end
+    } catch (error) {
+      throw new Error(`Failed to upload avatar: ${error.message}`);
+    }
+  }
+
+  @Post('set-display-name')
+  @UseGuards(JwtAuthGuard)
+  async setDisplayName(@Req() req, @Body() body: { displayName: string }) {
+    const userId = req.user.userId; // Extract userId from JWT payload
+    if (!userId) {
+      throw new UnauthorizedException('User is not authenticated.');
+    }
+    const { displayName } = body;
+  
+    // Check if the display name is valid
+    if (!displayName || displayName.trim().length === 0) {
+      throw new Error('Display name is required');
+    }
+  
+    const updatedUser = await this.authService.updateDisplayName(userId, displayName);
+    return { message: 'Display name updated successfully', user: updatedUser };
   }
 
   @Get('42/callback')

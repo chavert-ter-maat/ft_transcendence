@@ -9,6 +9,12 @@ interface User {
   oauthToken: string;
   oauthRefreshToken: string;
   provider: string;
+  displayName: string;
+  avatar?: string; // Add avatar field to the User model
+	imageType: string;
+	imageName?: string;
+	imageData?: ArrayBuffer;
+	imageString?: string;
 }
 
 const UserPage: React.FC = () => {
@@ -16,6 +22,9 @@ const UserPage: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>('');
+  const [newDisplayName, setNewDisplayName] = useState<string>('');
+  const [successMessage, setSuccessMessage] = useState<string>('');
+  const [avatar, setAvatar] = useState<File | null>(null); // State to store avatar image
 
   // Fetch user data when the component mounts
   useEffect(() => {
@@ -32,9 +41,7 @@ const UserPage: React.FC = () => {
             Authorization: `Bearer ${token}`,
           },
         });
-
-        // Assuming the response is the user object directly
-        setUser(response.data); // Ensure to set the whole response
+        setUser(response.data);
       } catch (err) {
         setError('Failed to fetch user data');
         console.error(err);
@@ -52,9 +59,95 @@ const UserPage: React.FC = () => {
     navigate('/login');
   };
 
-  const handlegototchats = () => {
-	if (user)
-    	navigate('/chat', {state: {username: user.username} });
+  const handleDisplayNameChange = async () => {
+    if (!newDisplayName) {
+      setError('Display name cannot be empty');
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('authToken');
+      if (!token) {
+        setError('No auth token found');
+        return;
+      }
+
+      await axios.post(
+        'http://localhost:4000/api/auth/set-display-name',
+        { displayName: newDisplayName },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+    //   if (user) {
+    //     setUser({ ...user, displayName: newDisplayName });
+    //   }
+      setSuccessMessage('Display name updated successfully');
+      setNewDisplayName('');
+    } catch (err) {
+      setError('Failed to update display name');
+      console.error(err);
+    }
+  };
+
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files ? e.target.files[0] : null;
+    if (file) {
+      // Simple file validation (optional)
+      if (file.size > 500000) { // Example: 5MB max size
+        setError('File size exceeds 0.5MB');
+        return;
+      }
+      if (!file.type.startsWith('image/')) {
+        setError('Please upload an image file');
+        return;
+      }
+      console.log('Selected file:', file);
+      setAvatar(file);
+    }
+  };
+
+  const handleAvatarUpload = async () => {
+    if (!avatar) {
+      setError('Please select an avatar image');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('avatar', avatar);
+
+    try {
+      const token = localStorage.getItem('authToken');
+      if (!token) {
+        setError('No auth token found');
+        return;
+      }
+	  console.log("BEFORE:" + avatar);
+      const response = await axios.post(
+        'http://localhost:4000/api/auth/upload-avatar',
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+
+      // Update the user object with the new avatar URL
+      if (response.data.avatar && user) {
+        setUser({ ...user, avatar: response.data.avatar });
+      }
+
+      setSuccessMessage('Avatar updated successfully');
+      setAvatar(null); // Clear the avatar after upload
+    } catch (err) {
+      setError('Failed to upload avatar');
+      console.error(err);
+    }
   };
 
   if (loading) {
@@ -65,6 +158,11 @@ const UserPage: React.FC = () => {
     return <div>Error: {error}</div>;
   }
 
+	const handlegototchats = () => {
+		if (user)
+			navigate('/chat', {state: {username: user.username} });
+	};
+
   return (
     <div style={{ padding: '20px' }}>
       <h1>Welcome to Your User Page</h1>
@@ -74,12 +172,43 @@ const UserPage: React.FC = () => {
           <p><strong>Username:</strong> {user.username}</p>
           <p><strong>Email:</strong> {user.email}</p>
           <p><strong>Provider:</strong> {user.provider}</p>
+          <p><strong>Display Name:</strong> {user.displayName}</p>
+		  <p><strong>Image Name:</strong> {user.imageName}</p>
+          
+          {/* Display avatar if exists */}
+          {user.imageName ? (
+            <img
+				src={"data:image/png;base64, " + user.imageString} // Assuming the backend serves the avatar image, don't like this
+              alt={user.imageName}
+              style={{ width: '100px', height: '100px', borderRadius: '50%' }}
+            />
+          ) : (
+            <p>No avatar set</p>
+          )}
+
+          <div>
+            <input
+              type="text"
+              value={newDisplayName}
+              onChange={(e) => setNewDisplayName(e.target.value)}
+              placeholder="Enter new display name"
+            />
+            <button onClick={handleDisplayNameChange}>Change Display Name</button>
+          </div>
+
+          <div>
+            <input type="file" accept="image/png" onChange={handleAvatarChange} />
+            <button onClick={handleAvatarUpload}>Upload Avatar</button>
+          </div>
+
+          {successMessage && <p style={{ color: 'green' }}>{successMessage}</p>}
         </div>
       ) : (
         <p>No user data found</p>
       )}
+
       <button onClick={handleLogout}>Logout</button>
-	  <button onClick={handlegototchats}>Got to chats.</button>
+	  <button onClick={handlegototchats}>Go to chats.</button>
     </div>
   );
 };

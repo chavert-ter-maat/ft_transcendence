@@ -137,74 +137,34 @@ export const UsersView: React.FC<UsersViewProps> = ({ logged_in_user, users_inpu
 	}
 
 	function LeaveChat() {
-			leaveChat(logged_in_user.chatname);
-			logged_in_user.chatname = "";
-			// messages_input = []; might be needed
-			setSwitch(0);
-			input1.setState("");
-			setLoaded(false);
-			logged_in_user.loaded = false;
-			logged_in_user.loading = false;
+		leaveChat(logged_in_user.chatname);
+		logged_in_user.chatname = "";
+		// messages_input = []; might be needed
+		setSwitch(0);
+		input1.setState("");
+		setLoaded(false);
+		logged_in_user.loaded = false;
+		logged_in_user.loading = false;
 	}
-
-	if (logged_in_user.page_creator && logged_in_user.page_admin)
-		{
-			return (
-				<div className="App">
-					<header className="App-header">
-					<img src={logo} className="App-logo" alt="logo" />
-					<h2>Editing: {logged_in_user.chatname}</h2>
-					<button onClick={() => GoBackToChat(logged_in_user, setLoaded, setSwitch, input1.setState, password1.setState)} className={"App-chat_name_button"}> Go to chat. </button>
-					<button onClick={() => LeaveChat()}> Leave this chat. </button>
-					<form onSubmit={addUser}>
-						<input type="text" placeholder="Enter username to add to chat" value={input1.state} onChange={(e) => input1.setState(e.target.value)} />
-						<input type="submit" value="Add user" />
-					</form>
-					<form onSubmit={setPublic}>
-						<input type="password" placeholder="Enter password to chat" value={password1.state} onChange={(e) => password1.setState(e.target.value)} />
-						<input type="submit" value="Set public, with password." />
-					</form>
-					</header>
-					<ol>
-						<USERSTAMP_LIST users={users_input} logged_in_user={logged_in_user}/>
-					</ol>
-				</div>
-			);
-		}
-	if (logged_in_user.page_admin)
-	{
-		return (
-			<div className="App">
-				<header className="App-header">
-				<img src={logo} className="App-logo" alt="logo" />
-				<h2>Editing: {logged_in_user.chatname}</h2>
-				<button onClick={() => GoBackToChat(logged_in_user, setLoaded, setSwitch, input1.setState, password1.setState)}> Go to chat. </button>
-				<button onClick={() => LeaveChat()}> Leave this chat. </button>
-				<form onSubmit={addUser}>
-					<input type="text" placeholder="Enter username to add to chat" value={input1.state} onChange={(e) => input1.setState(e.target.value)} />
-					<input type="submit" value="Add user" />
-				</form>
-				</header>
-				<ol>
-					<USERSTAMP_LIST users={users_input} logged_in_user={logged_in_user}/>
-				</ol>
-			</div>
-		);
-	}
-	else
-	{
-		return (
-			<div className="App">
-				<header className="App-header">
-				<img src={logo} className="App-logo" alt="logo" />
-				<h2>Editing: {logged_in_user.chatname}</h2>
-				<button onClick={() => GoBackToChat(logged_in_user, setLoaded, setSwitch, input1.setState, password1.setState)}> Go to chat. </button>
-				<button onClick={() => LeaveChat()}> Leave this chat. </button>
-				</header>
-				<ol>
-					<USERSTAMP_LIST users={users_input} logged_in_user={logged_in_user}/>
-				</ol>
-			</div>
-		);
-	}
+	return (
+		<div className="App">
+			<header className="App-header">
+			<img src={logo} className="App-logo" alt="logo" />
+			<h2>Editing: {logged_in_user.chatname}</h2>
+			<button onClick={() => GoBackToChat(logged_in_user, setLoaded, setSwitch, input1.setState, password1.setState)} className={"App-chat_name_button"}> Go to chat. </button>
+			<button onClick={() => LeaveChat()}> Leave this chat. </button>
+			{logged_in_user.page_admin && <form onSubmit={addUser}>
+				<input type="text" placeholder="Enter username to add to chat" value={input1.state} onChange={(e) => input1.setState(e.target.value)} />
+				<input type="submit" value="Add user" />
+			</form>}
+			{logged_in_user.page_creator && <form onSubmit={setPublic}>
+				<input type="password" placeholder="Enter password to chat" value={password1.state} onChange={(e) => password1.setState(e.target.value)} />
+				<input type="submit" value="Set public, with password." />
+			</form>}
+			</header>
+			<ol>
+				<USERSTAMP_LIST users={users_input} logged_in_user={logged_in_user}/>
+			</ol>
+		</div>
+	);
 }
