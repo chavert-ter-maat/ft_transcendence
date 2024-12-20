@@ -3,21 +3,6 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { User } from "../global.interface";
 
-// interface User {
-//   userId: number;
-//   username: string;
-//   email: string;
-//   oauthToken: string;
-//   oauthRefreshToken: string;
-//   provider: string;
-//   displayName: string;
-//   avatar?: string; // Add avatar field to the User model
-// 	imageType: string;
-// 	imageName?: string;
-// 	imageData?: ArrayBuffer;
-// 	imageString?: string;
-// }
-
 const UserPage: React.FC = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
@@ -52,7 +37,7 @@ const UserPage: React.FC = () => {
     };
 
     fetchUserData();
-  }, []);
+  }, [loading]);
 
   const handleLogout = () => {
     localStorage.removeItem('authToken');
@@ -88,6 +73,7 @@ const UserPage: React.FC = () => {
     //   }
       setSuccessMessage('Display name updated successfully');
       setNewDisplayName('');
+	  setLoading(true);
     } catch (err) {
       setError('Failed to update display name');
       console.error(err);
@@ -145,6 +131,7 @@ const UserPage: React.FC = () => {
 
       setSuccessMessage('Avatar updated successfully');
       setAvatar(null); // Clear the avatar after upload
+	  setLoading(true);
     } catch (err) {
       setError('Failed to upload avatar');
       console.error(err);

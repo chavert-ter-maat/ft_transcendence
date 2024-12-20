@@ -1,10 +1,10 @@
-import logo from './8589-screaming-cat.png';
 import a from './talking_cat_d.jpeg';
 import b from './talking_cat_ab.jpeg';
 import './App.css';
 import React from 'react';
 import axios from '../axios';
 import { UserStats, MessagesViewProps, message_stamp } from './Chat.interface';
+import { HeaderWrap } from "./Header";
 
 export const GoToChatOverview = (	logged_in_user: UserStats,
 		setLoaded: React.Dispatch<React.SetStateAction<boolean>>,
@@ -66,6 +66,9 @@ function MESSAGE_LIST( {messages, logged_in_user} : MessageList_int ) {
 }
 
 export const MessagesView: React.FC<MessagesViewProps> = ({ logged_in_user, messages_input, setLoaded, setSwitch, input1 }) => {
+	if (!logged_in_user.user)
+		throw new Error("No user");
+	
 	const addNewMessage = async (): Promise<boolean> => {
 		try {
 			//console.log("Chat added:" + logged_in_user.username + "_" + logged_in_user.chatname);
@@ -124,11 +127,8 @@ export const MessagesView: React.FC<MessagesViewProps> = ({ logged_in_user, mess
 		logged_in_user.loading = false;
 	}
 
-	// return message view:
-	return (
-		<div className="App">
-		<header className="App-header">
-			<img src={logo} className="App-logo" alt="logo" />
+	const JSX_content = (
+		<>
 			<h2>{logged_in_user.chatname}</h2>
 			<button onClick={() => GoToChatOverview(logged_in_user, setLoaded, setSwitch, messages_input, input1.setState)} className={"App-chat_name_button"}> Go to chat overview. </button>
 			<form onSubmit={enterOnMessage}>
@@ -138,7 +138,13 @@ export const MessagesView: React.FC<MessagesViewProps> = ({ logged_in_user, mess
 			<button onClick={() => GoToPrevPage()}> Go to previous page. </button>
 			<button onClick={() => GoToEditChat()}> Edit this chat: {logged_in_user.chatname}. </button>
 			<button onClick={() => GoToNextPage()}> Go to next page. </button>
-			</header>
+		</>
+	);
+
+	// return message view:
+	return (
+		<div className="App">
+		<HeaderWrap user={logged_in_user.user} insert={JSX_content}/>
 			<ol>
 				<MESSAGE_LIST messages={messages_input} logged_in_user={logged_in_user}/>
 			</ol>

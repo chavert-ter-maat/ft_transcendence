@@ -4,8 +4,11 @@ import React from 'react';
 import { EditViewProps } from './Chat.interface';
 import axios from '../axios';
 import { GoBackToChat } from './UsersView';
+import { HeaderWrap } from "./Header";
 
 export const EditView: React.FC<EditViewProps> = ({ logged_in_user, setLoaded, setSwitch, input1, password1 }) => {
+	if (!logged_in_user.user)
+		throw new Error("No user");
 
 	function reload(): void
 	{
@@ -120,11 +123,9 @@ export const EditView: React.FC<EditViewProps> = ({ logged_in_user, setLoaded, s
 		}
 	}
 
-	return (
-		<div className="App">
-			<header className="App-header">
-			<img src={logo} className="App-logo" alt="logo" />
-			<h2>Mute or block: {logged_in_user.selected_user}</h2>
+	const JSX_content = (
+		<>
+		<h2>Mute or block: {logged_in_user.selected_user}</h2>
 			<p>For amount of minutes. (-1 for indefinite, 0 to revoke block)</p>
 			<button onClick={() => GoBackToChat(logged_in_user, setLoaded, setSwitch, input1.setState, password1.setState)} className={"App-chat_name_button"}> Go to chat. </button>
 			<input
@@ -138,7 +139,12 @@ export const EditView: React.FC<EditViewProps> = ({ logged_in_user, setLoaded, s
 			{logged_in_user.page_admin && <button onClick={() => removeUser(logged_in_user.selected_user)}> Remove user. </button>}
 			{logged_in_user.page_admin && <button onClick={() => addNewAdmin(logged_in_user.selected_user)}> Make admin. </button>}
 			{logged_in_user.page_admin && <button onClick={() => banUser(logged_in_user.selected_user)}> Ban user. </button>}
-			</header>
+		</>
+	)
+
+	return (
+		<div className="App">
+			<HeaderWrap user={logged_in_user.user} insert={JSX_content}/>
 		</div>
 	); 
 }

@@ -1,8 +1,8 @@
-import logo from './8589-screaming-cat.png';
 import './App.css';
 import React from 'react';
 import axios from '../axios';
 import { UserStats, ChatOverviewProps, chat_stamp } from './Chat.interface';
+import { HeaderWrap } from "./Header";
 // import { useNavigate } from 'react-router-dom';
 
 interface ChatStamp_int {
@@ -116,12 +116,8 @@ export const ChatOverviewPage: React.FC<ChatOverviewProps> = ({ logged_in_user, 
 	// 	navigate('/userpage');
 	//   };
 
-	return (
-		<div className="App">
-			<header className="App-header">
-			<img	src={"data:image/png;base64, " + logged_in_user.user.imageString}
-              alt={logged_in_user.user.imageName} className="App-logo"	/>
-			<h2>{logged_in_user.user.username + "}aka{" + logged_in_user.user.displayName}</h2>
+	const JSX_content = (
+		<>
 			<form onSubmit={addChat}>
 				<input type="text" value={input1.state} onChange={(e) => input1.setState(e.target.value)} />
 				<input type="submit" value="Add chat" />
@@ -130,8 +126,12 @@ export const ChatOverviewPage: React.FC<ChatOverviewProps> = ({ logged_in_user, 
 				<input type="text" value={input2.state} onChange={(e) => input2.setState(e.target.value)} />
 				<input type="submit" value="Add direct message to user" />
 			</form>
-			{/* <button onClick={handlegotouserpage}>Got to user page.</button> */}
-			</header>
+		</>
+	);
+
+	return (
+		<div className="App">
+			<HeaderWrap user={logged_in_user.user} insert={JSX_content}/>
 			<ol>
 				<CHATSTAMP_LIST chats={chats_input} logged_in_user={logged_in_user} setSwitch={setSwitch} setLoaded={setLoaded}/>
 			</ol>

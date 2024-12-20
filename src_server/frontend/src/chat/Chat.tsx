@@ -167,7 +167,8 @@ const Chat: React.FC = () =>  {
 			logged_in_user.loading = true;
 			getChats();
 		}
-		return (ChatOverviewPage({
+		return (
+			ChatOverviewPage({
 			logged_in_user, chats_input, setLoaded, setSwitch,
 			input1: {state: input_state, setState: setInput},
 			input2: {state: input_state2, setState: setInput2}

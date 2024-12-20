@@ -3,6 +3,7 @@ import './App.css';
 import React from 'react';
 import axios from '../axios';
 import { UserStats, UsersViewProps, user_stamp } from './Chat.interface';
+import { HeaderWrap } from "./Header";
 
 interface UserStamp_int {
 	usery:			user_stamp;
@@ -29,6 +30,9 @@ export const GoBackToChat = (	logged_in_user: UserStats,
 }
 
 export const UsersView: React.FC<UsersViewProps> = ({ logged_in_user, users_input, setLoaded, setSwitch, input1, password1 }) => {
+	if (!logged_in_user.user)
+		throw new Error("No user");
+	
 	function USERSTAMP_RENDER({usery, logged_in_user}: UserStamp_int ): React.ReactElement {
 		// console.log(usery.name_);
 		if (usery.name_ !== logged_in_user.username)
@@ -146,10 +150,9 @@ export const UsersView: React.FC<UsersViewProps> = ({ logged_in_user, users_inpu
 		logged_in_user.loaded = false;
 		logged_in_user.loading = false;
 	}
-	return (
-		<div className="App">
-			<header className="App-header">
-			<img src={logo} className="App-logo" alt="logo" />
+
+	const JSX_content = (
+		<>
 			<h2>Editing: {logged_in_user.chatname}</h2>
 			<button onClick={() => GoBackToChat(logged_in_user, setLoaded, setSwitch, input1.setState, password1.setState)} className={"App-chat_name_button"}> Go to chat. </button>
 			<button onClick={() => LeaveChat()}> Leave this chat. </button>
@@ -161,7 +164,26 @@ export const UsersView: React.FC<UsersViewProps> = ({ logged_in_user, users_inpu
 				<input type="password" placeholder="Enter password to chat" value={password1.state} onChange={(e) => password1.setState(e.target.value)} />
 				<input type="submit" value="Set public, with password." />
 			</form>}
-			</header>
+		</>
+	);
+
+	return (
+		<div className="App">
+			<HeaderWrap user={logged_in_user.user} insert={JSX_content}/>
+			{/* <header className="App-header">
+			<img src={logo} className="App-logo" alt="logo" /> */}
+			{/* <h2>Editing: {logged_in_user.chatname}</h2>
+			<button onClick={() => GoBackToChat(logged_in_user, setLoaded, setSwitch, input1.setState, password1.setState)} className={"App-chat_name_button"}> Go to chat. </button>
+			<button onClick={() => LeaveChat()}> Leave this chat. </button>
+			{logged_in_user.page_admin && <form onSubmit={addUser}>
+				<input type="text" placeholder="Enter username to add to chat" value={input1.state} onChange={(e) => input1.setState(e.target.value)} />
+				<input type="submit" value="Add user" />
+			</form>}
+			{logged_in_user.page_creator && <form onSubmit={setPublic}>
+				<input type="password" placeholder="Enter password to chat" value={password1.state} onChange={(e) => password1.setState(e.target.value)} />
+				<input type="submit" value="Set public, with password." />
+			</form>} */}
+			{/* </header> */}
 			<ol>
 				<USERSTAMP_LIST users={users_input} logged_in_user={logged_in_user}/>
 			</ol>
