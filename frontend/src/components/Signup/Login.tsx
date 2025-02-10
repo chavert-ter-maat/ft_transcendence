@@ -1,7 +1,7 @@
 import { useState } from "react";
 import axios from 'axios';
 
-function Login() {
+function Signup() {
 
 	const [error, setError] = useState("")
 	const [success, setSuccess] = useState("")
@@ -28,8 +28,13 @@ function Login() {
 
 	return (
 		<div>
-			<div>Login</div>
+			<div>Signup</div>
 			<form onSubmit={handleFormSubmit}>
+				<label>
+					Email Address
+				</label><br />
+				<input type="text" name='email' placeholder="email address" />
+				<br />
 				<label>
 					Username
 				</label><br />
@@ -48,4 +53,4 @@ function Login() {
 		</div >
 	)
 }
-export default Login
+export default Signup 
