@@ -11,39 +11,41 @@ services:
       - ./pgdata:/var/lib/postgresql/data
     ports:
       - "5432:5432"
-    # networks:
-    #   - ft_transcendence
 
-  app:
+  frontend:
+    container_name: frontend
     build:
-      context: .
+      context: ./frontend
       dockerfile: Dockerfile
-    container_name: app
-    # environment:
-    #   - PORT=${PORT}
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend/src:/app/frontend/src
+
+  backend:
+    container_name: backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
     ports:
       - "3000:3000"
     depends_on:
       - db
     volumes:
-      - ./src:/app/src
-    # networks:
-    #   - ft_transcendence
+      - ./backend/src:/app/backend/src
 
   pgadmin:
     image: dpage/pgadmin4
     restart: always
     container_name: pgadmin4
+    depends_on:
+      - db
     environment:
       - PGADMIN_DEFAULT_EMAIL=${PGADMIN_DEFAULT_EMAIL}
       - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_DEFAULT_PASSWORD}
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
     ports:
       - "5050:80"
-    depends_on:
-      - db
-    # networks:
-    #   - ft_transcendence
-
-    # networks:
-    #   ft_transcendence:
-    #     name: ft_transcendence
