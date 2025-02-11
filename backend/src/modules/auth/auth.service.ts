@@ -1,4 +1,4 @@
-import { Injectable, MaxFileSizeValidator } from '@nestjs/common';
+import { BadRequestException, HttpException, HttpStatus, Injectable, MaxFileSizeValidator } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
@@ -41,16 +41,26 @@ export class AuthService {
 		const pass = await this.hashPassword(user.password);
 
 		// create the user
-		const newUser = await this.userService.create({ ...user, password: pass });
 
-		// tslint:disable-next-line: no-string-literal
-		const { password, ...result } = newUser['dataValues'];
+		try {
+			const newUser = await this.userService.create({ ...user, password: pass });
+			// tslint:disable-next-line: no-string-literal
+			const { password, ...result } = newUser['dataValues'];
 
-		// generate token
-		const token = await this.generateToken(result);
+			// generate token
+			const token = await this.generateToken(result);
 
-		// return the user and the token
-		return { user: result, token };
+			// return the user and the token
+			return { user: result, token };
+		} catch (error) {
+			if (error.name == "SequelizeUniqueConstraintError") {
+				throw new HttpException(error.original.detail, HttpStatus.BAD_REQUEST)
+			}
+			else {
+				throw new HttpException(error, HttpStatus.BAD_REQUEST)
+			}
+		}
+
 	}
 
 	private async generateToken(user) {

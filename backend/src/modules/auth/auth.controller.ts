@@ -1,4 +1,4 @@
-import { Controller, Body, Post, Get, Delete, UseGuards, Request } from '@nestjs/common';
+import { Controller, Body, Post, Get, Delete, UseGuards, Request, ValidationPipe } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { UserDto } from '../users/dto/user.dto';
@@ -15,7 +15,7 @@ export class AuthController {
 	}
 
 	@Post('signup')
-	async signUp(@Body() user: UserDto) {
+	async signUp(@Body(new ValidationPipe()) user: UserDto) {
 		return await this.authService.create(user);
 	}
 

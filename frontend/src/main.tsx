@@ -2,14 +2,14 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.tsx'
-import Login from './components/Login/Login.tsx'
-import Signup from './components/Signup/Login.tsx'
+// import Login from './components/Login/Login.tsx'
+import Signup from './components/Signup/Signup.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <App />
-    <Login />
-    <p>------------------</p>
+    {/* <Login />
+    <p>------------------</p> */}
     <Signup />
   </StrictMode>,
 )
