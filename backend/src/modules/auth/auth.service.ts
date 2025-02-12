@@ -5,6 +5,9 @@ import { UsersService } from '../users/users.service';
 import { speakeasy } from 'speakeasy';
 import { TwoFADto } from '../users/dto/TwoFA.dto';
 import { TwoFaStrategy } from './twofa.strategy';
+import { LoginUserDto } from '../users/dto/LoginUser.dto';
+import { CreateContextOptions } from 'vm';
+import { CreateUserDto } from '../users/dto/CreateUser.dto';
 const speakeasy = require('speakeasy');
 const QRCode = require('qrcode');
 
@@ -33,12 +36,13 @@ export class AuthService {
 		return result;
 	}
 
-	public async login(user) {
+	public async login(user: LoginUserDto) {
+		console.log("this is happening:", user)
 		const token = await this.generateToken(user);
 		return { user, token };
 	}
 
-	public async create(user) {
+	public async create(user: CreateUserDto) {
 		// hash the password
 		const pass = await this.hashPassword(user.password);
 
