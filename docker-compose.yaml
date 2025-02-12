@@ -40,11 +40,11 @@ services:
       - db
     volumes:
       - ./backend/src:/app/backend/src
-    # develop:
-    #   watch:
-    #     - action: sync
-    #       path: ./backend/src
-    #       target: ./backend/src
+    develop:
+      watch:
+        - action: sync
+          path: ./backend/src
+          target: ./backend/src
 
   pgadmin:
     image: dpage/pgadmin4
