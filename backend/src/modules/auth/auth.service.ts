@@ -3,6 +3,8 @@ import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import { speakeasy } from 'speakeasy';
+import { TwoFADto } from '../users/dto/TwoFA.dto';
+import { TwoFaStrategy } from './twofa.strategy';
 const speakeasy = require('speakeasy');
 const QRCode = require('qrcode');
 
@@ -78,15 +80,15 @@ export class AuthService {
 		return match;
 	}
 
-	async generateTwoFaSecret(email: string): Promise<void> {
+	async generateTwoFaSecret(user: TwoFADto): Promise<void> {
 		const secret = speakeasy.generateSecret()
-		const updateCount = await this.userService.updateTwoFaSecret(email, secret.base32);
+		const updateCount = await this.userService.updateTwoFaSecret(user.email, secret.base32);
 
 		if (!updateCount) {
 			return null;
 		}
 
-		const url = speakeasy.otpauthURL({ secret: secret.ascii, label: `ft_transcendence: ${email}` });
+		const url = speakeasy.otpauthURL({ secret: secret.ascii, label: `ft_transcendence: ${user.email}` });
 
 		console.log(url)
 
@@ -100,45 +102,45 @@ export class AuthService {
 
 	}
 
-	async deleteTwoFaSecret(email: string): Promise<[number]> {
-		const updateCount = await this.userService.resetTwoFaSecret(email);
+	async deleteTwoFaSecret(user: TwoFADto): Promise<[number]> {
+		const updateCount = await this.userService.resetTwoFaSecret(user.email);
 		return updateCount;
 	}
 
-	async verifyTwoFa(email: string, token: string): Promise<any> {
-		const user = await this.userService.findOneByEmail(email);
-		if (!user) {
+	async verifyTwoFa(user: TwoFADto): Promise<any> {
+		const identifiedUser = await this.userService.findOneByEmail(user.email);
+		if (!identifiedUser) {
 			console.log("User is not validated");
 			return null;
-		} else if (!user.secretKey) {
+		} else if (!identifiedUser.secretKey) {
 			console.log("2fa secret key is not set");
 			return null;
 		}
-		else if (!user.isActiveTwoFa) {
+		else if (!identifiedUser.isActiveTwoFa) {
 			console.log("2fa is disabled");
 			return null;
 		}
 
 		const isValidToken = speakeasy.totp.verify({
-			secret: user.secretKey,
+			secret: identifiedUser.secretKey,
 			encoding: 'base32',
-			token: token,
+			token: user.token,
 		});
 
 		if (isValidToken) {
-			return user;
+			return identifiedUser;
 		}
 		return null;
 	}
 
-	async enableTwoFa(email: string): Promise<any> {
-		const updateCount = await this.userService.updateIsActiveTwoFa(email, true);
+	async enableTwoFa(user: TwoFADto): Promise<any> {
+		const updateCount = await this.userService.updateIsActiveTwoFa(user.email, true);
 		console.log("update count:", updateCount)
 		return updateCount
 	}
 
-	async disableTwoFa(email: string): Promise<any> {
-		const updateCount = await this.userService.updateIsActiveTwoFa(email, false);
+	async disableTwoFa(user: TwoFADto): Promise<any> {
+		const updateCount = await this.userService.updateIsActiveTwoFa(user.email, false);
 		return updateCount
 	}
 }

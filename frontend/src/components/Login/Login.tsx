@@ -15,7 +15,8 @@ function Login() {
 				console.log(response)
 				setSuccess("Successful login")
 			}).catch(function (error) {
-				setError(error.message)
+				console.log(error)
+				setError(error.response.data.message)
 			});
 	}
 
@@ -31,16 +32,16 @@ function Login() {
 		<div>
 			<div>Login</div>
 			<form onSubmit={handleFormSubmit}>
-				<label>
+				<label htmlFor="field-username">
 					Username
 				</label><br />
-				<input type="text" name='username' placeholder="username" />
+				<input id='field-username' type="text" name='username' placeholder="username" />
 				<br />
-				<label>
+				<label htmlFor="field-password">
 					Password
 				</label>
 				<br />
-				<input type="text" name='password' placeholder="password" />
+				<input id='field-password' type="password" name='password' placeholder="password" />
 				<br />
 				<button type="submit" >Log in</button>
 			</form>

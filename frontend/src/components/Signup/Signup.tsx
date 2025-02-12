@@ -41,22 +41,22 @@ function Signup() {
 		<div>
 			<div>Signup</div>
 			<form onSubmit={handleFormSubmit}>
-				<label>
+				<label htmlFor="field-username">
 					Username
 				</label>
 				<br />
-				<input type="text" name='username' placeholder="username" />
+				<input id='field-username' type="text" name='username' placeholder="username" />
 				<br />
-				<label>
+				<label htmlFor='field-email'>
 					Email Address
 				</label><br />
-				<input type="text" name='email' placeholder="email address" />
+				<input id='field-email' type="text" name='email' placeholder="email address" />
 				<br />
-				<label>
+				<label htmlFor="field-password">
 					Password
 				</label>
 				<br />
-				<input type="text" name='password' placeholder="password" />
+				<input id='field-password' type="password" name='password' placeholder="password" />
 				<br />
 				<button type="submit" >Sign up</button>
 			</form>

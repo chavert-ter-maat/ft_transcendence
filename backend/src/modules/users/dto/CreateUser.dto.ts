@@ -1,6 +1,6 @@
-import { IsAlphanumeric, IsEmail, IsNotEmpty, IsStrongPassword, Length, Matches } from 'class-validator';
+import { IsAlphanumeric, IsEmail, IsNotEmpty, IsStrongPassword } from 'class-validator';
 
-export class UserDto {
+export class CreateUserDto {
 	@IsAlphanumeric()
 	@IsNotEmpty()
 	readonly username: string;

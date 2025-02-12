@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { User } from './user.entity';
-import { UserDto } from './dto/user.dto';
+import { CreateUserDto } from './dto/CreateUser.dto';
 import { USER_REPOSITORY } from '../../core/constants';
 
 @Injectable()
@@ -8,7 +8,7 @@ export class UsersService {
 
 	constructor(@Inject(USER_REPOSITORY) private readonly userRepository: typeof User) { }
 
-	async create(user: UserDto): Promise<User> {
+	async create(user: CreateUserDto): Promise<User> {
 		return await this.userRepository.create<User>(user);
 	}
 
@@ -26,7 +26,6 @@ export class UsersService {
 
 	async updateIsActiveTwoFa(email: string, value): Promise<[number]> {
 		return await this.userRepository.update({ isActiveTwoFa: value }, { where: { email } });
-
 	}
 
 	async resetTwoFaSecret(email: string): Promise<[number]> {

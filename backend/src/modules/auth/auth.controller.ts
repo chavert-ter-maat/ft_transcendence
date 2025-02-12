@@ -1,8 +1,9 @@
 import { Controller, Body, Post, Get, Delete, UseGuards, Request, ValidationPipe } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
-import { UserDto } from '../users/dto/user.dto';
-import { User } from '../users/user.entity';
+import { CreateUserDto } from '../users/dto/CreateUser.dto';
+import { LoginUserDto } from '../users/dto/LoginUser.dto';
+import { TwoFADto } from '../users/dto/TwoFA.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -10,39 +11,39 @@ export class AuthController {
 
 	@UseGuards(AuthGuard('local'))
 	@Post('login')
-	async login(@Request() req) {
-		return await this.authService.login(req.user);
+	async login(@Body(new ValidationPipe()) user: LoginUserDto) {
+		return await this.authService.login(user);
 	}
 
 	@Post('signup')
-	async signUp(@Body(new ValidationPipe()) user: UserDto) {
+	async signUp(@Body(new ValidationPipe()) user: CreateUserDto) {
 		return await this.authService.create(user);
 	}
 
 	@Post('twofa/enable')
-	async enableTwoFa(@Body() req) {
-		return this.authService.enableTwoFa(req.email);
+	async enableTwoFa(@Body() user: TwoFADto) {
+		return this.authService.enableTwoFa(user);
 	}
 
 	@Post('twofa/disable')
-	async disableTwoFa(@Body() req) {
-		return this.authService.disableTwoFa(req.email);
+	async disableTwoFa(@Body() user: TwoFADto) {
+		return this.authService.disableTwoFa(user);
 	}
 
 	@Get('twofa/secret')
-	async getTwoFaSecret(@Body() req: UserDto) {
-		const secret = await this.authService.generateTwoFaSecret(req.email);
+	async getTwoFaSecret(@Body() user: TwoFADto) {
+		const secret = await this.authService.generateTwoFaSecret(user);
 		return secret
 	}
 
 	@Delete('twofa/secret')
-	async deleteTwoFaSecret(@Body() req: UserDto) {
-		const secret = await this.authService.deleteTwoFaSecret(req.email);
+	async deleteTwoFaSecret(@Body() user: TwoFADto) {
+		const secret = await this.authService.deleteTwoFaSecret(user);
 		return secret
 	}
 
 	@Post('twofa/verify')
-	async verifyTwoFa(@Body() req) {
-		return this.authService.verifyTwoFa(req.email, req.token);
+	async verifyTwoFa(@Body() user: TwoFADto) {
+		return this.authService.verifyTwoFa(user);
 	}
 }
