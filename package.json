@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "@nestjs/class-validator": "github:nestjs/class-validator",
+    "@types/validator": "^13.12.2",
+    "class-validator": "^0.14.1"
+  }
+}

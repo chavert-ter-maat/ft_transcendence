@@ -21,7 +21,12 @@ function Signup() {
 				setError(errorMessage[0])
 			}
 			else if (typeof (errorMessage) === typeof "") {
-				setError(errorMessage)
+				if (errorMessage.startsWith("Key (email)")) {
+					let errorMessage = JSON.parse(error.config.data)
+					setError(`Email ${errorMessage.email} is already in use.`)
+				} else {
+					setError(errorMessage)
+				}
 			}
 			else {
 				setError("Unknown error")
