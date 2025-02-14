@@ -16,7 +16,7 @@ export class CreateUserDto {
 			minNumbers: 1,
 			minSymbols: 1,
 			minUppercase: 1
-		}
+		}, { message: "Password must be minimum 8 characters long consisting of lower, uppercase, numeric and special characters." }
 	)
 	@IsNotEmpty()
 	readonly password: string;

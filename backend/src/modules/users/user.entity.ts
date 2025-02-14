@@ -1,4 +1,4 @@
-import { Table, Column, Model, DataType } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, PrimaryKey } from 'sequelize-typescript';
 
 @Table
 export class User extends Model<User> {
@@ -6,6 +6,7 @@ export class User extends Model<User> {
         type: DataType.STRING,
         unique: true,
         allowNull: false,
+        // primaryKey: true
     })
     username: string;
 
@@ -31,4 +32,5 @@ export class User extends Model<User> {
         allowNull: false,
     })
     isActiveTwoFa: boolean;
+
 }

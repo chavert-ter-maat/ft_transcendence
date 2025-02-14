@@ -1,13 +1,15 @@
 import { BadRequestException, HttpException, HttpStatus, Injectable, MaxFileSizeValidator } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import { JwtService } from '@nestjs/jwt';
-import { UsersService } from '../users/users.service';
 import { speakeasy } from 'speakeasy';
-import { TwoFADto } from '../users/dto/TwoFA.dto';
+import { TwoFADto } from '../twofa/dto/TwoFA.dto';
 import { TwoFaStrategy } from './twofa.strategy';
 import { LoginUserDto } from '../users/dto/LoginUser.dto';
 import { CreateContextOptions } from 'vm';
 import { CreateUserDto } from '../users/dto/CreateUser.dto';
+
+import { JwtService } from '@nestjs/jwt';
+import { UsersService } from '../users/users.service';
+import { TwoFAService } from '../twofa/twofa.service';
 const speakeasy = require('speakeasy');
 const QRCode = require('qrcode');
 
@@ -15,6 +17,7 @@ const QRCode = require('qrcode');
 export class AuthService {
 	constructor(
 		private readonly userService: UsersService,
+		private readonly twoFAService: TwoFAService,
 		private readonly jwtService: JwtService,
 	) { }
 
@@ -86,12 +89,11 @@ export class AuthService {
 
 	async generateTwoFaSecret(user: TwoFADto): Promise<void> {
 		const secret = speakeasy.generateSecret()
-		const updateCount = await this.userService.updateTwoFaSecret(user.email, secret.base32);
+		const updateCount = await this.twoFAService.updateTwoFaSecret(user.email, secret.base32);
 
 		if (!updateCount) {
 			return null;
 		}
-
 		const url = speakeasy.otpauthURL({ secret: secret.ascii, label: `ft_transcendence: ${user.email}` });
 
 		console.log(url)
@@ -107,7 +109,7 @@ export class AuthService {
 	}
 
 	async deleteTwoFaSecret(user: TwoFADto): Promise<[number]> {
-		const updateCount = await this.userService.resetTwoFaSecret(user.email);
+		const updateCount = await this.twoFAService.resetTwoFaSecret(user.email);
 		return updateCount;
 	}
 
@@ -138,13 +140,13 @@ export class AuthService {
 	}
 
 	async enableTwoFa(user: TwoFADto): Promise<any> {
-		const updateCount = await this.userService.updateIsActiveTwoFa(user.email, true);
+		const updateCount = await this.twoFAService.updateIsActiveTwoFa(user.email, true);
 		console.log("update count:", updateCount)
 		return updateCount
 	}
 
 	async disableTwoFa(user: TwoFADto): Promise<any> {
-		const updateCount = await this.userService.updateIsActiveTwoFa(user.email, false);
+		const updateCount = await this.twoFAService.updateIsActiveTwoFa(user.email, false);
 		return updateCount
 	}
 }
