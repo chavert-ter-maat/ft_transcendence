@@ -1,57 +1,29 @@
-// import { useState } from "react";
-// import axios from 'axios';
+import axios from 'axios';
+import { useEffect, useState } from 'react'
+import TwoFASetup from './TwoFASetup'
+import TwoFAItem from './TwoFAItem';
+import VerifyTwoFA from './TwoFAVerification';
 
 function TwoFADashboard() {
 
-	// const [error, setError] = useState("")
-	// const [success, setSuccess] = useState("")
+	const [showTwoFaSetup, setShowTwoFASetup] = useState(false)
+	// const [showTwoFaItems, setShowTwoFAItems] = useState([])
 
-	// function validateUserLogin(username: string, password: string): void {
-	// 	axios.post('http://localhost:3000/auth/login', {
-	// 		username: username,
-	// 		password: password
-	// 	})
-	// 		.then(function (response) {
-	// 			console.log(response)
-	// 			setSuccess("Successful login")
-	// 		}).catch(function (error) {
-	// 			setError(error.message)
-	// 		});
-	// }
 
-	// function handleFormSubmit(e: React.FormEvent<HTMLFormElement>) {
-	// 	e.preventDefault();
-	// 	const formData = new FormData(e.currentTarget);
-	// 	const fields = Object.fromEntries(formData) as Record<string, string>;
-
-	// 	validateUserLogin(fields.username, fields.password);
-	// }
-	function handleOnClick() {
-
+	function handleOnClickEvent() {
+		setShowTwoFASetup(false)
+		setShowTwoFASetup(true)
 	}
 
 	return (
 		<div>
-			<div>Two Factor Authentication</div>
-			<button onClick={handleOnClick}>Add new two factor authentication</button>
+			<h1>2FA Dashboard</h1>
+			<button onClick={handleOnClickEvent}>Add 2fa</button>
+			{showTwoFaSetup && <TwoFASetup />}
+			{/* <VerifyTwoFA /> */}
+			<TwoFAItem />
 
-			{/* <form onSubmit={handleFormSubmit}>
-				<label>
-					Username
-				</label><br />
-				<input type="text" name='username' placeholder="username" />
-				<br />
-				<label>
-					Password
-				</label>
-				<br />
-				<input type="text" name='password' placeholder="password" />
-				<br />
-				<button type="submit" >Log in</button>
-			</form>
-			{error && <p>{error}</p>}
-			{success && <p>{success}</p>} */}
 		</div >
 	)
 }
-export default TwoFADashboard 
+export default TwoFADashboard

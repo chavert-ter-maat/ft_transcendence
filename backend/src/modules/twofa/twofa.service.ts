@@ -1,34 +1,81 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, HttpStatus, HttpException } from '@nestjs/common';
 import { TwoFA } from './twofa.entity';
-// import { TwoFADto } from './dto/TwoFA.dto';
 import { TWOFA_REPOSITORY } from '../../core/constants';
+import { UsersService } from '../users/users.service';
+import { ConditionalModule } from '@nestjs/config';
+import { TwoFADto } from './dto/TwoFA.dto';
+const QRCode = require('qrcode');
+const speakeasy = require('speakeasy');
 
 @Injectable()
 export class TwoFAService {
 
-	constructor(@Inject(TWOFA_REPOSITORY) private readonly TwoFARepository: typeof TwoFA) { }
+	constructor(
+		@Inject(TWOFA_REPOSITORY) private readonly TwoFARepository: typeof TwoFA,
+		private readonly userService: UsersService,
+	) { }
 
-	// async create(user: CreateUserDto): Promise<User> {
-	// 	return await this.userRepository.create<User>(user);
-	// }
-
-	// async findOneByEmail(email: string): Promise<User> {
-	// 	return await this.userRepository.findOne<User>({ where: { email } });
-	// }
-
-	// async findOneById(id: number): Promise<User> {
-	// 	return await this.userRepository.findOne<User>({ where: { id } });
-	// }
-
-	async updateTwoFaSecret(email: string, secret): Promise<[number]> {
-		return await this.TwoFARepository.update({ secretKey: secret }, { where: { email } });
+	async saveToDb(data): Promise<TwoFADto> {
+		console.log("create secret:", data)
+		return await this.TwoFARepository.create({ ...data, isActive: true });
 	}
 
-	async updateIsActiveTwoFa(email: string, value): Promise<[number]> {
-		return await this.TwoFARepository.update({ isActiveTwoFa: value }, { where: { email } });
+
+	async retrieveTwoFaSetup(data: TwoFADto): Promise<TwoFA> {
+		return this.TwoFARepository.findOne({ where: { email: data.email } })
 	}
 
-	async resetTwoFaSecret(email: string): Promise<[number]> {
-		return await this.TwoFARepository.update({ isActiveTwoFa: false, secretKey: null }, { where: { email } });
+	async generateTwoFaSecret(): Promise<object> {
+		try {
+			const secret = speakeasy.generateSecret()
+			const url = speakeasy.otpauthURL({ secret: secret.ascii, label: "ft_transcendence" });
+			const qrCodeUrl = await QRCode.toDataURL(url);
+			return { secretKey: secret.base32, qrCodeUrl: qrCodeUrl };
+		} catch (err) {
+			console.error("Couldn't generate QR code, try again");
+			throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR)
+		}
+
+	}
+
+
+	async verifyTwoFa(data): Promise<any> {
+		const identifiedUser = await this.userService.findOneByEmail(data.email);
+		if (!identifiedUser) {
+			throw new HttpException("Unauthorized user", HttpStatus.UNAUTHORIZED);
+		}
+
+		const isValidToken = speakeasy.totp.verify({
+			secret: data.secretKey,
+			encoding: 'base32',
+			token: data.token,
+		});
+
+		if (isValidToken) { return { email: identifiedUser.email, secretKey: data.secretKey } }
+		throw new HttpException("Invalid token", HttpStatus.UNAUTHORIZED);
+	}
+
+	async enableTwoFa(user: TwoFADto): Promise<any> {
+		const updateCount = await this.TwoFARepository.update({ isActive: true }, { where: { email: user.email } });
+
+		if (!updateCount[0]) {
+			throw new HttpException("No record updated", HttpStatus.INTERNAL_SERVER_ERROR)
+		}
+	}
+
+	async disableTwoFa(user: TwoFADto): Promise<any> {
+		const updateCount = await this.TwoFARepository.update({ isActive: false }, { where: { email: user.email } });
+
+		if (!updateCount[0]) {
+			throw new HttpException("No record updated", HttpStatus.INTERNAL_SERVER_ERROR)
+		}
+	}
+
+	async deleteTwoFAItem(user: TwoFADto): Promise<any> {
+		const updateCount = await this.TwoFARepository.destroy({ where: { email: user.email } });
+		console.log(updateCount)
+		if (!updateCount) {
+			throw new HttpException("No user found to be deleted", HttpStatus.INTERNAL_SERVER_ERROR)
+		}
 	}
 }

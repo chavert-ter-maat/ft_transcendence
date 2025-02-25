@@ -6,7 +6,6 @@ import { AuthController } from './auth.controller';
 import { UsersModule } from '../users/users.module';
 import { LocalStrategy } from './local.strategy';
 import { JwtStrategy } from './jwt.strategy';
-import { TwoFAService } from '../twofa/twofa.service';
 import { TwoFAModule } from '../twofa/towfa.module';
 
 @Module({

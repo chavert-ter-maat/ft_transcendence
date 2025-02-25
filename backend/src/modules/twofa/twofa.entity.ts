@@ -1,27 +1,25 @@
 import { Table, Column, Model, DataType } from 'sequelize-typescript';
 
-@Table
+@Table({ tableName: 'Twofas' })
 export class TwoFA extends Model<TwoFA> {
 	@Column({
 		type: DataType.STRING,
-		unique: true,
-		allowNull: false,
-	})
-	username: string;
-
-	@Column({
-		type: DataType.STRING,
+		primaryKey: true,
 		unique: true,
 		allowNull: false,
 	})
 	email: string;
-	@Column({ allowNull: true })
+
+	@Column({
+		type: DataType.STRING,
+		allowNull: false
+	})
 	secretKey: string;
 
 	@Column({
-		type: DataType.BOOLEAN, // Specify the data type as BOOLEAN
-		defaultValue: false,    // Set the default value to false
+		type: DataType.BOOLEAN,
+		defaultValue: false,
 		allowNull: false,
 	})
-	isActiveTwoFa: boolean;
+	isActive: boolean;
 }
