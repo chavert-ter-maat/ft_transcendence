@@ -17,7 +17,9 @@ export class TwoFAService {
 
 	async saveToDb(data): Promise<TwoFADto> {
 		console.log("create secret:", data)
-		return await this.TwoFARepository.create({ ...data, isActive: true });
+		const savedItem = await this.TwoFARepository.create({ ...data });
+		console.log(savedItem)
+		return savedItem
 	}
 
 
@@ -38,7 +40,6 @@ export class TwoFAService {
 
 	}
 
-
 	async verifyTwoFa(data): Promise<any> {
 		const identifiedUser = await this.userService.findOneByEmail(data.email);
 		if (!identifiedUser) {
@@ -53,22 +54,6 @@ export class TwoFAService {
 
 		if (isValidToken) { return { email: identifiedUser.email, secretKey: data.secretKey } }
 		throw new HttpException("Invalid token", HttpStatus.UNAUTHORIZED);
-	}
-
-	async enableTwoFa(user: TwoFADto): Promise<any> {
-		const updateCount = await this.TwoFARepository.update({ isActive: true }, { where: { email: user.email } });
-
-		if (!updateCount[0]) {
-			throw new HttpException("No record updated", HttpStatus.INTERNAL_SERVER_ERROR)
-		}
-	}
-
-	async disableTwoFa(user: TwoFADto): Promise<any> {
-		const updateCount = await this.TwoFARepository.update({ isActive: false }, { where: { email: user.email } });
-
-		if (!updateCount[0]) {
-			throw new HttpException("No record updated", HttpStatus.INTERNAL_SERVER_ERROR)
-		}
 	}
 
 	async deleteTwoFAItem(user: TwoFADto): Promise<any> {

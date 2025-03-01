@@ -12,7 +12,6 @@ createRoot(document.getElementById('root')!).render(
     {/* <App /> */}
     {/* <Signup /> */}
     {/* <Login /> */}
-    {/* <p>------------------</p> */}
     <TwoFADashboard />
   </StrictMode>,
 )

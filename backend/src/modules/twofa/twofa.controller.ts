@@ -27,16 +27,6 @@ export class TwoFAController {
 		return this.twoFAService.verifyTwoFa(data);
 	}
 
-	@Post('enable')
-	async enableTwoFa(@Body() user) {
-		return this.twoFAService.enableTwoFa(user);
-	}
-
-	@Post('disable')
-	async disableTwoFa(@Body() user) {
-		return this.twoFAService.disableTwoFa(user);
-	}
-
 	@Delete('item')
 	async deleteTwoFaSecret(@Body() user: TwoFADto) {
 		const secret = await this.twoFAService.deleteTwoFAItem(user);

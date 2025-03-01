@@ -9,6 +9,4 @@ export class VerifyTwoFADto {
 
 	@IsNotEmpty()
 	readonly token: Boolean;
-
-	readonly isActive: Boolean;
 }

@@ -1,72 +1,87 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
-function TwoFASetup() {
-	const [twoFAData, setTwoFAData] = useState({});
-	const [errorMessage, setErrorMessage] = useState("")
-	const [successMessage, setSuccessMessage] = useState("")
+function TwoFASetup({ setCurrentTwoFAItem }) {
+	const [twoFAData, setTwoFASetupData] = useState(null); // Initially null
+	const [errorMessage, setErrorMessage] = useState("");
+	const [loading, setLoading] = useState(true); // Loading state
 
-	useEffect(() => {
-		axios.get("http://localhost:3000/auth/twofa/generate")
-			.then((response) => {
-				console.log("response:", response);
-				setTwoFAData(response.data);
-			})
-			.catch((e) => {
-				setSuccessMessage("")
-				setErrorMessage(e.response.data)
-			});
-	}, []);
+	async function generateQRCode() {
+		setLoading(true)
+		try {
+			const response = await axios.get("http://localhost:3000/auth/twofa/generate");
+			console.log("response:", response.data);
+			setTwoFASetupData(response.data);
+			setErrorMessage("");
+		} catch (e) {
+			setErrorMessage(e.response?.data?.message || "An error occurred");
+		} finally {
+			setLoading(false);
+		}
+	}
 
-	function saveSecretKeyToDatabase(res: object) {
-		axios.post("http://localhost:3000/auth/twofa/save", { secretKey: twoFAData.secretKey, email: "test@testmail.com" })
-			.then((response) => {
-				setSuccessMessage("Two Factor Authentication is successfully set up")
-				setErrorMessage("")
+	async function saveSecretKeyToDatabase() {
+		try {
+			const response = await axios.post("http://localhost:3000/auth/twofa/save", {
+				secretKey: twoFAData?.secretKey,
+				email: "test@testmail.com"
 			})
-			.catch((e) => {
-				console.log(e)
-				setSuccessMessage("")
-				setErrorMessage(e)
-			});
+			setErrorMessage("");
+			return response?.data;
+		}
+		catch (e) {
+			console.log(e);
+			setErrorMessage(e.response?.data?.message || "Failed to save secret key");
+		};
 	}
 
 
-	function setTwoFA(e) {
+	async function saveTwoFASetup(e) {
 		e.preventDefault();
 		const formData = new FormData(e.currentTarget);
-		const formFields = Object.fromEntries(formData) as Record<string, string>;
-
-		axios.post("http://localhost:3000/auth/twofa/verify", { ...formFields, secretKey: twoFAData.secretKey, email: "test@testmail.com" })
-			.then((response) => {
-				console.log("twofadata: ", response)
-				setErrorMessage("")
-				saveSecretKeyToDatabase(response.data)
+		const formFields = Object.fromEntries(formData);
+		try {
+			const response = await axios.post("http://localhost:3000/auth/twofa/verify", {
+				...formFields,
+				secretKey: twoFAData?.secretKey,
+				email: "test@testmail.com"
 			})
-			.catch((e) => {
-				console.log("error occurred: ", e);
-				setErrorMessage(e.response.data.message)
-			});
+			console.log("twoFA verification response: ", response);
+			setErrorMessage("");
+			const savedItem = await saveSecretKeyToDatabase();
+			console.log(savedItem)
+			setCurrentTwoFAItem(savedItem)
 
+		}
+		catch (e) {
+			console.log("error occurred: ", e);
+			setErrorMessage(e.response?.data?.message || "Verification failed");
+		};
 	}
 
 	return (
 		<div>
 			<h2>Add Two Factor Authentication</h2>
+			{!twoFAData && <button onClick={generateQRCode}>Add 2FA</button>}
 
-			<img src={twoFAData.qrCodeUrl} alt="QR Code" />
-			<p>Scan the QR code with your authenticator app</p>
-			<br />
-			<form onSubmit={setTwoFA}>
-				<label htmlFor="2fa-verification">
-					Verify with your token
-				</label> <br />
-				<input id="2fa-verification" name="token" placeholder="Enter token" type="text" required />
-				<br />
-				<button type="submit">verify</button>
-			</form>
-			{errorMessage && <p>{errorMessage}</p>}
-			{successMessage && <p>{successMessage}</p>}
+			{/* Show QR Code when data is available */}
+			{twoFAData && (
+				<>
+					<p>Scan the QR code with your authenticator app</p>
+					{loading && <p>Loading QR Code...</p>}
+					<img src={twoFAData.qrCodeUrl} alt="QR Code" /> <br />
+
+					<button onClick={generateQRCode}>🔁 Regenerate QR</button>
+					<br />
+					<br />
+					<form onSubmit={saveTwoFASetup}>
+						<input id="2fa-verification" name="token" placeholder="Enter token" type="text" required />
+						<br />
+						<button type="submit">Setup☑️</button>
+					</form>
+					{errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}				</>
+			)}
+
 		</div>
 	);
 }

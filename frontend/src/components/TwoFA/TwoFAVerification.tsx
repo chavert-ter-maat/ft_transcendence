@@ -2,54 +2,53 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 
 function VerifyTwoFA() {
-	const [errorMessage, setErrorMessage] = useState("")
-	const [successMessage, setSuccessMessage] = useState("")
-	const [verifiedUser, setVerifiedUser] = useState()
+	const [errorMessage, setErrorMessage] = useState("");
+	const [successMessage, setSuccessMessage] = useState("");
+	const [verifiedUser, setVerifiedUser] = useState(null);
 
 	useEffect(() => {
+		const fetchVerifiedUser = async () => {
+			try {
+				const response = await axios.get("http://localhost:3000/auth/twofa/item", {
+					params: { email: "test@testmail.com" }
+				});
+				setVerifiedUser(response.data);
+			} catch (error) {
+				setErrorMessage(error.response?.data?.message || "Failed to fetch user");
+			}
+		};
+
+		fetchVerifiedUser();
 	}, []);
 
-	useEffect(() => {
-		axios.get("http://localhost:3000/auth/twofa/item", { params: { email: "test@testmail.com" } })
-			.then((response) => {
-				console.log("verified user", response)
-				setVerifiedUser(response.data)
-			})
-			.catch((e) => {
-				setErrorMessage(e.message)
-			});
-	}, []);
-
-	function handleVerification(e) {
+	const handleVerification = async (e) => {
 		e.preventDefault();
 		const formData = new FormData(e.currentTarget);
-		const formFields = Object.fromEntries(formData) as Record<string, string>;
+		const formFields = Object.fromEntries(formData);
 
-		axios.post("http://localhost:3000/auth/twofa/verify", { ...verifiedUser, ...formFields })
-			.then((response) => {
-				setSuccessMessage("Token verified")
-				setErrorMessage("")
-			})
-			.catch((e) => {
-				console.log("error msg", e)
-				setSuccessMessage("")
-				setErrorMessage(e.response.data.message)
+		try {
+			await axios.post("http://localhost:3000/auth/twofa/verify", {
+				...verifiedUser,
+				...formFields,
 			});
-	}
-
+			setSuccessMessage("Token verified successfully");
+			setErrorMessage("");
+		} catch (error) {
+			setSuccessMessage("");
+			setErrorMessage(error.response?.data?.message || "Verification failed");
+		}
+	};
 
 	return (
 		<div>
-			<p>Verify your Token</p>
+			<h2>Verify Your Token</h2>
 			<form onSubmit={handleVerification}>
-				<label htmlFor="2fa-verification">
-				</label> <br />
 				<input id="2fa-verification" name="token" placeholder="Enter token" type="text" required />
 				<br />
 				<button type="submit">Verify</button>
 			</form>
-			{errorMessage && <p>{errorMessage}</p>}
-			{successMessage && <p>{successMessage}</p>}
+			{errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
+			{successMessage && <p style={{ color: "green" }}>{successMessage}</p>}
 		</div>
 	);
 }

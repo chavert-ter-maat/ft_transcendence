@@ -15,11 +15,4 @@ export class TwoFA extends Model<TwoFA> {
 		allowNull: false
 	})
 	secretKey: string;
-
-	@Column({
-		type: DataType.BOOLEAN,
-		defaultValue: false,
-		allowNull: false,
-	})
-	isActive: boolean;
 }

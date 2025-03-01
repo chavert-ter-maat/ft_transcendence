@@ -22,6 +22,4 @@ export class CreateUserDto {
 	readonly password: string;
 
 	readonly secretKey: string;
-
-	readonly isActiveTwoFa: boolean
 }

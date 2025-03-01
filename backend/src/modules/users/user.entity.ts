@@ -26,11 +26,4 @@ export class User extends Model<User> {
     @Column({ allowNull: true })
     secretKey: string;
 
-    @Column({
-        type: DataType.BOOLEAN, // Specify the data type as BOOLEAN
-        defaultValue: false,    // Set the default value to false
-        allowNull: false,
-    })
-    isActiveTwoFa: boolean;
-
 }
