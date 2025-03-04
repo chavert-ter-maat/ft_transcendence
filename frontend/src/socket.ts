@@ -1,5 +1,13 @@
 import { io, Socket } from "socket.io-client";
-import { GameState } from "./components/Game";
+import {
+  GameState,
+  PlayerKey,
+  CountdownData,
+  MatchFoundData,
+  QueueStatusData,
+  MovePaddleData,
+  ErrorData,
+} from "./types";
 
 let socket: Socket | null = null;
 const VITE_API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
@@ -43,9 +51,7 @@ export const getSocket = (): Socket => {
   return socket;
 };
 
-export const onCountdown = (
-  callback: (data: { gameId: string; duration: number }) => void
-) => {
+export const onCountdown = (callback: (data: CountdownData) => void) => {
   socket?.on("countdown", callback);
 };
 
@@ -53,7 +59,7 @@ export const offCountdown = () => {
   socket?.off("countdown");
 };
 
-export const onMatchFound = (callback: (data: { gameId: string }) => void) => {
+export const onMatchFound = (callback: (data: MatchFoundData) => void) => {
   socket?.on("matchFound", callback);
 };
 
@@ -61,7 +67,7 @@ export const offMatchFound = () => {
   socket?.off("matchFound");
 };
 
-export const onQueueStatus = (callback: (data: { status: string }) => void) => {
+export const onQueueStatus = (callback: (data: QueueStatusData) => void) => {
   socket?.on("queueStatus", callback);
 };
 
@@ -76,20 +82,17 @@ export const joinQueue = (gameMode: string) => {
 export const joinGame = (
   gameMode: string,
   gameId: string | undefined,
-  setQueueStatus: React.Dispatch<React.SetStateAction<string>>,
   callback: (gameId: string) => void
 ) => {
   socket?.emit("joinGame", { gameMode, gameId });
   if (gameMode === "remoteMultiplayer") {
-    socket?.on("matchFound", (data) => {
+    socket?.on("matchFound", (data: MatchFoundData) => {
       callback(data.gameId);
     });
   } else {
     socket?.on("gameStarted", callback);
   }
 };
-
-type PlayerKey = "player1" | "player2" | "default";
 
 const lastMoveTimes: Record<PlayerKey, number> = {
   player1: 0,
@@ -112,7 +115,11 @@ export const movePaddle = (
   if (now - lastTime >= MOVE_THROTTLE) {
     const socket = getSocket();
     if (socket) {
-      socket.emit("movePaddle", { gameId, direction, player });
+      socket.emit("movePaddle", {
+        gameId,
+        direction,
+        player,
+      } as MovePaddleData);
       lastMoveTimes[playerKey] = now;
     }
   }
@@ -143,7 +150,7 @@ export const requestRematch = (
   if (socket) {
     socket.emit("requestRematch", { gameId });
 
-    socket.once("error", (data: { message: string }) => {
+    socket.once("error", (data: ErrorData) => {
       if (onError) {
         onError(data.message);
       }

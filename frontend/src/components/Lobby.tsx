@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { GameMode } from "./Game";
+import { GameMode, LobbyProps } from "../types";
 import {
   getSocket,
   joinGame,
@@ -10,12 +10,6 @@ import {
   onQueueStatus,
   offQueueStatus,
 } from "../socket";
-
-interface LobbyProps {
-  onGameStart: (gameMode: GameMode, gameId: string) => void;
-  queueStatus: string;
-  setQueueStatus: React.Dispatch<React.SetStateAction<string>>;
-}
 
 const Lobby: React.FC<LobbyProps> = ({
   onGameStart,
@@ -71,9 +65,13 @@ const Lobby: React.FC<LobbyProps> = ({
       setQueueStatus("joining");
       socket.emit("joinQueue", { playerId: socket.id });
     } else {
-      joinGame(gameMode, undefined, () => {}, (gameId) => {
-        onGameStart(gameMode, gameId);
-      });
+      joinGame(
+        gameMode,
+        undefined,
+        (gameId) => {
+          onGameStart(gameMode, gameId);
+        }
+      );
     }
   };
 

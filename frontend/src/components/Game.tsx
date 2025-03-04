@@ -13,62 +13,7 @@ import {
   requestRematch,
 } from "../socket";
 import Scoreboard from "./Scoreboard";
-
-export interface Player {
-  id: string;
-  paddle: Paddle;
-  score: number;
-}
-
-export interface Paddle {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-}
-
-export interface Ball {
-  x: number;
-  y: number;
-  radius: number;
-  velocityX: number;
-  velocityY: number;
-}
-
-export interface PowerUp {
-  x: number;
-  y: number;
-  width: number;
-}
-
-export type GameMode =
-  | "singleplayer"
-  | "localMultiplayer"
-  | "remoteMultiplayer";
-
-export interface GameState {
-  player1: Player;
-  player2: Player;
-  ball: Ball;
-  gameStarted: Date;
-  gameMode: GameMode;
-  powerUp?: PowerUp;
-}
-
-interface CoordinateCache {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  radius?: number;
-}
-
-interface GameProps {
-  gameMode: GameMode;
-  gameId: string;
-  setQueueStatus: React.Dispatch<React.SetStateAction<string>>;
-  onGameStart: (gameMode: GameMode, gameId: string) => void;
-}
+import { GameState, CoordinateCache, GameProps } from "../types";
 
 const Game: React.FC<GameProps> = ({
   gameMode,

@@ -1,13 +1,9 @@
 import React, { useState, useEffect } from "react";
 import "./App.css";
 import Lobby from "./components/Lobby";
-import Game, { GameMode } from "./components/Game";
+import Game from "./components/Game";
 import { connectSocket, disconnectSocket } from "./socket";
-
-interface SocketStatusProps {
-  isConnected: boolean;
-  socketId: string | null;
-}
+import { SocketStatusProps, GameMode } from "./types";
 
 const SocketStatus: React.FC<SocketStatusProps> = ({ isConnected, socketId }) => (
   <div className="socket-status">
