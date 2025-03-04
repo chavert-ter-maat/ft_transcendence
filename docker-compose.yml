@@ -32,6 +32,8 @@ services:
       - ./frontend/src:/app/frontend/src
     networks:
       - app-network
+    env_file:
+      - .env
     develop:
       watch:
         - action: sync
