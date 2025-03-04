@@ -82,12 +82,7 @@ export const joinGame = (
   socket?.emit("joinGame", { gameMode, gameId });
   if (gameMode === "remoteMultiplayer") {
     socket?.on("matchFound", (data) => {
-      socket?.off("queueStatus");
       callback(data.gameId);
-    });
-    socket?.on("queueStatus", (data) => {
-      setQueueStatus(data.status);
-      console.log("Queue status:", data.status);
     });
   } else {
     socket?.on("gameStarted", callback);

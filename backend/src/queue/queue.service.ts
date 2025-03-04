@@ -52,12 +52,14 @@ export class QueueService {
       if (socket2) socket2.join(tempLobby);
 
       const duration = 5;
+
+      this.gameGateway.server
+        .to([player1, player2])
+        .emit('queueStatus', { status: 'matched' });
+
       this.gameGateway.server
         .to([player1, player2])
         .emit('countdown', { gameId: null, duration });
-
-      socket1?.emit('queueStatus', { status: 'matched' });
-      socket2?.emit('queueStatus', { status: 'matched' });
 
       setTimeout(() => {
         if (!socket1?.connected || !socket2?.connected) {

@@ -27,7 +27,6 @@ const Lobby: React.FC<LobbyProps> = ({
 
   useEffect(() => {
     const handleCountdown = (data: { gameId: string; duration: number }) => {
-      setQueueStatus("matched");
       setCountdown(data.duration);
       const interval = setInterval(() => {
         setCountdown((prev) => {
@@ -71,13 +70,8 @@ const Lobby: React.FC<LobbyProps> = ({
     if (gameMode === "remoteMultiplayer") {
       setQueueStatus("joining");
       socket.emit("joinQueue", { playerId: socket.id });
-      socket.once("queueStatus", (data: { status: string }) => {
-        if (data.status === "inQueue") {
-          setQueueStatus("inQueue");
-        }
-      });
     } else {
-      joinGame(gameMode, undefined, setQueueStatus, (gameId) => {
+      joinGame(gameMode, undefined, () => {}, (gameId) => {
         onGameStart(gameMode, gameId);
       });
     }

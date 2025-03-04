@@ -211,9 +211,19 @@ export class GameService {
     const game = this.games.get(gameId);
     if (game) {
       if (game.player1?.id) {
+        const timeout1 = this.powerUpTimeouts.get(game.player1.id);
+        if (timeout1) {
+          clearTimeout(timeout1);
+          this.powerUpTimeouts.delete(game.player1.id);
+        }
         this.playerGameMap.delete(game.player1.id);
       }
       if (game.player2?.id) {
+        const timeout2 = this.powerUpTimeouts.get(game.player2.id);
+        if (timeout2) {
+          clearTimeout(timeout2);
+          this.powerUpTimeouts.delete(game.player2.id);
+        }
         this.playerGameMap.delete(game.player2.id);
       }
       this.games.delete(gameId);
@@ -264,6 +274,8 @@ export class GameService {
     }, SERVER_TICKRATE);
   }
 
+  private powerUpTimeouts: Map<string, NodeJS.Timeout> = new Map();
+
   private updateGame(gameId: string, game: GameState) {
     const now = Date.now();
     const isSinglePlayer = game.gameMode === 'singleplayer';
@@ -272,7 +284,7 @@ export class GameService {
     if (!game.powerUp && now - roundStartTime >= 2000) {
       game.powerUp = {
         x: 20 + Math.random() * 60,
-        y: Math.random() * 100,
+        y: 10 + Math.random() * 80,
         width: 3,
         spawnTime: now,
       };
@@ -304,17 +316,22 @@ export class GameService {
           game.ball.velocityX > 0 ? game.player1 : game.player2;
         const originalHeight = 10;
 
-        if (affectedPlayer.paddle.height === originalHeight) {
-          affectedPlayer.paddle.height = originalHeight * 2;
-          setTimeout(() => {
-            if (this.games.has(gameId)) {
-              const currentGame = this.games.get(gameId);
-              if (currentGame) {
-                affectedPlayer.paddle.height = originalHeight;
-              }
-            }
-          }, 10000);
+        const existingTimeout = this.powerUpTimeouts.get(affectedPlayer.id);
+        if (existingTimeout) {
+          clearTimeout(existingTimeout);
         }
+
+        affectedPlayer.paddle.height = originalHeight * 2;
+        const timeoutId = setTimeout(() => {
+          if (this.games.has(gameId)) {
+            const currentGame = this.games.get(gameId);
+            if (currentGame) {
+              affectedPlayer.paddle.height = originalHeight;
+            }
+          }
+          this.powerUpTimeouts.delete(affectedPlayer.id);
+        }, 10000);
+        this.powerUpTimeouts.set(affectedPlayer.id, timeoutId);
         game.powerUp = undefined;
         game.lastPowerUpSpawn = now;
       }

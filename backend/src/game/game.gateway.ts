@@ -114,9 +114,10 @@ export class GameGateway
 
   @SubscribeMessage('joinQueue')
   handleJoinQueue(@ConnectedSocket() client: Socket) {
+    client.emit('queueStatus', { status: 'inQueue' });
     const result = this.queueService.addPlayerToQueue(client.id);
-    if (result.message === 'Joined queue') {
-      client.emit('queueStatus', { status: 'inQueue' });
+    if (result.message !== 'Joined queue') {
+      client.emit('queueStatus', { status: 'error' });
     }
   }
 
