@@ -14,7 +14,7 @@ function App(): JSX.Element {
         <Route path="/" element={<Navigate to="/login" />} />
         <Route path="/login" element={<Login />} />
         <Route path="/auth/42/callback" element={<AuthCallback />} />
-		<Route path="/game" element={<App_game />} />
+		{/* <Route path="/game" element={<App_game />} /> */}
 		{/* <Route path="/chat" element={<Chat />} /> */}
         <Route
           path="/userpage"
@@ -32,14 +32,14 @@ function App(): JSX.Element {
             </ProtectedRoute>
           }
         />
-		{/* <Route
+		<Route
           path="/game"
           element={
             <ProtectedRoute>
               <App_game />
             </ProtectedRoute>
           }
-        /> */}
+        />
       </Routes>
     </Router>
   );
