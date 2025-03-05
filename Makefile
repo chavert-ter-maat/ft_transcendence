@@ -10,11 +10,11 @@ all: up
 
 up:
 	@mkdir -p $(DB_DATA)
-	NODE_ENV=production ${DOCKER_COMPOSE} up --build -d
+	NODE_ENV=production ${DOCKER_COMPOSE} up --build
 
 dev:
 	@mkdir -p $(DB_DATA)
-	NODE_ENV=development ${DOCKER_COMPOSE} --profile dev up --build -d
+	NODE_ENV=development ${DOCKER_COMPOSE} --profile dev up --build
 
 test: down build up
 

@@ -19,7 +19,7 @@ import { QueueService } from 'src/queue/queue.service';
   cors: {
     origin: process.env.FRONTEND_PORT
       ? [`http://localhost:${process.env.FRONTEND_PORT}`]
-      : ['http://localhost:5173'],
+      : ['http://localhost:3000'],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     credentials: true,
     allowedHeaders: ['Content-Type', 'Authorization'],

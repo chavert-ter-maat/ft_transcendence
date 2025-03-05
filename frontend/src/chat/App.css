@@ -1,0 +1,193 @@
+.App {
+  text-align: center;
+}
+
+:root {
+	--user_message_background_color: rgb(128, 196, 255);
+	--user_message_font_color: rgb(255, 255, 255);
+	--some_message_background_color: rgb(128, 255, 196);
+	--some_message_font_color: rgb(255, 255, 255);
+	--mesage_user_font_size: calc(8px + 0.8vmin);
+	--mesage_body_font_size: calc(10px + 1vmin);
+	--mesage_time_font_size: calc(5px + 0.5vmin);
+	--mesage_pic_size: calc(var(--mesage_user_font_size) + var(--mesage_body_font_size) + var(--mesage_time_font_size));
+}
+
+.App-logo {
+	width: 20%;
+	z-index: 1; 
+}
+
+.App-chat_name {
+	background-color: var(--user_message_background_color);
+	width: 50%;
+	margin-top: 1%;
+	padding-top: 1%;
+	padding-left: 5%;
+	padding-right: 5%;
+	display: flex;
+	flex-direction: column;
+	float: left;
+	align-items: start;
+	font-size: calc(15px + 1.5vmin);
+	color: var(--user_message_font_color);
+}
+
+.App-chat_name_timestamp {
+	background-color: var(--user_message_background_color);
+	width: 50%;
+	padding-left: 5%;
+	padding-right: 5%;
+	padding-bottom: 1%;
+	display: flex;
+	flex-direction: column;
+	float: left;
+	align-items: end;
+	font-size: var(--mesage_time_font_size);
+	color: var(--user_message_font_color);
+}
+
+.App-chat_name_button {
+	background-color: var(--user_message_background_color);
+	margin-top: 1%;
+	width: 30%;
+	display: flex;
+	flex-direction: row;
+	float: right;
+	align-items: center;
+	height: var(--mesage_pic_size);
+	font-size: calc(6px + 0.6vmin);
+	color: var(--user_message_font_color);
+  }
+
+
+.App-header {
+  /* background-color: #282c34; */
+  min-height: 45vh;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+  background-image: url("mountain-valley.jpg");
+  background-size: 100% 100%;
+}
+
+.App-message_Jojo_pic {
+	background-color: var(--user_message_background_color);
+	width: 10%;
+	display: flex;
+	flex-direction: row;
+	float: left;
+	align-items: start;
+	height: var(--mesage_pic_size);
+	/* background-color: var(--user_message_background_color);
+	width: 60%;
+	display: flex;
+	flex-direction: column;
+	float: right;
+	align-items: end;
+	font-size: var(--mesage_time_font_size);
+	color: var(--user_message_font_color); */
+  }
+
+.App-message_Jojo_user {
+	background-color: var(--user_message_background_color);
+	width: 60%;
+	padding-left: 15%;
+	padding-right: 15%;
+	display: flex;
+	flex-direction: column;
+	float: right;
+	align-items: end;
+	font-size: var(--mesage_user_font_size);
+	color: var(--user_message_font_color);
+  }
+
+.App-message_Jojo {
+	background-color: var(--user_message_background_color);
+	/* min-height: var(--mesage_body_font_size); */
+	width: 60%;
+	padding-left: 15%;
+	padding-right: 15%;
+	display: flex;
+	flex-direction: column;
+	float: right;
+	align-items: start;
+	font-size: var(--mesage_body_font_size);
+	color: var(--user_message_font_color);
+  }
+
+.App-message_Jojo_timestamp {
+	background-color: var(--user_message_background_color);
+	width: 60%;
+	padding-left: 15%;
+	padding-right: 15%;
+	display: flex;
+	flex-direction: column;
+	float: right;
+	align-items: end;
+	font-size: var(--mesage_time_font_size);
+	color: var(--user_message_font_color);
+  }
+
+  .App-message_someone_else_pic {
+	background-color: var(--user_message_background_color);
+	width: 10%;
+	display: flex;
+	flex-direction: row;
+	float: right;
+	align-items: end;
+	height: var(--mesage_pic_size);
+	/* background-color: var(--user_message_background_color);
+	width: 60%;
+	display: flex;
+	flex-direction: column;
+	float: right;
+	align-items: end;
+	font-size: var(--mesage_time_font_size);
+	color: var(--user_message_font_color); */
+  }
+
+.App-message_someone_else_user {
+	background-color: var(--some_message_background_color);
+	width: 60%;
+	padding-right: 15%;
+	padding-left: 15%;
+	display: flex;
+	flex-direction: column;
+	float: left;
+	align-items: end;
+	font-size: var(--mesage_user_font_size);
+	color: var(--some_message_font_color);
+  }
+
+.App-message_someone_else {
+	background-color: var(--some_message_background_color);
+	/* min-height: var(--mesage_body_font_size); */
+	width: 60%;
+	padding-right: 15%;
+	padding-left: 15%;
+	display: flex;
+	float: left;
+	flex-direction: column;
+	align-items: start;
+	font-size: var(--mesage_body_font_size);
+	color: var(--some_message_font_color);
+  }
+
+.App-message_someone_else_timestamp {
+	background-color: var(--some_message_background_color);
+	width: 60%;
+	padding-right: 15%;
+	padding-left: 15%;
+	display: flex;
+	flex-direction: column;
+	float: left;
+	align-items: end;
+	font-size: var(--mesage_time_font_size);
+	color: var(--some_message_font_color);
+  }
+
+.App-link {
+  color: #61dafb;
+}

@@ -1,87 +1,48 @@
-import React, { useState, useEffect } from "react";
-import "./App.css";
-import Lobby from "./components/Lobby";
-import Game from "./components/Game";
-import { connectSocket, disconnectSocket } from "./socket";
-import { SocketStatusProps, GameMode } from "./types";
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import Login from './components/Login';
+import UserPage from './components/UserPage';
+import AuthCallback from './components/AuthCallback';
+import ProtectedRoute from './components/ProtectedRoute';
+import Chat from './chat/Chat';
+import App_game from './App_game';
 
-const SocketStatus: React.FC<SocketStatusProps> = ({ isConnected, socketId }) => (
-  <div className="socket-status">
-    {isConnected ? (
-      <span className="status-connected">
-        Connected {socketId && `(ID: ${socketId})`}
-      </span>
-    ) : (
-      <span className="status-disconnected">Disconnected</span>
-    )}
-  </div>
-);
-
-const App: React.FC = () => {
-  const [gameStarted, setGameStarted] = useState(false);
-  const [gameMode, setGameMode] = useState<GameMode>("singleplayer");
-  const [gameId, setGameId] = useState("");
-  const [queueStatus, setQueueStatus] = useState("inactive");
-  const [isConnected, setIsConnected] = useState(false);
-  const [socketId, setSocketId] = useState<string | null>(null);
-
-  useEffect(() => {
-    console.log("Connecting socket...");
-    const socket = connectSocket();
-
-    const handleConnect = () => {
-      setIsConnected(true);
-      setSocketId(socket?.id || null);
-    };
-
-    const handleDisconnect = () => {
-      setIsConnected(false);
-      setSocketId(null);
-    };
-
-    socket?.on("connect", handleConnect);
-    socket?.on("disconnect", handleDisconnect);
-
-    if (socket?.connected) {
-      handleConnect();
-    }
-
-    return () => {
-      socket?.off("connect", handleConnect);
-      socket?.off("disconnect", handleDisconnect);
-      disconnectSocket();
-    };
-  }, []);
-
-  const handleGameStart = (
-    selectedGameMode: GameMode,
-    selectedGameId: string
-  ) => {
-    setGameMode(selectedGameMode);
-    setGameId(selectedGameId);
-    setGameStarted(selectedGameId !== "");
-  };
-
+function App(): JSX.Element {
   return (
-    <div className="app">
-      <SocketStatus isConnected={isConnected} socketId={socketId} />
-      {!gameStarted && (
-        <Lobby
-          onGameStart={handleGameStart}
-          queueStatus={queueStatus}
-          setQueueStatus={setQueueStatus}
+    <Router>
+      <Routes>
+        <Route path="/" element={<Navigate to="/login" />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/auth/42/callback" element={<AuthCallback />} />
+		<Route path="/game" element={<App_game />} />
+		{/* <Route path="/chat" element={<Chat />} /> */}
+        <Route
+          path="/userpage"
+          element={
+            <ProtectedRoute>
+              <UserPage />
+            </ProtectedRoute>
+          }
         />
-      )}
-      {gameStarted && (
-        <Game
-          gameMode={gameMode}
-          gameId={gameId}
-          setQueueStatus={setQueueStatus}
-          onGameStart={handleGameStart}
+		<Route
+          path="/chat"
+          element={
+            <ProtectedRoute>
+              <Chat />
+            </ProtectedRoute>
+          }
         />
-      )}
-    </div>
+		{/* <Route
+          path="/game"
+          element={
+            <ProtectedRoute>
+              <App_game />
+            </ProtectedRoute>
+          }
+        /> */}
+      </Routes>
+    </Router>
   );
-};
+}
 
 export default App;

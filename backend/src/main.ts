@@ -18,6 +18,8 @@ async function bootstrap() {
     process.exit(1);
   }
 
+  app.setGlobalPrefix('api'); //necesary?
+
   app.enableCors({
     origin: [
       `http://localhost:${frontendPort}`,
@@ -30,6 +32,6 @@ async function bootstrap() {
     exposedHeaders: ['Content-Range', 'X-Content-Range'],
   });
 
-  await app.listen(backendPort ?? 3000);
+  await app.listen(backendPort ?? 4000);
 }
 bootstrap();
