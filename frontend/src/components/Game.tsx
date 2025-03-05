@@ -16,6 +16,7 @@ import Scoreboard from "./Scoreboard";
 import { GameState, CoordinateCache, GameProps } from "../types";
 
 const Game: React.FC<GameProps> = ({
+	userId,
   gameMode,
   gameId: initialGameId,
   setQueueStatus,
@@ -363,12 +364,13 @@ const Game: React.FC<GameProps> = ({
     );
   }
 
+  	console.log(userId);
   return (
     <div className="game-container">
       <Scoreboard
         player1Score={gameState?.player1.score || 0}
         player2Score={gameState?.player2.score || 0}
-        player1Id={gameState?.player1.id || ""}
+        player1Id={userId}
         player2Id={gameState?.player2.id || ""}
       />
       <canvas ref={canvasRef} width={800} height={600} />

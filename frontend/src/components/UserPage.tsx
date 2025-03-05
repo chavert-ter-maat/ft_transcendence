@@ -150,6 +150,10 @@ const UserPage: React.FC = () => {
 		if (user)
 			navigate('/chat', {state: {user: user} });
 	};
+	const handlegototgame = () => {
+		if (user)
+			navigate('/game', {state: {user: user} });
+	};
 
   return (
     <div style={{ padding: '20px' }}>
@@ -197,6 +201,7 @@ const UserPage: React.FC = () => {
 
       <button onClick={handleLogout}>Logout</button>
 	  <button onClick={handlegototchats}>Go to chats.</button>
+	  <button onClick={handlegototgame}>Go to game.</button>
     </div>
   );
 };

@@ -6,6 +6,7 @@ export interface SocketStatusProps {
 }
 
 export interface GameProps {
+	userId: string;
   gameMode: GameMode;
   gameId: string;
   setQueueStatus: React.Dispatch<React.SetStateAction<string>>;

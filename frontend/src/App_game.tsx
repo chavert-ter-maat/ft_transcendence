@@ -4,6 +4,8 @@ import Lobby from "./components/Lobby";
 import Game from "./components/Game";
 import { connectSocket, disconnectSocket } from "./socket";
 import { SocketStatusProps, GameMode } from "./types";
+import { useLocation } from "react-router-dom";
+import { User } from '../global.interface';
 
 const SocketStatus: React.FC<SocketStatusProps> = ({ isConnected, socketId }) => (
   <div className="socket-status">
@@ -18,6 +20,8 @@ const SocketStatus: React.FC<SocketStatusProps> = ({ isConnected, socketId }) =>
 );
 
 const App_game: React.FC = () => {
+	const state = useLocation().state as {user: User};
+
   const [gameStarted, setGameStarted] = useState(false);
   const [gameMode, setGameMode] = useState<GameMode>("singleplayer");
   const [gameId, setGameId] = useState("");
@@ -62,6 +66,7 @@ const App_game: React.FC = () => {
     setGameStarted(selectedGameId !== "");
   };
 
+  console.log("App_game", state.user.username);
   return (
     <div className="app">
       <SocketStatus isConnected={isConnected} socketId={socketId} />
@@ -74,6 +79,7 @@ const App_game: React.FC = () => {
       )}
       {gameStarted && (
         <Game
+		  userId={state.user.username}
           gameMode={gameMode}
           gameId={gameId}
           setQueueStatus={setQueueStatus}
