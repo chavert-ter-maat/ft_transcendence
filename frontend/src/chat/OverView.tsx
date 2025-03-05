@@ -112,9 +112,9 @@ export const ChatOverviewPage: React.FC<ChatOverviewProps> = ({ logged_in_user, 
 		event.preventDefault();
 	}
 
-	// const handlegotouserpage = () => {
-	// 	navigate('/userpage');
-	//   };
+	const handleGoBack = () => {
+		window.history.back();
+	  };
 
 	const JSX_content = (
 		<>
@@ -132,6 +132,7 @@ export const ChatOverviewPage: React.FC<ChatOverviewProps> = ({ logged_in_user, 
 	return (
 		<div className="App">
 			<HeaderWrap user={logged_in_user.user} insert={JSX_content}/>
+			<button onClick={handleGoBack}>Go Back</button>
 			<ol>
 				<CHATSTAMP_LIST chats={chats_input} logged_in_user={logged_in_user} setSwitch={setSwitch} setLoaded={setLoaded}/>
 			</ol>

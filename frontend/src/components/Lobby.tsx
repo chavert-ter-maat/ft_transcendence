@@ -85,6 +85,10 @@ const Lobby: React.FC<LobbyProps> = ({
     setSelectedMode("singleplayer");
   };
 
+  const handleGoBack = () => {
+	window.history.back();
+  };
+
   return (
     <div>
       {queueStatus === "inactive" && selectedMode !== "remoteMultiplayer" && (
@@ -132,6 +136,7 @@ const Lobby: React.FC<LobbyProps> = ({
         </div>
       )}
       {countdown !== null && <p>Game starts in: {countdown}</p>}
+	  <button onClick={handleGoBack}>Go Back</button>
     </div>
   );
 };
