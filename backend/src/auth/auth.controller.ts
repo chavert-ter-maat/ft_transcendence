@@ -15,6 +15,7 @@ import { JwtAuthGuard } from './guards/42-auth.guards';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FortyTwoAuthGuard } from './guards/passport.guard'; // Correct import for FortyTwoAuthGuard
 import { AuthService } from './auth.service';
+import { User } from './auth.model';
 
 @Controller('auth')
 export class AuthController {
@@ -96,6 +97,27 @@ export class AuthController {
   
       // Save the OAuth tokens and ensure the user is created in the database
       const savedUser = await this.authService.saveToDatabase(user);
+      
+      // Generate the access token using the saved user's userId
+      const { accessToken } = await this.authService.signIn(savedUser);
+  
+      const redirectUrl = `${process.env.FRONTEND_URL}/auth/42/callback?token=${accessToken}`;
+      return res.redirect(redirectUrl);
+    } catch (error) {
+      console.error('Callback error:', error);
+      return res.redirect(`${process.env.FRONTEND_URL}/login?error=authentication_failed`);
+    }
+  }
+
+  //REMOVE THIS FUNCTION ITS FOR TESTING AND BYPASSES THE INTRA LOGIN
+  @Get('testAccount') 
+//   @UseGuards(FortyTwoAuthGuard)
+  async callback_test(@Res() res) {
+    try {
+      console.log('Callback bypassed for test account :');
+  
+      // Save the OAuth tokens and ensure the user is created in the database
+      const savedUser = await this.authService.saveToDatabase({ email: "test.test", username: "testAccount", displayName: null, avatar: null, oauthToken: null, oauthRefreshToken: null, oauthExpiresAt: null, provider: '42' });
       
       // Generate the access token using the saved user's userId
       const { accessToken } = await this.authService.signIn(savedUser);

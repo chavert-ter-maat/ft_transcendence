@@ -39,8 +39,7 @@ export const UsersView: React.FC<UsersViewProps> = ({ logged_in_user, users_inpu
 			return (
 				<div>
 					<li className={"App-chat_name"}>{usery.name_}</li>
-					<button onClick={() => ButtonGoAddMuteOrBlock(usery.name_)} className={"App-chat_name_button"}> Edit user. </button>
-					<button onClick={() => ButtonGoAddMuteOrBlock(usery.name_)} className={"App-chat_name_button"}> Go to userpage. </button>
+					<button onClick={() => ButtonGoAddMuteOrBlock(usery.name_)} className={"App-chat_name_button"}> Go to user. </button>
 				</div>
 			)
 		else
@@ -165,7 +164,7 @@ export const UsersView: React.FC<UsersViewProps> = ({ logged_in_user, users_inpu
 				<input type="text" placeholder="Enter username to add to chat" value={input1.state} onChange={(e) => input1.setState(e.target.value)} />
 				<input type="submit" value="Add user" />
 			</form>}
-			{logged_in_user.page_creator && <form onSubmit={setPublic}>
+			{(logged_in_user.page_creator && !logged_in_user.chatname.startsWith("DM"))&& <form onSubmit={setPublic}>
 				<input type="password" placeholder="Enter password to chat" value={password1.state} onChange={(e) => password1.setState(e.target.value)} />
 				<input type="submit" value="Set public, with password." />
 			</form>}

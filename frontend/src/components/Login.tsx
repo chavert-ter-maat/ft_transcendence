@@ -12,6 +12,12 @@ const Login: React.FC = () => {
     window.location.href = fortyTwoLoginUrl;
   };
 
+  const loginTestAccount = (): void => {
+    console.log("Redirecting to skip OAuth login and create test account...");
+	window.location.href = `http://localhost:4000/api/auth/testAccount`;
+    // window.location.href = fortyTwoLoginUrl;
+  };
+
 
   return (
     <div className="registration-container">
@@ -19,6 +25,7 @@ const Login: React.FC = () => {
       
       {/* OAuth Login Button */}
       <button onClick={handleOAuthLogin}>Login with 42 OAuth</button>
+	  <button onClick={loginTestAccount}>Login with test account</button>
       
     </div>
   );

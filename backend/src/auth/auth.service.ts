@@ -71,6 +71,8 @@ export class AuthService {
   
     const { email, username, displayName = null, avatar = null, oauthToken = null, oauthRefreshToken = null, oauthExpiresAt = null, provider = '42' } = user;  // Change username to email
   
+	console.log("user adding:", email, username);
+
     if (!email) {  // Change username to email
       throw new Error('Email is required to save OAuth tokens.');
     }
