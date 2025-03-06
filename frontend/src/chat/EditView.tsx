@@ -5,8 +5,9 @@ import { EditViewProps } from './Chat.interface';
 import axios from '../axios';
 import { GoBackToChat } from './UsersView';
 import { HeaderWrap } from "./Header";
+// import { useNavigate } from 'react-router-dom';
 
-export const EditView: React.FC<EditViewProps> = ({ logged_in_user, setLoaded, setSwitch, input1, password1 }) => {
+export const EditView: React.FC<EditViewProps> = ({ logged_in_user, setLoaded, setSwitch, requestedUserInfo, navigate, input1, password1 }) => {
 	if (!logged_in_user.user)
 		throw new Error("No user");
 
@@ -123,9 +124,27 @@ export const EditView: React.FC<EditViewProps> = ({ logged_in_user, setLoaded, s
 		}
 	}
 
+	// @mhaan handle to go to invite player for game. Invite can be pushed as an message?
+	const inviteforgame = () => {
+		if (logged_in_user)
+			navigate('/game', {state: {user: logged_in_user, requestedUser: requestedUserInfo} });
+	};
+
 	const JSX_content = (
 		<>
-		<h2>Mute or block: {logged_in_user.selected_user}</h2>
+		<p>Viewing profile: {requestedUserInfo?.username || "user name not loaded"}</p>
+		<h1>aka: {requestedUserInfo?.displayName || "display name not set loaded"}</h1>
+		{requestedUserInfo?.imageName ? (
+            <img
+				src={"data:image/png;base64, " + requestedUserInfo.imageString} // Assuming the backend serves the avatar image, don't like this
+              alt={requestedUserInfo.imageName}
+              style={{ width: '100px', height: '100px', borderRadius: '50%' }}
+            />
+          ) : (
+            <p>No avatar set</p>
+          )}
+		<button onClick={inviteforgame}>Go to game.</button>
+		<h3>Mute or block: {logged_in_user.selected_user}</h3>
 			<p>For amount of minutes. (-1 for indefinite, 0 to revoke block)</p>
 			<button onClick={() => GoBackToChat(logged_in_user, setLoaded, setSwitch, input1.setState, password1.setState)} className={"App-chat_name_button"}> Go to chat. </button>
 			<input

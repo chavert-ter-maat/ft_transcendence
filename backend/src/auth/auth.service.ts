@@ -36,6 +36,20 @@ export class AuthService {
 		user.imageString = this.arrayBufferToBase64(user.imageData); //shitty placed
     return user;
   }
+
+  async getUserInfoSomeoneElse(username: string): Promise<Partial<User>> {
+    const user = await User.findOne({
+      where: { username },
+      attributes: ['username', 'provider', 'avatar', 'displayName', 'imageName', 'imageType', 'imageData'],  // Add all attributes you want
+    });
+  
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+	if (user.imageData)
+		user.imageString = this.arrayBufferToBase64(user.imageData); //shitty placed
+    return user;
+  }
   
 
   async createUser(email: string, password: string): Promise<User> {  // Change username to email

@@ -27,13 +27,23 @@ export class AuthController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('userInfo')
+  @Get('userInfo') //might be security issue? req.user.id can be arbitrarly set or is this protected?
   async getUserInfo(@Req() req) {
     const userId = req.user.userId; 
     if (typeof userId !== 'number') {
       throw new Error('User ID is invalid');
     }
     return this.authService.getUserInfo(userId);
+  }
+
+  @Post('userInfoSomeoneElse')
+  @UseGuards(JwtAuthGuard)
+  async getUserInfoSomeoneElse(@Body() body: { requestedUser: string }) {
+	const { requestedUser } = body;
+    if (typeof requestedUser !== 'string') { //unnecesary?
+      throw new Error('requestedUser is invalid');
+    }
+    return this.authService.getUserInfoSomeoneElse(requestedUser);
   }
 
   @Get('42')

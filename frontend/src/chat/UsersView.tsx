@@ -40,12 +40,14 @@ export const UsersView: React.FC<UsersViewProps> = ({ logged_in_user, users_inpu
 				<div>
 					<li className={"App-chat_name"}>{usery.name_}</li>
 					<button onClick={() => ButtonGoAddMuteOrBlock(usery.name_)} className={"App-chat_name_button"}> Edit user. </button>
+					<button onClick={() => ButtonGoAddMuteOrBlock(usery.name_)} className={"App-chat_name_button"}> Go to userpage. </button>
 				</div>
 			)
 		else
 			return (
 				<div>
 					<li className={"App-chat_name"}>{usery.name_}</li>
+					<button onClick={() => ButtonGoAddMuteOrBlock(usery.name_)} className={"App-chat_name_button"}> Go to userpage. </button>
 				</div>
 		)
 	}
@@ -63,7 +65,10 @@ export const UsersView: React.FC<UsersViewProps> = ({ logged_in_user, users_inpu
 
 	function ButtonGoAddMuteOrBlock(username: string) {
 		logged_in_user.selected_user = username;
+		setLoaded(false);
 		setSwitch(5);
+		logged_in_user.loaded = false;
+		logged_in_user.loading = false;
 		//console.log("add as mute or block:" + username);
 	}
 

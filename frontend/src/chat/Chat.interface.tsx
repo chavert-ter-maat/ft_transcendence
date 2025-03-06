@@ -1,5 +1,6 @@
 import React from 'react';
 import { User } from '../global.interface';
+import { useNavigate } from 'react-router-dom'; 
 
 export interface message_stamp	{
 	message_:	string,
@@ -85,6 +86,8 @@ export interface EditViewProps {
 	logged_in_user:	UserStats;
 	setLoaded:		React.Dispatch<React.SetStateAction<boolean>>;
 	setSwitch:		React.Dispatch<React.SetStateAction<number>>;
+	requestedUserInfo:	User;
+	naviagte:		ReturnType<typeof useNavigate>;
 	input1:			StringState;
 	password1:		StringState;
 }

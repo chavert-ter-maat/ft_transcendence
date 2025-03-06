@@ -20,7 +20,7 @@ const SocketStatus: React.FC<SocketStatusProps> = ({ isConnected, socketId }) =>
 );
 
 const App_game: React.FC = () => {
-	const state = useLocation().state as {user: User};
+	const state = useLocation().state as {user: User, requestedUser: User};
 
   const [gameStarted, setGameStarted] = useState(false);
   const [gameMode, setGameMode] = useState<GameMode>("singleplayer");
@@ -67,6 +67,8 @@ const App_game: React.FC = () => {
   };
 
   console.log("App_game", state.user.username);
+  // @mhaan requested player here.
+  console.log("Invited player", state.requestedUser?.username);
   return (
     <div className="app">
       <SocketStatus isConnected={isConnected} socketId={socketId} />

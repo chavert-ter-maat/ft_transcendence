@@ -1,6 +1,6 @@
 import './App.css';
 import React, { useState } from 'react';
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import axios from '../axios';
 import { message_stamp, chat_stamp, user_stamp, UserStats } from './Chat.interface';
 import { ChatOverviewPage } from './OverView';
@@ -13,6 +13,7 @@ import { User } from '../global.interface';
 let messages_input:	message_stamp[]	= [];
 let	chats_input:	chat_stamp[]	= [];
 let users_input:	user_stamp[]	= [];
+let	requestedUserInfo:	User;
 
 let logged_in_user: UserStats = {
 	username:		"",
@@ -41,6 +42,7 @@ let	just_started:	boolean = true;
 const Chat: React.FC = () =>  {
 	//might have to be an fetch for the user data
 	const state = useLocation().state as {user: User};
+	const navigate = useNavigate();
 
 	if (state)
 	{
@@ -111,6 +113,21 @@ const Chat: React.FC = () =>  {
 				//console.log("limiting offset" + logged_in_user.page_offset);
 				logged_in_user.end_reached = true;//offset -= 20;
 			}
+			setLoaded(true);
+			logged_in_user.loaded = true;
+		} catch (error: any) {
+				alert(error.response?.data.message || 'Login failed');
+		}
+		logged_in_user.loading = false;
+	}
+
+	const getRequestedUser = async (): Promise<void> => {
+		try {
+			console.log("Requesting user info of:" + logged_in_user.selected_user);
+			const response = await axios.post('/api/auth/userInfoSomeoneElse',
+				{requestedUser: logged_in_user.selected_user});
+			requestedUserInfo = response.data;
+			console.log("requestUserLoaded: ", requestedUserInfo.username);
 			setLoaded(true);
 			logged_in_user.loaded = true;
 		} catch (error: any) {
@@ -216,8 +233,14 @@ const Chat: React.FC = () =>  {
 	//edit user
 	else
 	{
+		console.log("everuthing is loaded?", logged_in_user.loaded, logged_in_user.loading);
+		if (!logged_in_user.loaded && !logged_in_user.loading)
+		{
+			logged_in_user.loading = true;
+			getRequestedUser();
+		}
 		return(EditView({
-			logged_in_user, setLoaded, setSwitch,
+			logged_in_user, setLoaded, setSwitch, requestedUserInfo, navigate,
 			input1: {state: input_state, setState: setInput},
 			password1: {state: password_state, setState: setPassword}
 		}))

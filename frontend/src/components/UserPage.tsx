@@ -152,7 +152,7 @@ const UserPage: React.FC = () => {
 	};
 	const handlegototgame = () => {
 		if (user)
-			navigate('/game', {state: {user: user} });
+			navigate('/game', {state: {user: user, requestedUser: null} });
 	};
 
   return (
