@@ -11,9 +11,9 @@ import { ConfigModule } from '@nestjs/config';
 @Injectable()
 export class FortyTwoStrategy extends PassportStrategy(Strategy, '42') {
   constructor() {
-	// console.log("client ID: ",  process.env.CLIENT_ID_42);
+	// console.log("client ID: ",  process.env.CLIENT_UID_42);
     super({
-      clientID: process.env.CLIENT_ID_42,
+      clientID: process.env.CLIENT_UID_42,
       clientSecret: process.env.CLIENT_SECRET_42,
       callbackURL: process.env.CALLBACK_URL_42,
       scope: ['public'],

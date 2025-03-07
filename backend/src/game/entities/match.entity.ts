@@ -1,7 +1,11 @@
-import { Column, Model, Table } from 'sequelize-typescript';
+import { Column, Model, Table, PrimaryKey } from 'sequelize-typescript';
 
-@Table({ tableName: 'match_history' })
+@Table
 export class Match extends Model {
+  @PrimaryKey
+  @Column
+  gameId: string;
+
   @Column
   player1Id: string;
 

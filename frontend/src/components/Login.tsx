@@ -4,7 +4,8 @@ import { useNavigate } from 'react-router-dom';
 
 const Login: React.FC = () => {
 
-  const fortyTwoLoginUrl = `https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-a5bd312a93c816bff99a2b38516ad438f718452a8e8a1935968b23c7517f509b&redirect_uri=http%3A%2F%2Flocalhost%3A4000%2Fapi%2Fauth%2F42%2Fcallback&response_type=code`;
+  const fortyTwoLoginUrl = import.meta.env.REDIRECT_URI_42;
+  console.log(fortyTwoLoginUrl);
 
   // Redirect to the backend's OAuth login endpoint for 42 authentication
   const handleOAuthLogin = (): void => {
@@ -14,13 +15,13 @@ const Login: React.FC = () => {
 
   const loginTestAccount = (): void => {
     console.log("Redirecting to skip OAuth login and create test account...");
-	window.location.href = `http://localhost:4000/api/auth/testAccount`;
+	window.location.href = `http://localhost:3000/api/auth/testAccount`;
     // window.location.href = fortyTwoLoginUrl;
   };
 
   const loginTestAccount2 = (): void => {
     console.log("Redirecting to skip OAuth login and create test account...");
-	window.location.href = `http://localhost:4000/api/auth/testAccount2`;
+	window.location.href = `http://localhost:3000/api/auth/testAccount2`;
     // window.location.href = fortyTwoLoginUrl;
   };
 
