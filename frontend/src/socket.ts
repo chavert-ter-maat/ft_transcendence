@@ -86,11 +86,11 @@ export const joinGame = (
 ) => {
   socket?.emit("joinGame", { gameMode, gameId });
   if (gameMode === "remoteMultiplayer") {
-    socket?.on("matchFound", (data: MatchFoundData) => {
+    socket?.once("matchFound", (data: MatchFoundData) => {
       callback(data.gameId);
     });
   } else {
-    socket?.on("gameStarted", callback);
+    socket?.once("gameStarted", callback);
   }
 };
 

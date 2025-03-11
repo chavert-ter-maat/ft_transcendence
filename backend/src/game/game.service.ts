@@ -1,6 +1,7 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, Inject, forwardRef } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Match } from './entities/match.entity';
+import { QueueService } from '../queue/queue.service';
 import {
   GameState,
   Paddle,
@@ -29,7 +30,18 @@ export class GameService {
   constructor(
     @InjectModel(Match)
     private matchModel: typeof Match,
-  ) {}
+    @Inject(forwardRef(() => QueueService))
+    readonly queueService: QueueService,
+  ) {
+    setInterval(() => {
+      this.logger.log(
+        `[METRICS] Active Games: ${this.games.size} | ` +
+          `Active PowerUps: ${this.powerUpTimeouts.size} | ` +
+          `Player Mappings: ${this.playerGameMap.size} | ` +
+          `Queue Length: ${this.queueService.queueLength}`,
+      );
+    }, 10000);
+  }
 
   private server: Server | null = null;
   private rematchRequests: Map<string, string[]> = new Map();
