@@ -16,7 +16,7 @@ import Scoreboard from "./Scoreboard";
 import { GameState, CoordinateCache, GameProps } from "../types";
 
 const Game: React.FC<GameProps> = ({
-	userId,
+  userId,
   gameMode,
   gameId: initialGameId,
   setQueueStatus,
@@ -363,8 +363,6 @@ const Game: React.FC<GameProps> = ({
       </div>
     );
   }
-
-  	console.log(userId);
   return (
     <div className="game-container">
       <Scoreboard
