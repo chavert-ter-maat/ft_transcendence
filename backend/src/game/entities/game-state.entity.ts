@@ -43,4 +43,7 @@ export interface GameState {
   powerUp?: PowerUp;
   lastPowerUpSpawn?: number;
   roundStartTime?: number;
+  powerUpTimeouts?: {
+    [playerId: string]: NodeJS.Timeout;
+  };
 }
