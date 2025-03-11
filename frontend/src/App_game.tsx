@@ -6,7 +6,7 @@ import { connectSocket, disconnectSocket } from "./socket";
 import { GameMode } from "./types";
 import SocketStatus from "./components/socketStatus";
 import { useLocation } from "react-router-dom";
-import { User } from "../global.interface";
+import { User } from "./global.interface";
 
 const App_game: React.FC = () => {
   const state = useLocation().state as { user: User; requestedUser: User };
