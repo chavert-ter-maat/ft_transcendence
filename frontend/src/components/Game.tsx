@@ -85,8 +85,6 @@ const Game: React.FC<GameProps> = ({
 
       lastMoveTimeRef.current = currentTime;
     }
-
-    animationFrameRef.current = requestAnimationFrame(processPaddleMovement);
   }, [gameId, gameMode]);
 
   useEffect(() => {
@@ -162,13 +160,10 @@ const Game: React.FC<GameProps> = ({
       if (socket) {
         socket.once("gameStarted", () => {
           onGameStateUpdate(setGameState);
-          animationFrameRef.current = requestAnimationFrame(
-            processPaddleMovement
-          );
         });
       }
     },
-    [processPaddleMovement, setQueueStatus]
+    [setQueueStatus]
   );
 
   useEffect(() => {
@@ -185,27 +180,16 @@ const Game: React.FC<GameProps> = ({
     const socket = getSocket();
     if (!socket) return;
 
-    if (animationFrameRef.current) {
-      cancelAnimationFrame(animationFrameRef.current);
-    }
-
     window.addEventListener("keydown", handleKeyDown);
     window.addEventListener("keyup", handleKeyUp);
     onGameStateUpdate(setGameState);
-
-    animationFrameRef.current = requestAnimationFrame(processPaddleMovement);
 
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("keyup", handleKeyUp);
       offGameStateUpdate();
-
-      if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current);
-        animationFrameRef.current = undefined;
-      }
     };
-  }, [gameId, gameMode, handleKeyDown, handleKeyUp, processPaddleMovement]);
+  }, [gameId, gameMode, handleKeyDown, handleKeyUp]);
 
   const calculateCoordinates = useCallback(
     (
@@ -312,18 +296,13 @@ const Game: React.FC<GameProps> = ({
     let frameId: number;
 
     const animate = () => {
+      processPaddleMovement();
       renderGame();
       frameId = requestAnimationFrame(animate);
     };
-
     frameId = requestAnimationFrame(animate);
-
-    return () => {
-      if (frameId) {
-        cancelAnimationFrame(frameId);
-      }
-    };
-  }, [renderGame]);
+    return () => cancelAnimationFrame(frameId);
+  }, [renderGame, processPaddleMovement]);
 
   if (winner || opponentDisconnected) {
     return (

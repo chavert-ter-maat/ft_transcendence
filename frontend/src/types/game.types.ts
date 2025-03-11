@@ -42,4 +42,7 @@ export interface CoordinateCache {
   radius?: number;
 }
 
-export type GameMode = "singleplayer" | "localMultiplayer" | "remoteMultiplayer";
+export type GameMode =
+  | "singleplayer"
+  | "localMultiplayer"
+  | "remoteMultiplayer";

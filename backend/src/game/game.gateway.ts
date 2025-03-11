@@ -60,6 +60,10 @@ export class GameGateway
     this.connectedSockets.delete(client.id);
     this.queueService.removePlayerFromQueue(client.id);
     this.gameService.handleDisconnect(client.id);
+
+    client.rooms.forEach((room) => {
+      client.leave(room);
+    });
   }
 
   @SubscribeMessage('joinGame')
