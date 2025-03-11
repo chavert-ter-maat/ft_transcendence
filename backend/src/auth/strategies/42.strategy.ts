@@ -27,7 +27,7 @@ export class FortyTwoStrategy extends PassportStrategy(Strategy, '42') {
       email: profile.emails[0].value,
       oauthToken: accessToken,
       oauthRefreshToken: refreshToken,
-      provider: '42'
+      provider: '42',
     };
 
     return user;

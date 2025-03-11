@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 
 const Login: React.FC = () => {
 
-  const fortyTwoLoginUrl = import.meta.env.REDIRECT_URI_42;
+  const fortyTwoLoginUrl = import.meta.env.VITE_REDIRECT_URI_42;
   console.log(fortyTwoLoginUrl);
 
   // Redirect to the backend's OAuth login endpoint for 42 authentication
