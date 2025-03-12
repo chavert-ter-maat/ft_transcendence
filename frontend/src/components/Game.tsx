@@ -222,6 +222,8 @@ const Game: React.FC<GameProps> = ({
 
   const coordinates = useMemo(() => {
     if (!canvasRef.current || !gameState) return null;
+    const canvas = canvasRef.current;
+
     return {
       player1: calculateCoordinates(
         gameState.player1.paddle,
@@ -239,14 +241,16 @@ const Game: React.FC<GameProps> = ({
         },
         canvasRef.current
       ),
-      powerUp: gameState.powerUp
-        ? {
-            x: gameState.powerUp.x * canvasRef.current.width * 0.01,
-            y: gameState.powerUp.y * canvasRef.current.height * 0.01,
-            width: gameState.powerUp.width * canvasRef.current.width * 0.01,
-            height: gameState.powerUp.width * canvasRef.current.width * 0.01,
-          }
-        : null,
+      powerUps: (() => {
+        if (!gameState.powerUps) return [];
+        const calculatedPowerUps = gameState.powerUps.map((powerUp) => ({
+          x: powerUp.x * canvas.width * 0.01,
+          y: powerUp.y * canvas.height * 0.01,
+          width: powerUp.width * canvas.width * 0.01,
+          height: powerUp.width * canvas.width * 0.01,
+        }));
+        return calculatedPowerUps;
+      })(),
     };
   }, [gameState, calculateCoordinates]);
 
@@ -283,14 +287,16 @@ const Game: React.FC<GameProps> = ({
       context.fillStyle = "#000";
       context.fillRect(0, 0, canvas.width, canvas.height);
 
+      if (coordinates.powerUps && coordinates.powerUps.length > 0) {
+        coordinates.powerUps.forEach((powerUp) => {
+          drawPowerup(context, powerUp);
+        });
+      }
+
       if (gameState.player1 && gameState.player2) {
         drawPaddle(context, coordinates.player1);
         drawPaddle(context, coordinates.player2);
         drawBall(context, coordinates.ball);
-      }
-
-      if (coordinates.powerUp && gameState.powerUp) {
-        drawPowerup(context, coordinates.powerUp);
       }
     }
   }, [coordinates, gameState, drawPaddle, drawBall, drawPowerup]);

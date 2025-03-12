@@ -92,7 +92,7 @@ export class AuthController {
   @UseGuards(FortyTwoAuthGuard)
   async callback(@Req() req, @Res() res) {
     try {
-      console.log('Callback received:', req.user);
+      // console.log('Callback received:', req.user);
       const user = req.user;
   
       // Save the OAuth tokens and ensure the user is created in the database

@@ -23,6 +23,10 @@ const GAME_PARAMETERS = {
     initialVelocityY: 0.5,
     initialSpeed: 0.75,
   },
+  paddles: {
+    size: 10,
+    speed: 1,
+  },
 };
 
 @Injectable()
@@ -107,18 +111,20 @@ export class GameService {
         paddle: { ...initialPaddle, x: 2 },
         score: 0,
         inGame: true,
+        activePowerups: undefined,
       },
       player2: {
         id: '',
         paddle: { ...initialPaddle, x: 96 },
         score: 0,
         inGame: true,
+        activePowerups: undefined,
       },
       ball: initialBall,
       gameStarted: new Date(),
       roundStartTime: Date.now(),
       gameMode,
-      powerUpTimeouts: {},
+      powerUps: [],
     };
   }
 
@@ -222,13 +228,6 @@ export class GameService {
   removeGame(gameId: string) {
     const game = this.games.get(gameId);
     if (game) {
-      // Clear any active power-up timeouts
-      if (game.powerUpTimeouts) {
-        Object.values(game.powerUpTimeouts).forEach((timeout) => {
-          clearTimeout(timeout);
-        });
-      }
-
       if (game.player1?.id) {
         this.playerGameMap.delete(game.player1.id);
       }
@@ -286,32 +285,47 @@ export class GameService {
   private updateGame(gameId: string, game: GameState) {
     const now = Date.now();
     const isSinglePlayer = game.gameMode === 'singleplayer';
-    const roundStartTime = game.roundStartTime || now;
 
-    if (!game.powerUp && now - roundStartTime >= 2000) {
-      game.powerUp = {
+    [game.player1, game.player2].forEach((player) => {
+      if (player.activePowerups && now >= player.activePowerups.endTime) {
+        if (player.activePowerups.effect === 'size') {
+          player.paddle.height = GAME_PARAMETERS.paddles.size;
+        }
+        player.activePowerups = undefined;
+      }
+    });
+
+    if (!game.powerUps) {
+      game.powerUps = [];
+    }
+
+    if (
+      game.powerUps.length < 2 &&
+      now - (game.lastPowerUpSpawn || 0) >= 2000
+    ) {
+      game.powerUps.push({
         x: 20 + Math.random() * 60,
         y: 10 + Math.random() * 80,
         width: 3,
         spawnTime: now,
-      };
+      });
       game.lastPowerUpSpawn = now;
     }
 
-    if (game.powerUp && now - game.powerUp.spawnTime >= 5000) {
-      game.powerUp = undefined;
-    }
+    game.powerUps = game.powerUps.filter(
+      (powerUp) => now - powerUp.spawnTime < 5000,
+    );
 
-    if (game.powerUp) {
+    game.powerUps = game.powerUps.filter((powerUp) => {
       const ballLeft = game.ball.x - game.ball.radius;
       const ballRight = game.ball.x + game.ball.radius;
       const ballTop = game.ball.y - game.ball.radius;
       const ballBottom = game.ball.y + game.ball.radius;
 
-      const powerUpLeft = game.powerUp.x;
-      const powerUpRight = game.powerUp.x + game.powerUp.width;
-      const powerUpTop = game.powerUp.y;
-      const powerUpBottom = game.powerUp.y + game.powerUp.width;
+      const powerUpLeft = powerUp.x;
+      const powerUpRight = powerUp.x + powerUp.width;
+      const powerUpTop = powerUp.y;
+      const powerUpBottom = powerUp.y + powerUp.width;
 
       if (
         ballRight > powerUpLeft &&
@@ -321,33 +335,16 @@ export class GameService {
       ) {
         const affectedPlayer =
           game.ball.velocityX > 0 ? game.player1 : game.player2;
-        const originalHeight = 10;
 
-        // Clear existing timeout if there is one
-        if (game.powerUpTimeouts?.[affectedPlayer.id]) {
-          clearTimeout(game.powerUpTimeouts[affectedPlayer.id]);
-        }
-
-        affectedPlayer.paddle.height = originalHeight * 2;
-        const timeoutId = setTimeout(() => {
-          if (this.games.has(gameId)) {
-            const currentGame = this.games.get(gameId);
-            if (currentGame) {
-              affectedPlayer.paddle.height = originalHeight;
-              if (currentGame.powerUpTimeouts) {
-                delete currentGame.powerUpTimeouts[affectedPlayer.id];
-              }
-            }
-          }
-        }, 10000);
-        if (!game.powerUpTimeouts) {
-          game.powerUpTimeouts = {};
-        }
-        game.powerUpTimeouts[affectedPlayer.id] = timeoutId;
-        game.powerUp = undefined;
-        game.lastPowerUpSpawn = now;
+        affectedPlayer.activePowerups = {
+          endTime: Date.now() + 10000,
+          effect: 'size',
+        };
+        affectedPlayer.paddle.height = GAME_PARAMETERS.paddles.size * 2;
+        return false; // Remove this power-up
       }
-    }
+      return true; // Keep this power-up
+    });
 
     if (isSinglePlayer) {
       this.moveBotPaddle(game.player2.paddle, game.ball);
@@ -491,7 +488,8 @@ export class GameService {
       GAME_PARAMETERS.ball.initialVelocityY * (ball.velocityY > 0 ? -1 : 1);
     ball.speed = GAME_PARAMETERS.ball.initialSpeed;
 
-    game.powerUp = undefined;
+    // Clear all power-ups when resetting the ball
+    game.powerUps = [];
     game.lastPowerUpSpawn = undefined;
 
     return Date.now();
