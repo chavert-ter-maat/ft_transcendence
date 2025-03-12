@@ -2,6 +2,7 @@ import { Injectable, ConflictException, NotFoundException, UnauthorizedException
 import { InjectModel } from '@nestjs/sequelize';
 import { Chat } from './message.model';
 import { User } from '../auth/auth.model';
+import * as bcrypt from 'bcrypt';
 // import { JwtService } from '@nestjs/jwt';
 
 
@@ -213,7 +214,7 @@ export class MessageService {
 		const newChat = await this.userChat.create(
 			{ chatname: dm_chat_name, creator: username, admins: [], banned_users: [], messages: [first_message],
 			user_stamps: [{name_: username, admin_: false, timestamp: Date()}, {name_: chatname, admin_: false, timestamp: Date()}],
-			muted_users: [], password: "", public: false, DM: true, last_edit: Date()} as any);
+			muted_users: [], password: "", salt: await bcrypt.genSalt(10), public: false, DM: true, last_edit: Date()} as any);
 		await (newChat as any).addUser(user);
 		await (newChat as any).addUser(dm_user);
 		return [newChat.user_stamps, dm_chat_name];
@@ -245,7 +246,8 @@ export class MessageService {
 		{
 			if (existingChat.public)
 			{
-				if (!existingChat.password || existingChat.password == password)
+				const hashed_password_chat = await bcrypt.hash(password, existingChat.salt);
+				if (!existingChat.password || existingChat.password == hashed_password_chat)
 				{
 					await this.add_user_internal(existingChat, username, username);
 					return (existingChat.user_stamps);
@@ -264,7 +266,7 @@ export class MessageService {
 			const newChat = await this.userChat.create(
 				{ chatname, creator: username, admins: [username], banned_users: [], messages: [first_message],
 				user_stamps: [{name_: username, admin_: true, timestamp: Date()}], muted_users: [],
-				password: "", public: false, DM: false, last_edit: Date()} as any);
+				password: "", salt: await bcrypt.genSalt(10), public: false, DM: false, last_edit: Date()} as any);
 			await (newChat as any).addUser(user);
 			return (newChat.user_stamps);
 		}
@@ -393,7 +395,9 @@ export class MessageService {
 		const existingChat = await this.get_chat_with_permissions(username, chatname);
 		if (existingChat && existingChat.creator == username)
 		{
-			existingChat.password = password_chat;
+			// existingChat.salt = await bcrypt.genSalt(10);
+    		const hashed_password_chat = await bcrypt.hash(password_chat, existingChat.salt);
+			existingChat.password = hashed_password_chat;
 			existingChat.public = true;
 			existingChat.last_edit = Date();
 			existingChat.changed('password', true);
