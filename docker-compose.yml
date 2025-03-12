@@ -12,7 +12,7 @@ services:
       - .env
     container_name: db
     volumes:
-      - ~/.sgoinfre/transcendence/pgdata:/var/lib/postgresql/data
+      - ${DB_LOCATION}
     ports:
       - "5432:5432"
     networks:
