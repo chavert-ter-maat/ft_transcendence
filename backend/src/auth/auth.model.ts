@@ -1,19 +1,19 @@
 import {
-  Column,
-  Model,
-  Table,
-  PrimaryKey,
-  AutoIncrement,
-  DataType,
-  BelongsToMany,
+	Column,
+	Model,
+	Table,
+	PrimaryKey,
+	AutoIncrement,
+	DataType,
+	BelongsToMany,
 } from 'sequelize-typescript';
 import { Chat } from '../messages/message.model';
 import { UserChat } from '../messages/userchat.model';
 
 interface BlockUser {
-	username:		string;
-	timestamp:		number;
-	forever:		boolean;
+	username: string;
+	timestamp: number;
+	forever: boolean;
 }
 
 @Table
@@ -92,7 +92,7 @@ export class User extends Model<User> {
 	})
 	updatedAt: Date;
 
-  	@Column(DataType.STRING)
+	@Column(DataType.STRING)
 	imageType: string;
 
 	@Column(DataType.STRING)
@@ -105,12 +105,19 @@ export class User extends Model<User> {
 	imageString: string;
 
 	@Column({
-		type:			DataType.ARRAY(DataType.JSON),
-		allowNull:		false,
+		type: DataType.ARRAY(DataType.JSON),
+		allowNull: false,
 	})
 	public blocked_users!: BlockUser[];
-  
-	@BelongsToMany(() => Chat, { 
+
+	@Column({
+		type: DataType.STRING,
+		allowNull: true,
+		defaultValue: null,
+	})
+	twoFASecretKey: string;
+
+	@BelongsToMany(() => Chat, {
 		through: () => UserChat,
 		foreignKey: 'userId',
 		otherKey: 'chatId',

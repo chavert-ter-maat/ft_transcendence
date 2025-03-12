@@ -11,6 +11,7 @@ import { Chat } from './messages/message.model';
 import { UserChat } from './messages/userchat.model';
 import { AuthModule } from './auth/auth.module';
 import { MessageModule } from './messages/message.module';
+import { TwoFAModule } from './twofa/towfa.module'
 
 //unnecesary?
 // import * as dotenv from 'dotenv';
@@ -42,10 +43,11 @@ import { MessageModule } from './messages/message.module';
 
     GameModule,
     QueueModule,
-	AuthModule,
-	MessageModule,
+    AuthModule,
+    MessageModule,
+    TwoFAModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }
