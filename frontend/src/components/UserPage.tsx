@@ -22,7 +22,7 @@ const UserPage: React.FC = () => {
           return;
         }
 
-        const response = await axios.get('http://localhost:4000/api/auth/userInfo', { //magic value
+        const response = await axios.get('http://localhost:3000/api/auth/userInfo', { //magic value
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -59,7 +59,7 @@ const UserPage: React.FC = () => {
       }
 
       await axios.post(
-        'http://localhost:4000/api/auth/set-display-name', //magic value 
+        'http://localhost:3000/api/auth/set-display-name', //magic value 
         { displayName: newDisplayName },
         {
           headers: {
@@ -114,7 +114,7 @@ const UserPage: React.FC = () => {
       }
 	  console.log("BEFORE:" + avatar);
       const response = await axios.post(
-        'http://localhost:4000/api/auth/upload-avatar', //magic value
+        'http://localhost:3000/api/auth/upload-avatar', //magic value
         formData,
         {
           headers: {

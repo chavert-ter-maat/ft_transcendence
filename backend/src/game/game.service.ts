@@ -1,6 +1,7 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, Inject, forwardRef } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Match } from './entities/match.entity';
+import { QueueService } from '../queue/queue.service';
 import {
   GameState,
   Paddle,
@@ -29,7 +30,17 @@ export class GameService {
   constructor(
     @InjectModel(Match)
     private matchModel: typeof Match,
-  ) {}
+    @Inject(forwardRef(() => QueueService))
+    readonly queueService: QueueService,
+  ) {
+    setInterval(() => {
+      this.logger.log(
+        `[METRICS] Active Games: ${this.games.size} | ` +
+          `Player Mappings: ${this.playerGameMap.size} | ` +
+          `Queue Length: ${this.queueService.queueLength}`,
+      );
+    }, 10000);
+  }
 
   private server: Server | null = null;
   private rematchRequests: Map<string, string[]> = new Map();
@@ -107,6 +118,7 @@ export class GameService {
       gameStarted: new Date(),
       roundStartTime: Date.now(),
       gameMode,
+      powerUpTimeouts: {},
     };
   }
 
@@ -210,20 +222,17 @@ export class GameService {
   removeGame(gameId: string) {
     const game = this.games.get(gameId);
     if (game) {
+      // Clear any active power-up timeouts
+      if (game.powerUpTimeouts) {
+        Object.values(game.powerUpTimeouts).forEach((timeout) => {
+          clearTimeout(timeout);
+        });
+      }
+
       if (game.player1?.id) {
-        const timeout1 = this.powerUpTimeouts.get(game.player1.id);
-        if (timeout1) {
-          clearTimeout(timeout1);
-          this.powerUpTimeouts.delete(game.player1.id);
-        }
         this.playerGameMap.delete(game.player1.id);
       }
       if (game.player2?.id) {
-        const timeout2 = this.powerUpTimeouts.get(game.player2.id);
-        if (timeout2) {
-          clearTimeout(timeout2);
-          this.powerUpTimeouts.delete(game.player2.id);
-        }
         this.playerGameMap.delete(game.player2.id);
       }
       this.games.delete(gameId);
@@ -274,8 +283,6 @@ export class GameService {
     }, SERVER_TICKRATE);
   }
 
-  private powerUpTimeouts: Map<string, NodeJS.Timeout> = new Map();
-
   private updateGame(gameId: string, game: GameState) {
     const now = Date.now();
     const isSinglePlayer = game.gameMode === 'singleplayer';
@@ -316,9 +323,9 @@ export class GameService {
           game.ball.velocityX > 0 ? game.player1 : game.player2;
         const originalHeight = 10;
 
-        const existingTimeout = this.powerUpTimeouts.get(affectedPlayer.id);
-        if (existingTimeout) {
-          clearTimeout(existingTimeout);
+        // Clear existing timeout if there is one
+        if (game.powerUpTimeouts?.[affectedPlayer.id]) {
+          clearTimeout(game.powerUpTimeouts[affectedPlayer.id]);
         }
 
         affectedPlayer.paddle.height = originalHeight * 2;
@@ -327,11 +334,16 @@ export class GameService {
             const currentGame = this.games.get(gameId);
             if (currentGame) {
               affectedPlayer.paddle.height = originalHeight;
+              if (currentGame.powerUpTimeouts) {
+                delete currentGame.powerUpTimeouts[affectedPlayer.id];
+              }
             }
           }
-          this.powerUpTimeouts.delete(affectedPlayer.id);
         }, 10000);
-        this.powerUpTimeouts.set(affectedPlayer.id, timeoutId);
+        if (!game.powerUpTimeouts) {
+          game.powerUpTimeouts = {};
+        }
+        game.powerUpTimeouts[affectedPlayer.id] = timeoutId;
         game.powerUp = undefined;
         game.lastPowerUpSpawn = now;
       }
@@ -394,9 +406,9 @@ export class GameService {
     ) {
       ball.velocityX = -ball.velocityX;
 
-      const collidePoint = ball.y - (paddle.y + paddle.height / 2);
-      const normalizedCollidePoint = collidePoint / (paddle.height / 2);
-      const angleRad = (Math.PI / 4) * normalizedCollidePoint;
+      const contactPoint = ball.y - (paddle.y + paddle.height / 2);
+      const normalizedContactPoint = contactPoint / (paddle.height / 2);
+      const angleRad = (Math.PI / 4) * normalizedContactPoint;
       const direction = ball.x < 50 ? 1 : -1;
       ball.velocityX = direction * ball.speed * Math.cos(angleRad);
       ball.velocityY = ball.speed * Math.sin(angleRad);

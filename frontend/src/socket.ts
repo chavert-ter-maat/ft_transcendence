@@ -10,7 +10,7 @@ import {
 } from "./types";
 
 let socket: Socket | null = null;
-const VITE_API_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
+const VITE_API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 export const connectSocket = () => {
   if (!socket) {
@@ -86,11 +86,11 @@ export const joinGame = (
 ) => {
   socket?.emit("joinGame", { gameMode, gameId });
   if (gameMode === "remoteMultiplayer") {
-    socket?.on("matchFound", (data: MatchFoundData) => {
+    socket?.once("matchFound", (data: MatchFoundData) => {
       callback(data.gameId);
     });
   } else {
-    socket?.on("gameStarted", callback);
+    socket?.once("gameStarted", callback);
   }
 };
 

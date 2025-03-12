@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject, forwardRef } from '@nestjs/common';
 import { GameService } from '../game/game.service';
 import { GameGateway } from '../game/game.gateway';
 
@@ -6,7 +6,14 @@ import { GameGateway } from '../game/game.gateway';
 export class QueueService {
   private queue: string[] = [];
 
-  constructor(private readonly gameService: GameService) {}
+  get queueLength(): number {
+    return this.queue.length;
+  }
+
+  constructor(
+    @Inject(forwardRef(() => GameService))
+    readonly gameService: GameService,
+  ) {}
 
   private gameGateway: GameGateway;
 

@@ -19,7 +19,7 @@ import { QueueService } from 'src/queue/queue.service';
   cors: {
     origin: process.env.FRONTEND_PORT
       ? [`http://localhost:${process.env.FRONTEND_PORT}`]
-      : ['http://localhost:3000'],
+      : ['http://localhost:5173'],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     credentials: true,
     allowedHeaders: ['Content-Type', 'Authorization'],
@@ -60,6 +60,10 @@ export class GameGateway
     this.connectedSockets.delete(client.id);
     this.queueService.removePlayerFromQueue(client.id);
     this.gameService.handleDisconnect(client.id);
+
+    client.rooms.forEach((room) => {
+      client.leave(room);
+    });
   }
 
   @SubscribeMessage('joinGame')

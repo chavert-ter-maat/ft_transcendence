@@ -32,6 +32,6 @@ async function bootstrap() {
     exposedHeaders: ['Content-Range', 'X-Content-Range'],
   });
 
-  await app.listen(backendPort ?? 4000);
+  await app.listen(backendPort ?? 3000);
 }
 bootstrap();

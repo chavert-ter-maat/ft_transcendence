@@ -16,7 +16,7 @@ import Scoreboard from "./Scoreboard";
 import { GameState, CoordinateCache, GameProps } from "../types";
 
 const Game: React.FC<GameProps> = ({
-	userId,
+  userId,
   gameMode,
   gameId: initialGameId,
   setQueueStatus,
@@ -31,6 +31,7 @@ const Game: React.FC<GameProps> = ({
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const contextRef = useRef<CanvasRenderingContext2D | null>(null);
   const keyRef = useRef<{ [key: string]: boolean }>({});
   const lastMoveTimeRef = useRef<number>(0);
   const animationFrameRef = useRef<number>();
@@ -39,6 +40,12 @@ const Game: React.FC<GameProps> = ({
   useEffect(() => {
     gameIdRef.current = gameId;
   }, [gameId]);
+
+  useEffect(() => {
+    if (canvasRef.current) {
+      contextRef.current = canvasRef.current.getContext("2d");
+    }
+  }, []);
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     if (["ArrowUp", "ArrowDown", "w", "s"].includes(e.key)) {
@@ -85,8 +92,6 @@ const Game: React.FC<GameProps> = ({
 
       lastMoveTimeRef.current = currentTime;
     }
-
-    animationFrameRef.current = requestAnimationFrame(processPaddleMovement);
   }, [gameId, gameMode]);
 
   useEffect(() => {
@@ -162,13 +167,10 @@ const Game: React.FC<GameProps> = ({
       if (socket) {
         socket.once("gameStarted", () => {
           onGameStateUpdate(setGameState);
-          animationFrameRef.current = requestAnimationFrame(
-            processPaddleMovement
-          );
         });
       }
     },
-    [processPaddleMovement, setQueueStatus]
+    [setQueueStatus]
   );
 
   useEffect(() => {
@@ -185,27 +187,16 @@ const Game: React.FC<GameProps> = ({
     const socket = getSocket();
     if (!socket) return;
 
-    if (animationFrameRef.current) {
-      cancelAnimationFrame(animationFrameRef.current);
-    }
-
     window.addEventListener("keydown", handleKeyDown);
     window.addEventListener("keyup", handleKeyUp);
     onGameStateUpdate(setGameState);
-
-    animationFrameRef.current = requestAnimationFrame(processPaddleMovement);
 
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("keyup", handleKeyUp);
       offGameStateUpdate();
-
-      if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current);
-        animationFrameRef.current = undefined;
-      }
     };
-  }, [gameId, gameMode, handleKeyDown, handleKeyUp, processPaddleMovement]);
+  }, [gameId, gameMode, handleKeyDown, handleKeyUp]);
 
   const calculateCoordinates = useCallback(
     (
@@ -273,20 +264,22 @@ const Game: React.FC<GameProps> = ({
       context.arc(coords.x, coords.y, coords.radius!, 0, Math.PI * 2);
       context.fillStyle = "#FFF";
       context.fill();
-      context.closePath();
+    },
+    []
+  );
+
+  const drawPowerup = useCallback(
+    (context: CanvasRenderingContext2D, coords: CoordinateCache) => {
+      context.fillStyle = "#0F0";
+      context.fillRect(coords.x, coords.y, coords.width, coords.height);
     },
     []
   );
 
   const renderGame = useCallback(() => {
     const canvas = canvasRef.current;
-    if (canvas && coordinates && gameState) {
-      const context = canvas.getContext("2d");
-      if (!context) {
-        console.error("Couldn't get canvas context");
-        return;
-      }
-
+    const context = contextRef.current;
+    if (canvas && context && coordinates && gameState) {
       context.fillStyle = "#000";
       context.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -297,33 +290,25 @@ const Game: React.FC<GameProps> = ({
       }
 
       if (coordinates.powerUp && gameState.powerUp) {
-        context.fillStyle = "#0F0";
-        context.fillRect(
-          coordinates.powerUp.x,
-          coordinates.powerUp.y,
-          coordinates.powerUp.width,
-          coordinates.powerUp.height
-        );
+        drawPowerup(context, coordinates.powerUp);
       }
     }
-  }, [coordinates, gameState, drawPaddle, drawBall]);
+  }, [coordinates, gameState, drawPaddle, drawBall, drawPowerup]);
 
   useEffect(() => {
-    let frameId: number;
-
     const animate = () => {
+      processPaddleMovement();
       renderGame();
-      frameId = requestAnimationFrame(animate);
+      animationFrameRef.current = requestAnimationFrame(animate);
     };
-
-    frameId = requestAnimationFrame(animate);
+    animationFrameRef.current = requestAnimationFrame(animate);
 
     return () => {
-      if (frameId) {
-        cancelAnimationFrame(frameId);
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
       }
     };
-  }, [renderGame]);
+  }, [renderGame, processPaddleMovement]);
 
   if (winner || opponentDisconnected) {
     return (
@@ -363,8 +348,6 @@ const Game: React.FC<GameProps> = ({
       </div>
     );
   }
-
-  	console.log(userId);
   return (
     <div className="game-container">
       <Scoreboard

@@ -30,7 +30,7 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Get('userInfo') //might be security issue? req.user.id can be arbitrarly set or is this protected?
   async getUserInfo(@Req() req) {
-    const userId = req.user.userId; 
+    const userId = req.user.userId;
     if (typeof userId !== 'number') {
       throw new Error('User ID is invalid');
     }
@@ -114,7 +114,7 @@ export class AuthController {
 //   @UseGuards(FortyTwoAuthGuard)
   async callback_test(@Res() res) {
     try {
-      console.log('Callback bypassed for test account :');
+      console.log('Callback bypassed for test account:');
   
       // Save the OAuth tokens and ensure the user is created in the database
       const savedUser = await this.authService.saveToDatabase({ email: "test.test", username: "testAccount", displayName: null, avatar: null, oauthToken: null, oauthRefreshToken: null, oauthExpiresAt: null, provider: '42' });

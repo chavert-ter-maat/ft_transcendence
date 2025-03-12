@@ -15,7 +15,7 @@ const AuthCallback: React.FC = () => {
     if (error) {
       setError('Authentication failed. Please try again.');
       console.log('Authentication failed. Please try again.');
-      setTimeout(() => navigate('/login'), 3000);
+      setTimeout(() => navigate('/login'), 5173);
       return;
     }
 
@@ -28,7 +28,7 @@ const AuthCallback: React.FC = () => {
     } else {
       setError('No authentication token received');
       console.log('No authentication token received blabla');
-      setTimeout(() => navigate('/login'), 3000);
+      setTimeout(() => navigate('/login'), 5173);
     }
   }, [navigate]);
 

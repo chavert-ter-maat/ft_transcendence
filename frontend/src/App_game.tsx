@@ -3,24 +3,13 @@ import "./App_game.css";
 import Lobby from "./components/Lobby";
 import Game from "./components/Game";
 import { connectSocket, disconnectSocket } from "./socket";
-import { SocketStatusProps, GameMode } from "./types";
+import { GameMode } from "./types";
+import SocketStatus from "./components/socketStatus";
 import { useLocation } from "react-router-dom";
-import { User } from '../global.interface';
-
-const SocketStatus: React.FC<SocketStatusProps> = ({ isConnected, socketId }) => (
-  <div className="socket-status">
-    {isConnected ? (
-      <span className="status-connected">
-        Connected {socketId && `(ID: ${socketId})`}
-      </span>
-    ) : (
-      <span className="status-disconnected">Disconnected</span>
-    )}
-  </div>
-);
+import { User } from "./global.interface";
 
 const App_game: React.FC = () => {
-	const state = useLocation().state as {user: User, requestedUser: User};
+  const state = useLocation().state as { user: User; requestedUser: User };
 
   const [gameStarted, setGameStarted] = useState(false);
   const [gameMode, setGameMode] = useState<GameMode>("singleplayer");
@@ -81,7 +70,7 @@ const App_game: React.FC = () => {
       )}
       {gameStarted && (
         <Game
-		  userId={state.user.username}
+          userId={state.user.username}
           gameMode={gameMode}
           gameId={gameId}
           setQueueStatus={setQueueStatus}
