@@ -46,4 +46,5 @@ export interface GameState {
   powerUpTimeouts?: {
     [playerId: string]: NodeJS.Timeout;
   };
+  rematchRequests?: string[];
 }
