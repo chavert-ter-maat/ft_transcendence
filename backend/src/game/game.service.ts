@@ -14,7 +14,7 @@ import { Server } from 'socket.io';
 const SERVER_TICKRATE = 1000 / 60;
 
 const GAME_PARAMETERS = {
-  score_limit: 3,
+  score_limit: 2,
   ball: {
     initialX: 50,
     initialY: 50,
@@ -301,7 +301,8 @@ export class GameService {
 
     if (
       game.powerUps.length < 2 &&
-      now - (game.lastPowerUpSpawn || 0) >= 2000
+      now - (game.lastPowerUpSpawn || 0) >= 5000 &&
+      now - game.roundStartTime >= 5000
     ) {
       game.powerUps.push({
         x: 20 + Math.random() * 60,
@@ -313,7 +314,7 @@ export class GameService {
     }
 
     game.powerUps = game.powerUps.filter(
-      (powerUp) => now - powerUp.spawnTime < 5000,
+      (powerUp) => now - powerUp.spawnTime < 8000,
     );
 
     game.powerUps = game.powerUps.filter((powerUp) => {
@@ -341,9 +342,9 @@ export class GameService {
           effect: 'size',
         };
         affectedPlayer.paddle.height = GAME_PARAMETERS.paddles.size * 2;
-        return false; // Remove this power-up
+        return false;
       }
-      return true; // Keep this power-up
+      return true;
     });
 
     if (isSinglePlayer) {
@@ -488,7 +489,6 @@ export class GameService {
       GAME_PARAMETERS.ball.initialVelocityY * (ball.velocityY > 0 ? -1 : 1);
     ball.speed = GAME_PARAMETERS.ball.initialSpeed;
 
-    // Clear all power-ups when resetting the ball
     game.powerUps = [];
     game.lastPowerUpSpawn = undefined;
 
