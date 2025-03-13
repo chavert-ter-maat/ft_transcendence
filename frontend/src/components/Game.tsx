@@ -36,11 +36,9 @@ const Game: React.FC<GameProps> = ({
   const lastMoveTimeRef = useRef<number>(0);
   const animationFrameRef = useRef<number>();
 
-  // Initialize canvas context
   useEffect(() => {
     if (canvasRef.current) {
       contextRef.current = canvasRef.current.getContext("2d");
-      // Initial clear is done in renderGame, no need here
     }
   }, []);
 
@@ -323,7 +321,12 @@ const Game: React.FC<GameProps> = ({
 
   useEffect(() => {
     if (!gameState) return;
-    return setupAnimationLoop();
+    
+    const cleanupAnimation = setupAnimationLoop();
+    
+    return () => {
+      cleanupAnimation();
+    };
   }, [gameState, setupAnimationLoop]);
 
   if (winner || opponentDisconnected) {
