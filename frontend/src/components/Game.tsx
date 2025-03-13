@@ -40,7 +40,7 @@ const Game: React.FC<GameProps> = ({
     if (canvasRef.current) {
       contextRef.current = canvasRef.current.getContext("2d");
     }
-  }, []);
+  }, [gameId]);
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     if (["ArrowUp", "ArrowDown", "w", "s"].includes(e.key)) {
@@ -125,14 +125,8 @@ const Game: React.FC<GameProps> = ({
       : [];
 
     return {
-      player1: calculateCoordinates(
-        gameState.player1.paddle,
-        canvas
-      ),
-      player2: calculateCoordinates(
-        gameState.player2.paddle,
-        canvas
-      ),
+      player1: calculateCoordinates(gameState.player1.paddle, canvas),
+      player2: calculateCoordinates(gameState.player2.paddle, canvas),
       ball: calculateCoordinates(
         {
           ...gameState.ball,
@@ -194,15 +188,15 @@ const Game: React.FC<GameProps> = ({
     if (animationFrameRef.current) {
       cancelAnimationFrame(animationFrameRef.current);
     }
-    
+
     const animate = () => {
       processPaddleMovement();
       renderGame();
       animationFrameRef.current = requestAnimationFrame(animate);
     };
-    
+
     animationFrameRef.current = requestAnimationFrame(animate);
-    
+
     return () => {
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
@@ -267,37 +261,33 @@ const Game: React.FC<GameProps> = ({
     });
   };
 
-  const handleServerRematch = useCallback(
-    (rematchGameId: string) => {
-      if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current);
-        animationFrameRef.current = undefined;
-      }
-      offGameStateUpdate();
+  const handleServerRematch = useCallback((rematchGameId: string) => {
+    if (animationFrameRef.current) {
+      cancelAnimationFrame(animationFrameRef.current);
+      animationFrameRef.current = undefined;
+    }
+    offGameStateUpdate();
 
-      setGameId(rematchGameId);
-      setWinner(null);
-      setRematchRequested(false);
-      setTimeLeft(null);
-      setGameState(null);
-      setOpponentDisconnected(false);
+    setGameId(rematchGameId);
+    setWinner(null);
+    setRematchRequested(false);
+    setTimeLeft(null);
+    setGameState(null);
+    setOpponentDisconnected(false);
 
-      const socket = getSocket();
-      if (socket) {
-        socket.emit("getGameState", { gameId: rematchGameId });
-      }
-
-      onGameStateUpdate(setGameState);
-    },
-    []
-  );
+    const socket = getSocket();
+    if (socket) {
+      socket.emit("getGameState", { gameId: rematchGameId });
+    }
+    onGameStateUpdate(setGameState);
+  }, []);
 
   useEffect(() => {
     const socket = getSocket();
     if (!socket) return;
 
     socket.on("rematchStarted", handleServerRematch);
-    
+
     return () => {
       socket.off("rematchStarted");
     };
@@ -310,6 +300,7 @@ const Game: React.FC<GameProps> = ({
     window.addEventListener("keydown", handleKeyDown);
     window.addEventListener("keyup", handleKeyUp);
 
+    socket.emit("getGameState", { gameId });
     onGameStateUpdate(setGameState);
 
     return () => {
@@ -317,13 +308,13 @@ const Game: React.FC<GameProps> = ({
       window.removeEventListener("keyup", handleKeyUp);
       offGameStateUpdate();
     };
-  }, [handleKeyDown, handleKeyUp]);
+  }, [handleKeyDown, handleKeyUp, gameId]);
 
   useEffect(() => {
     if (!gameState) return;
-    
+
     const cleanupAnimation = setupAnimationLoop();
-    
+
     return () => {
       cleanupAnimation();
     };
