@@ -13,8 +13,9 @@ export default defineConfig({
     port: 5173,
     proxy: {
       "/socket.io": {
-        target: "ws://localhost:3000",
+        target: "http://backend:3000",
         ws: true,
+        changeOrigin: true,
       },
     },
   },
