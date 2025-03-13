@@ -21,13 +21,13 @@ async function bootstrap() {
   app.setGlobalPrefix('api'); //necesary?
 
   app.enableCors({
-    origin: [`http://0.0.0.0:${frontendPort}`],
+    origin: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
     credentials: true,
     allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
     exposedHeaders: ['Content-Range', 'X-Content-Range'],
   });
 
-  await app.listen(backendPort ?? 3000);
+  await app.listen(backendPort ?? 3000, '0.0.0.0');
 }
 bootstrap();
