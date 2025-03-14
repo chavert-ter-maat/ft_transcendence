@@ -17,6 +17,7 @@ import { FortyTwoAuthGuard } from './guards/passport.guard'; // Correct import f
 import { AuthService } from './auth.service';
 import { User } from './auth.model';
 
+const hostname = process.env.VITE_HOST_NAME || 'localhost';
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
@@ -101,11 +102,11 @@ export class AuthController {
       // Generate the access token using the saved user's userId
       const { accessToken } = await this.authService.signIn(savedUser);
   
-      const redirectUrl = `http://${process.env.VITE_HOST_NAME}:${process.env.FRONTEND_PORT}/auth/42/callback?token=${accessToken}`;
+      const redirectUrl = `http://${hostname}:${process.env.FRONTEND_PORT}/auth/42/callback?token=${accessToken}`;
       return res.redirect(redirectUrl);
     } catch (error) {
       console.error('Callback error:', error);
-      return res.redirect(`http://${process.env.VITE_HOST_NAME}:${process.env.FRONTEND_PORT}/login?error=authentication_failed`);
+      return res.redirect(`http://${hostname}:${process.env.FRONTEND_PORT}/login?error=authentication_failed`);
     }
   }
 
@@ -122,11 +123,11 @@ export class AuthController {
       // Generate the access token using the saved user's userId
       const { accessToken } = await this.authService.signIn(savedUser);
   
-      const redirectUrl = `http://${process.env.VITE_HOST_NAME}:${process.env.FRONTEND_PORT}/auth/42/callback?token=${accessToken}`;
+      const redirectUrl = `http://${hostname}:${process.env.FRONTEND_PORT}/auth/42/callback?token=${accessToken}`;
       return res.redirect(redirectUrl);
     } catch (error) {
       console.error('Callback error:', error);
-      return res.redirect(`http://${process.env.VITE_HOST_NAME}:${process.env.FRONTEND_PORT}/login?error=authentication_failed`);
+      return res.redirect(`http://${hostname}:${process.env.FRONTEND_PORT}/login?error=authentication_failed`);
     }
   }
 
@@ -142,11 +143,11 @@ export class AuthController {
       // Generate the access token using the saved user's userId
       const { accessToken } = await this.authService.signIn(savedUser);
   
-      const redirectUrl = `http://${process.env.VITE_HOST_NAME}:${process.env.FRONTEND_PORT}/auth/42/callback?token=${accessToken}`;
+      const redirectUrl = `http://${hostname}:${process.env.FRONTEND_PORT}/auth/42/callback?token=${accessToken}`;
       return res.redirect(redirectUrl);
     } catch (error) {
       console.error('Callback error:', error);
-      return res.redirect(`http://${process.env.VITE_HOST_NAME}:${process.env.FRONTEND_PORT}/login?error=authentication_failed`);
+      return res.redirect(`http://${hostname}:${process.env.FRONTEND_PORT}/login?error=authentication_failed`);
     }
   }
 }

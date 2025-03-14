@@ -7,8 +7,6 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Chat from './chat/Chat';
 import App_game from './App_game';
 
-console.log(`${import.meta.env.VITE_HOST_NAME}`)
-
 function App(): JSX.Element {
   return (
     <Router>
