@@ -3,7 +3,7 @@ import React from 'react';
 const Login: React.FC = () => {
   const hostname = import.meta.env.VITE_HOST_NAME || 'localhost';
   const fortyTwoLoginUrl = `https://api.intra.42.fr/oauth/authorize?client_id=${import.meta.env.VITE_CLIENT_UID_42}&redirect_uri=http%3A%2F%2F${hostname}%3A3000%2Fapi%2Fauth%2F42%2Fcallback&response_type=code`
-  const apiUrl = `${hostname}:${import.meta.env.VITE_BACKEND_PORT}`;
+  const apiUrl = `http://${hostname}:${import.meta.env.VITE_BACKEND_PORT}`;
   
   console.log('API URL:', apiUrl); // Debug log
   
