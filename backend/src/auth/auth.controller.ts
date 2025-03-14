@@ -101,11 +101,11 @@ export class AuthController {
       // Generate the access token using the saved user's userId
       const { accessToken } = await this.authService.signIn(savedUser);
   
-      const redirectUrl = `${process.env.FRONTEND_URL}/auth/42/callback?token=${accessToken}`;
+      const redirectUrl = `http://${process.env.VITE_HOST_NAME}:${process.env.FRONTEND_PORT}/auth/42/callback?token=${accessToken}`;
       return res.redirect(redirectUrl);
     } catch (error) {
       console.error('Callback error:', error);
-      return res.redirect(`${process.env.FRONTEND_URL}/login?error=authentication_failed`);
+      return res.redirect(`http://${process.env.VITE_HOST_NAME}:${process.env.FRONTEND_PORT}/login?error=authentication_failed`);
     }
   }
 
@@ -122,11 +122,11 @@ export class AuthController {
       // Generate the access token using the saved user's userId
       const { accessToken } = await this.authService.signIn(savedUser);
   
-      const redirectUrl = `${process.env.FRONTEND_URL}/auth/42/callback?token=${accessToken}`;
+      const redirectUrl = `http://${process.env.VITE_HOST_NAME}:${process.env.FRONTEND_PORT}/auth/42/callback?token=${accessToken}`;
       return res.redirect(redirectUrl);
     } catch (error) {
       console.error('Callback error:', error);
-      return res.redirect(`${process.env.FRONTEND_URL}/login?error=authentication_failed`);
+      return res.redirect(`http://${process.env.VITE_HOST_NAME}:${process.env.FRONTEND_PORT}/login?error=authentication_failed`);
     }
   }
 
@@ -142,11 +142,11 @@ export class AuthController {
       // Generate the access token using the saved user's userId
       const { accessToken } = await this.authService.signIn(savedUser);
   
-      const redirectUrl = `${process.env.FRONTEND_URL}/auth/42/callback?token=${accessToken}`;
+      const redirectUrl = `http://${process.env.VITE_HOST_NAME}:${process.env.FRONTEND_PORT}/auth/42/callback?token=${accessToken}`;
       return res.redirect(redirectUrl);
     } catch (error) {
       console.error('Callback error:', error);
-      return res.redirect(`${process.env.FRONTEND_URL}/login?error=authentication_failed`);
+      return res.redirect(`http://${process.env.VITE_HOST_NAME}:${process.env.FRONTEND_PORT}/login?error=authentication_failed`);
     }
   }
 }

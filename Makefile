@@ -2,7 +2,7 @@ NAME = ft_transcendence
 
 include .env
 
-DB_DATA = ${DB_LOCATION} #${HOME}/.sgoinfre/transcendence/postgres #?
+DB_DATA = ${DB_LOCATION}
 
 DOCKER_COMPOSE = docker-compose -f ./docker-compose.yml
 
@@ -16,7 +16,7 @@ up:
 
 dev:
 	@mkdir -p $(DB_DATA)
-	NODE_ENV=development ${DOCKER_COMPOSE} --profile dev up --build
+	NODE_ENV=development HOSTNAME=$(shell hostname) ${DOCKER_COMPOSE} --profile dev up --build
 
 test: down build up
 
