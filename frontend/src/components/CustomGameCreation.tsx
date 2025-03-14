@@ -1,32 +1,23 @@
 import React, { useState } from "react";
-import "./CustomGameCreation.css";
-import {
-  CustomGameModes,
-  CustomGameCreationProps,
-} from "../types/customGame.types";
+import "../App_game.css";
+import { GameMode, LobbyProps } from "../types";
+import { joinGame } from "../socket";
 
-const CustomGameCreation: React.FC<CustomGameCreationProps> = ({
+const CustomGameCreation: React.FC<LobbyProps> = ({
   onGameStart,
   setQueueStatus,
 }) => {
-  const [gameSettings, setGameSettings] = useState({
-    gameMode: CustomGameModes,
-  });
-  // const [selectedMode, setSelectedMode] = useState<CustomGameModes | null>(
-  //   null
-  // );
-
-  const handleModeSelect = (mode: CustomGameModes) => {
-    setSelectedMode(mode);
-  };
+  const [selectedMode, setSelectedMode] = useState<GameMode>("singleplayer");
 
   const handleStartGame = () => {
-    if (!selectedMode) return;
-
-    const gameMode =
-      selectedMode === "local-multiplayer" ? "localMultiplayer" : selectedMode;
     setQueueStatus("inactive");
-    onGameStart(gameMode, "");
+    joinGame(
+      selectedMode,
+      undefined,
+      (gameId) => {
+        onGameStart(selectedMode, gameId);
+      }
+    );
   };
 
   return (
@@ -34,19 +25,21 @@ const CustomGameCreation: React.FC<CustomGameCreationProps> = ({
       <h2 className="custom-game_title">Create Custom Game</h2>
       <div className="settings">
         <div className="setting">
-          <label>Paddle Size:</label>
+          <label>Game Mode:</label>
           <select
-            value={selectedMode || ""}
-            onChange={(e) => setSelectedMode(e.target.value as CustomGameModes)}
+            value={selectedMode}
+            onChange={(e) => setSelectedMode(e.target.value as GameMode)}
           >
             <option value="singleplayer">Singleplayer</option>
-            <option value="local multiplayer">Local Multiplayer</option>
+            <option value="localMultiplayer">Local Multiplayer</option>
           </select>
         </div>
       </div>
       <div className="buttons">
-        <button onClick={handleStartGame}>Start Game</button>
-        <button onClick={onBack}>Back to Lobby</button>
+        <button onClick={handleStartGame}>
+          Start Game
+        </button>
+        <button onClick={() => window.history.back()}>Back to Lobby</button>
       </div>
     </div>
   );

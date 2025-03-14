@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { GameMode, LobbyProps } from "../types";
+import CustomGameCreation from "./CustomGameCreation";
 import {
   getSocket,
   joinGame,
@@ -18,6 +19,7 @@ const Lobby: React.FC<LobbyProps> = ({
 }) => {
   const [countdown, setCountdown] = useState<number | null>(null);
   const [selectedMode, setSelectedMode] = useState<GameMode>("singleplayer");
+  const [showCustomSetup, setShowCustomSetup] = useState(false);
 
   useEffect(() => {
     const handleCountdown = (data: { gameId: string; duration: number }) => {
@@ -65,13 +67,9 @@ const Lobby: React.FC<LobbyProps> = ({
       setQueueStatus("joining");
       socket.emit("joinQueue", { playerId: socket.id });
     } else {
-      joinGame(
-        gameMode,
-        undefined,
-        (gameId) => {
-          onGameStart(gameMode, gameId);
-        }
-      );
+      joinGame(gameMode, undefined, (gameId) => {
+        onGameStart(gameMode, gameId);
+      });
     }
   };
 
@@ -86,25 +84,31 @@ const Lobby: React.FC<LobbyProps> = ({
   };
 
   const handleGoBack = () => {
-	window.history.back();
+    window.history.back();
   };
 
   return (
     <div>
-      {queueStatus === "inactive" && selectedMode !== "remoteMultiplayer" && (
+      {showCustomSetup ? (
+        <CustomGameCreation
+          onGameStart={onGameStart}
+          setQueueStatus={setQueueStatus}
+          queueStatus={queueStatus}
+        />
+      ) : (
         <>
-          <h2>Select Game Mode</h2>
-          <button onClick={() => handleJoinQueue("singleplayer" as GameMode)}>
-            Single Player
-          </button>
-          <button
-            onClick={() => handleJoinQueue("localMultiplayer" as GameMode)}
-          >
-            Local Multiplayer
-          </button>
-          <button onClick={() => setSelectedMode("remoteMultiplayer")}>
-            Remote Multiplayer
-          </button>
+          {queueStatus === "inactive" &&
+            selectedMode !== "remoteMultiplayer" && (
+              <>
+                <h2>Select Game Mode</h2>
+                <button onClick={() => setShowCustomSetup(true)}>
+                  Custom Game
+                </button>
+                <button onClick={() => setSelectedMode("remoteMultiplayer")}>
+                  Remote Multiplayer
+                </button>
+              </>
+            )}
         </>
       )}
 
@@ -136,7 +140,7 @@ const Lobby: React.FC<LobbyProps> = ({
         </div>
       )}
       {countdown !== null && <p>Game starts in: {countdown}</p>}
-	  <button onClick={handleGoBack}>Go Back</button>
+      <button onClick={handleGoBack}>Go Back</button>
     </div>
   );
 };
