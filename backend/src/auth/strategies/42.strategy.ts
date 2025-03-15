@@ -1,12 +1,6 @@
-// src/auth/strategies/42.strategy.ts
-import { Module } from '@nestjs/common';
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import Strategy from 'passport-42';
-import { ConfigModule } from '@nestjs/config';
-// import * as dotenv from 'dotenv';
-
-// dotenv.config();
 
 @Injectable()
 export class FortyTwoStrategy extends PassportStrategy(Strategy, '42') {

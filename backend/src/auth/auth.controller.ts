@@ -5,7 +5,6 @@ import {
   Get,
   Req,
   UseGuards,
-  Param,
   Res,
   UnauthorizedException,
   UseInterceptors,
@@ -13,13 +12,12 @@ import {
 } from '@nestjs/common';
 import { JwtAuthGuard } from './guards/42-auth.guards';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { FortyTwoAuthGuard } from './guards/passport.guard'; // Correct import for FortyTwoAuthGuard
+import { FortyTwoAuthGuard } from './guards/passport.guard';
 import { AuthService } from './auth.service';
-import { User } from './auth.model';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService) { }
 
   @Get('protected')
   @UseGuards(JwtAuthGuard)
@@ -40,7 +38,7 @@ export class AuthController {
   @Post('userInfoSomeoneElse')
   @UseGuards(JwtAuthGuard)
   async getUserInfoSomeoneElse(@Body() body: { requestedUser: string }) {
-	const { requestedUser } = body;
+    const { requestedUser } = body;
     if (typeof requestedUser !== 'string') { //unnecesary?
       throw new Error('requestedUser is invalid');
     }
@@ -59,7 +57,7 @@ export class AuthController {
   async uploadAvatar(@UploadedFile() file, @Req() req): Promise<any> {
     try {
       const userId = req.user.userId;
-      
+
       // Handle the avatar upload and get the avatar URL
       const updatedUser = await this.authService.updateUserAvatar(userId, file);
 
@@ -78,12 +76,12 @@ export class AuthController {
       throw new UnauthorizedException('User is not authenticated.');
     }
     const { displayName } = body;
-  
+
     // Check if the display name is valid
     if (!displayName || displayName.trim().length === 0) {
       throw new Error('Display name is required');
     }
-  
+
     const updatedUser = await this.authService.updateDisplayName(userId, displayName);
     return { message: 'Display name updated successfully', user: updatedUser };
   }
@@ -94,15 +92,25 @@ export class AuthController {
     try {
       console.log('Callback received:', req.user);
       const user = req.user;
-  
+
       // Save the OAuth tokens and ensure the user is created in the database
       const savedUser = await this.authService.saveToDatabase(user);
-      
-      // Generate the access token using the saved user's userId
-      const { accessToken } = await this.authService.signIn(savedUser);
-  
-      const redirectUrl = `${process.env.FRONTEND_URL}/auth/42/callback?token=${accessToken}`;
-      return res.redirect(redirectUrl);
+
+      console.log("saved key: ", savedUser.twoFASecretKey)
+
+      if (savedUser.twoFASecretKey) {
+        console.log("2fa is activated")
+        localStorage.setItem("userId", savedUser.userId.toString())
+        localStorage.setItem("secretKey", savedUser.twoFASecretKey)
+        const redirectUrl = `${process.env.FRONTEND_URL}/auth/verify-2fa`;
+        return res.redirect(redirectUrl);
+      }
+      else {
+        const { accessToken } = await this.authService.signIn(savedUser);
+        const redirectUrl = `${process.env.FRONTEND_URL}/auth/42/callback?token=${accessToken}`;
+        return res.redirect(redirectUrl);
+      }
+
     } catch (error) {
       console.error('Callback error:', error);
       return res.redirect(`${process.env.FRONTEND_URL}/login?error=authentication_failed`);
@@ -110,18 +118,18 @@ export class AuthController {
   }
 
   //REMOVE THIS FUNCTION ITS FOR TESTING AND BYPASSES THE INTRA LOGIN
-  @Get('testAccount') 
-//   @UseGuards(FortyTwoAuthGuard)
+  @Get('testAccount')
+  //   @UseGuards(FortyTwoAuthGuard)
   async callback_test(@Res() res) {
     try {
       console.log('Callback bypassed for test account:');
-  
+
       // Save the OAuth tokens and ensure the user is created in the database
       const savedUser = await this.authService.saveToDatabase({ email: "test.test", username: "testAccount", displayName: null, avatar: null, oauthToken: null, oauthRefreshToken: null, oauthExpiresAt: null, provider: '42' });
-      
+
       // Generate the access token using the saved user's userId
       const { accessToken } = await this.authService.signIn(savedUser);
-  
+
       const redirectUrl = `${process.env.FRONTEND_URL}/auth/42/callback?token=${accessToken}`;
       return res.redirect(redirectUrl);
     } catch (error) {
@@ -130,18 +138,18 @@ export class AuthController {
     }
   }
 
-  @Get('testAccount2') 
-//   @UseGuards(FortyTwoAuthGuard)
+  @Get('testAccount2')
+  //   @UseGuards(FortyTwoAuthGuard)
   async callback_test2(@Res() res) {
     try {
       console.log('Callback bypassed for test account :');
-  
+
       // Save the OAuth tokens and ensure the user is created in the database
       const savedUser = await this.authService.saveToDatabase({ email: "test.test2", username: "testAccount2", displayName: null, avatar: null, oauthToken: null, oauthRefreshToken: null, oauthExpiresAt: null, provider: '42' });
-      
+
       // Generate the access token using the saved user's userId
       const { accessToken } = await this.authService.signIn(savedUser);
-  
+
       const redirectUrl = `${process.env.FRONTEND_URL}/auth/42/callback?token=${accessToken}`;
       return res.redirect(redirectUrl);
     } catch (error) {

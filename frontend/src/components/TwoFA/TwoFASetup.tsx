@@ -9,7 +9,7 @@ function TwoFASetup({ setCurrentTwoFAItem }) {
 	async function generateQRCode() {
 		setLoading(true)
 		try {
-			const response = await axios.get("http://localhost:3000/auth/twofa/generate");
+			const response = await axios.get(`${process.env.FRONTEND_URL}/auth/twofa/generate`);
 			console.log("response:", response.data);
 			setTwoFASetupData(response.data);
 			setErrorMessage("");
@@ -22,9 +22,10 @@ function TwoFASetup({ setCurrentTwoFAItem }) {
 
 	async function saveSecretKeyToDatabase() {
 		try {
-			const response = await axios.post("http://localhost:3000/auth/twofa/save", {
-				secretKey: twoFAData?.secretKey,
-				email: "test@testmail.com"
+			const response = await axios.post(`${process.env.FRONTEND_URL}/auth/twofa/save`, {
+				authToken: localStorage.getItem("authToken")
+				// secretKey: twoFAData?.secretKey,
+				// email: "test@testmail.com"
 			})
 			setErrorMessage("");
 			return response?.data;
@@ -43,8 +44,9 @@ function TwoFASetup({ setCurrentTwoFAItem }) {
 		try {
 			const response = await axios.post("http://localhost:3000/auth/twofa/verify", {
 				...formFields,
-				secretKey: twoFAData?.secretKey,
-				email: "test@testmail.com"
+				authToken: localStorage.getItem("authToken")
+				// secretKey: twoFAData?.secretKey,
+				// email: "test@testmail.com"
 			})
 			console.log("twoFA verification response: ", response);
 			setErrorMessage("");
@@ -79,7 +81,8 @@ function TwoFASetup({ setCurrentTwoFAItem }) {
 						<br />
 						<button type="submit">Setup☑️</button>
 					</form>
-					{errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}				</>
+					{errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
+				</>
 			)}
 
 		</div>

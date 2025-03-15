@@ -1,8 +1,8 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { User } from 'src/auth/auth.model'; // Import the User model
-import * as bcrypt from 'bcrypt'; // Import bcrypt to compare hashed passwords
-import * as path from 'path'; // Path operations
+import { User } from 'src/auth/auth.model';
+import * as bcrypt from 'bcrypt';
+import * as path from 'path';
 
 type AuthInput = { email: string; password: string };  // Change username to email
 type AuthResult = { accessToken: string; email: string };  // Change username to email
@@ -60,6 +60,7 @@ export class AuthService {
 	}
 
 	async signIn(user: User): Promise<AuthResult> {
+		console.log("user", user)
 		const payload = { userId: user.userId, email: user.email };  // Change username to email
 		const accessToken = this.jwtService.sign(payload);
 
@@ -69,9 +70,17 @@ export class AuthService {
 	async saveToDatabase(user: any): Promise<User> {
 		console.log('Saving OAuth tokens:', user);
 
-		const { email, username, displayName = null, avatar = null, oauthToken = null, oauthRefreshToken = null, oauthExpiresAt = null, provider = '42' } = user;  // Change username to email
+		const {
+			email,
+			username,
+			displayName = null,
+			avatar = null,
+			oauthToken = null,
+			oauthRefreshToken = null,
+			oauthExpiresAt = null,
+			provider = '42' } = user;  // Change username to email
 
-		console.log("user adding:", email, username);
+		console.log(`User information from 42 -> username: ${username}, email: ${email}`);
 
 		if (!email) {  // Change username to email
 			throw new Error('Email is required to save OAuth tokens.');

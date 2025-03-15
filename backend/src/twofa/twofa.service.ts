@@ -1,6 +1,8 @@
 import { Injectable, Inject, HttpStatus, HttpException } from '@nestjs/common';
 import { User } from '../auth/auth.model';
 import { TwoFADto } from './dto/TwoFA.dto';
+import { AuthService } from '../auth/auth.service';
+import { JwtService } from '@nestjs/jwt';
 const QRCode = require('qrcode');
 const speakeasy = require('speakeasy');
 
@@ -35,18 +37,20 @@ export class TwoFAService {
 	}
 
 	async verifyTwoFa(data): Promise<any> {
-		const identifiedUser = await User.findOne({ where: { email: data.email } });
-		if (!identifiedUser) {
-			throw new HttpException("Unauthorized user", HttpStatus.UNAUTHORIZED);
-		}
-
 		const isValidToken = speakeasy.totp.verify({
 			secret: data.secretKey,
 			encoding: 'base32',
 			token: data.token,
 		});
 
-		if (isValidToken) { return { email: identifiedUser.email, secretKey: data.secretKey } }
+		if (isValidToken) {
+			console.log("valid token")
+			// data = { userId: 1, email: email }
+			// return JwtService.sign(data)
+			// AuthService.signIn(data)
+			// const redirectUrl = `${process.env.FRONTEND_URL}/auth/42/callback?token=${accessToken}`;
+			// return res.redirect(redirectUrl);
+		}
 		throw new HttpException("Invalid token", HttpStatus.UNAUTHORIZED);
 	}
 

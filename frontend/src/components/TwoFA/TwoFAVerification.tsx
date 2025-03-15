@@ -9,8 +9,10 @@ function VerifyTwoFA() {
 	useEffect(() => {
 		const fetchVerifiedUser = async () => {
 			try {
-				const response = await axios.get("http://localhost:3000/auth/twofa/item", {
-					params: { email: "test@testmail.com" }
+				const url = new URL(document.URL)
+				const secretKey = url.searchParams.get("secretKey")
+				const response = await axios.get(`${process.env.FRONTEND_URL}/auth/twofa/item`, {
+					params: { secretKey: secretKey }
 				});
 				setVerifiedUser(response.data);
 			} catch (error) {
@@ -27,9 +29,12 @@ function VerifyTwoFA() {
 		const formFields = Object.fromEntries(formData);
 
 		try {
-			await axios.post("http://localhost:3000/auth/twofa/verify", {
+			const url = new URL(document.URL)
+			const secretKey = url.searchParams.get("secretKey")
+			await axios.post(`${process.env.FRONTEND_URL}/auth/twofa/verify`, {
 				...verifiedUser,
 				...formFields,
+				secretKey: secretKey
 			});
 			setSuccessMessage("Token verified successfully");
 			setErrorMessage("");

@@ -2,7 +2,6 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 import TwoFASetup from './TwoFASetup';
 import CurrentTwoFASetup from './TwoFAItem';
-import VerifyTwoFA from './TwoFAVerification';
 
 function TwoFADashboard() {
 	const [currentTwoFAItem, setCurrentTwoFAItem] = useState(null);
@@ -13,15 +12,13 @@ function TwoFADashboard() {
 		setLoading(true)
 		async function fetchData() {
 			try {
-				const response = await axios.get("http://localhost:3000/auth/twofa/item", {
-					params: { email: "test@testmail.com" },
-				});
+				const response = await axios.get(`${process.env.FRONTEND_URL}/auth/twofa/item`, { authToken: localStorage.getItem("authToken") });
 				console.log("raw response:", response.data);
 				setCurrentTwoFAItem(response.data);
 			} catch (error) {
 				console.error("TwoFAItems error:", error);
 			} finally {
-				setLoading(false); // Stop loading once request completes
+				setLoading(false);
 			}
 		};
 		fetchData();
@@ -31,7 +28,7 @@ function TwoFADashboard() {
 		<div>
 			<h1>2FA Dashboard</h1>
 			{loading ? (
-				<p>Loading...</p> // Show loading message
+				<p>Loading...</p>
 			) : currentTwoFAItem ? (
 				<CurrentTwoFASetup
 					secretKey={currentTwoFAItem.secretKey}
