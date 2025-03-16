@@ -4,24 +4,24 @@ import axios from "axios";
 function VerifyTwoFA() {
 	const [errorMessage, setErrorMessage] = useState("");
 	const [successMessage, setSuccessMessage] = useState("");
-	const [verifiedUser, setVerifiedUser] = useState(null);
+	// const [verifiedUser, setVerifiedUser] = useState(null);
 
-	useEffect(() => {
-		const fetchVerifiedUser = async () => {
-			try {
-				const url = new URL(document.URL)
-				const secretKey = url.searchParams.get("secretKey")
-				const response = await axios.get(`${process.env.FRONTEND_URL}/auth/twofa/item`, {
-					params: { secretKey: secretKey }
-				});
-				setVerifiedUser(response.data);
-			} catch (error) {
-				setErrorMessage(error.response?.data?.message || "Failed to fetch user");
-			}
-		};
+	// useEffect(() => {
+	// 	const fetchVerifiedUser = async () => {
+	// 		try {
+	// 			const url = new URL(document.URL)
+	// 			const secretKey = url.searchParams.get("secretKey")
+	// 			const response = await axios.get(`http://localhost:3000/api/auth/twofa/item`, {
+	// 				params: { secretKey: secretKey }
+	// 			});
+	// 			setVerifiedUser(response.data);
+	// 		} catch (error) {
+	// 			setErrorMessage(error.response?.data?.message || "Failed to fetch user");
+	// 		}
+	// 	};
 
-		fetchVerifiedUser();
-	}, []);
+	// 	fetchVerifiedUser();
+	// }, []);
 
 	const handleVerification = async (e) => {
 		e.preventDefault();
@@ -30,17 +30,18 @@ function VerifyTwoFA() {
 
 		try {
 			const url = new URL(document.URL)
-			const secretKey = url.searchParams.get("secretKey")
-			await axios.post(`${process.env.FRONTEND_URL}/auth/twofa/verify`, {
-				...verifiedUser,
+			const sessionId = url.searchParams.get("sessionId")
+			const response = await axios.post(`http://localhost:3000/api/auth/twofa/validate`, {
 				...formFields,
-				secretKey: secretKey
+				sessionId
 			});
-			setSuccessMessage("Token verified successfully");
+			console.log(response)
+			setSuccessMessage("Token validated successfully");
 			setErrorMessage("");
 		} catch (error) {
 			setSuccessMessage("");
-			setErrorMessage(error.response?.data?.message || "Verification failed");
+			console.log(error)
+			setErrorMessage(error.response?.data?.message || "token validation failed");
 		}
 	};
 

@@ -6,11 +6,10 @@ interface SemiProtectedRouteProps {
 }
 
 const SemiProtectedRoute: React.FC<SemiProtectedRouteProps> = ({ children }) => {
-  const userId = localStorage.getItem('authToken');
-  const secretKey = localStorage.getItem('authToken');
+  const sessionId = localStorage.getItem('sessionId');
 
-  if (!(userId && secretKey)) {
-    console.log('No secretKey or UserID found, redirecting to login');
+  if (!sessionId) {
+    console.log('No sessionId found, redirecting to login');
     return <Navigate to="/login" replace />;
   }
 

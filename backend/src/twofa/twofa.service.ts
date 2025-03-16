@@ -1,4 +1,4 @@
-import { Injectable, Inject, HttpStatus, HttpException } from '@nestjs/common';
+import { Injectable, Inject, HttpStatus, HttpException, ConsoleLogger } from '@nestjs/common';
 import { User } from '../auth/auth.model';
 import { TwoFADto } from './dto/TwoFA.dto';
 import { jwtDecode } from "jwt-decode";
@@ -37,7 +37,7 @@ export class TwoFAService {
 
 	}
 
-	async verifyTwoFa(data): Promise<any> {
+	async validateTwoFA(data): Promise<any> {
 
 		const isValidToken = speakeasy.totp.verify({
 			secret: data.secretKey,
@@ -45,11 +45,29 @@ export class TwoFAService {
 			token: data.token,
 		});
 		if (isValidToken) {
-			return {
-				"verificationStatus": "verified"
-			}
+			return isValidToken;
 		}
 		throw new HttpException("Invalid token", HttpStatus.UNAUTHORIZED);
+	}
+
+
+	async validateTwoFAFirstTime(data): Promise<any> {
+		const user = await User.findOne({ where: { sessionId: data.sessionId } });
+
+		if (user) {
+			try {
+				this.validateTwoFA(data)
+				console.log("2fa validated")
+				const accessToken = user.accessToken;
+				user.update({ sessionId: null })
+				return accessToken;
+			}
+			catch (e) {
+				throw new HttpException(e, HttpStatus.UNAUTHORIZED);
+			}
+		}
+
+
 	}
 
 	async deleteTwoFAItem(user: TwoFADto): Promise<any> {

@@ -1,4 +1,4 @@
-import { Controller, Body, Post, Get, Delete, UseGuards, Request, ValidationPipe, Param, Query } from '@nestjs/common';
+import { Controller, Body, Post, Get, Delete, Query, Res } from '@nestjs/common';
 import { TwoFAService } from '../twofa/twofa.service';
 import { VerifyTwoFADto } from './dto/VerifyTwoFA.dto';
 import { TwoFADto } from './dto/TwoFA.dto';
@@ -22,9 +22,16 @@ export class TwoFAController {
 		return this.twoFAService.saveToDb(data);
 	}
 
-	@Post('verify')
-	async verifyTwoFa(@Body() data: VerifyTwoFADto) {
-		return this.twoFAService.verifyTwoFa(data);
+	@Post('validate')
+	async validateTwoFaFirstTime(@Body() data: VerifyTwoFADto, @Res() res) {
+		const accessToken = await this.twoFAService.validateTwoFAFirstTime(data);
+		const redirectUrl = `${process.env.FRONTEND_URL}/auth/42/callback?token=${accessToken}`;
+		res.redirect(redirectUrl);
+	}
+
+	@Post('setup/validate')
+	async validateTwoFA(@Body() data: VerifyTwoFADto) {
+		return this.twoFAService.validateTwoFA(data);
 	}
 
 	@Delete('item')

@@ -14,6 +14,9 @@ import { JwtAuthGuard } from './guards/42-auth.guards';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FortyTwoAuthGuard } from './guards/passport.guard';
 import { AuthService } from './auth.service';
+import { v4 as uuidv4 } from 'uuid';
+import { session } from 'passport';
+
 
 @Controller('auth')
 export class AuthController {
@@ -96,13 +99,12 @@ export class AuthController {
       // Save the OAuth tokens and ensure the user is created in the database
       const savedUser = await this.authService.saveToDatabase(user);
 
-      console.log("saved key: ", savedUser.twoFASecretKey)
-
       if (savedUser.twoFASecretKey) {
         console.log("2fa is activated")
-        localStorage.setItem("userId", savedUser.userId.toString())
-        localStorage.setItem("secretKey", savedUser.twoFASecretKey)
-        const redirectUrl = `${process.env.FRONTEND_URL}/auth/verify-2fa`;
+        const sessionId = uuidv4()
+        const { accessToken } = await this.authService.signIn(savedUser);
+        await savedUser.update({ sessionId, accessToken })
+        const redirectUrl = `${process.env.FRONTEND_URL}/auth/verify-2fa?sessionId=${sessionId}`;
         return res.redirect(redirectUrl);
       }
       else {

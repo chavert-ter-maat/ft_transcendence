@@ -8,7 +8,7 @@ import SemiProtectedRoute from './components/SemiProtectedRoute';
 import Chat from './chat/Chat';
 import App_game from './App_game';
 import TwoFADashboard from './components/TwoFA/TwoFADashboard';
-import VerifyTwoFA from './components/TwoFA/TwoFADashboard';
+import VerifyTwoFA from './components/TwoFA/TwoFAVerification';
 
 function App(): JSX.Element {
   return (
@@ -54,9 +54,9 @@ function App(): JSX.Element {
         <Route
           path="/auth/verify-2fa"
           element={
-            <SemiProtectedRoute>
-              <VerifyTwoFA />
-            </SemiProtectedRoute>
+            // <SemiProtectedRoute>
+            <VerifyTwoFA />
+            // {/* </SemiProtectedRoute> */}
           }
         />
       </Routes>

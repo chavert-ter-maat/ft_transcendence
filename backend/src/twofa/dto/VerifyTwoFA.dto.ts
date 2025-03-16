@@ -1,8 +1,9 @@
 import { IsNotEmpty } from 'class-validator';
 
 export class VerifyTwoFADto {
-	@IsNotEmpty()
 	readonly secretKey: string;
+
+	readonly sessionId: string;
 
 	@IsNotEmpty()
 	readonly token: Boolean;

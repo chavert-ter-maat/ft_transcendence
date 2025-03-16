@@ -42,7 +42,7 @@ function TwoFASetup({ tokenContent, setCurrentTwoFAItem }) {
 		const formData = new FormData(e.currentTarget);
 		const formFields = Object.fromEntries(formData);
 		try {
-			const response = await axios.post("http://localhost:3000/api/auth/twofa/verify", {
+			const response = await axios.post("http://localhost:3000/api/auth/twofa/setup/validate", {
 				...formFields,
 				secretKey: twoFAData?.secretKey,
 			})

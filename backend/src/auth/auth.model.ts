@@ -116,6 +116,18 @@ export class User extends Model<User> {
 	})
 	twoFASecretKey: string;
 
+	@Column({
+		type: DataType.STRING,
+		allowNull: true,
+	})
+	sessionId: string;
+
+	@Column({
+		type: DataType.STRING,
+		allowNull: true,
+	})
+	accessToken: string;
+
 	@BelongsToMany(() => Chat, {
 		through: () => UserChat,
 		foreignKey: 'userId',
