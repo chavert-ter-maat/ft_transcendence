@@ -1,13 +1,15 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
-function CurrentTwoFASetup({ secretKey, createdAt, setCurrentTwoFAItem }) {
+function CurrentTwoFASetup({ currentTwoFAItem, setCurrentTwoFAItem }) {
 
 	async function handleDeleteTwoFA() {
 		const isConfirmed = confirm("Are you sure you want to delete 2FA?")
 		if (isConfirmed) {
 			try {
-				await axios.delete("http://localhost:3000/auth/twofa/item", { data: { email: "test@testmail.com" } });
+				const response = await axios.delete("http://localhost:3000/api/auth/twofa/item",
+					{ data: { email: currentTwoFAItem.email, secretKey: currentTwoFAItem.twoFASecretKey } });
+				console.log(response)
 				setCurrentTwoFAItem(null)
 			} catch (error) {
 				console.error("TwoFAItems deletion error:", error);
@@ -28,8 +30,8 @@ function CurrentTwoFASetup({ secretKey, createdAt, setCurrentTwoFAItem }) {
 				</thead>
 				<tbody>
 					<tr>
-						<td>{secretKey.substr(0, 5) + "*****" + secretKey.substr(-5)}</td>
-						<td>{createdAt || "N/A"}</td>
+						<td>{currentTwoFAItem.twoFASecretKey.substr(0, 5) + "*****" + currentTwoFAItem.twoFASecretKey.substr(-5)}</td>
+						<td>{currentTwoFAItem.createdAt || "N/A"}</td>
 						<td>
 							<button onClick={handleDeleteTwoFA}>❌</button>
 						</td>

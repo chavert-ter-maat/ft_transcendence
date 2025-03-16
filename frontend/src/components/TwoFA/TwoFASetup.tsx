@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
-function TwoFASetup({ setCurrentTwoFAItem }) {
-	const [twoFAData, setTwoFASetupData] = useState(null); // Initially null
+function TwoFASetup({ tokenContent, setCurrentTwoFAItem }) {
+	const [twoFAData, setTwoFASetupData] = useState(null);
 	const [errorMessage, setErrorMessage] = useState("");
-	const [loading, setLoading] = useState(true); // Loading state
+	const [loading, setLoading] = useState(true);
 
 	async function generateQRCode() {
 		setLoading(true)
 		try {
-			const response = await axios.get(`${process.env.FRONTEND_URL}/auth/twofa/generate`);
+			const response = await axios.get(`http://localhost:3000/api/auth/twofa/generate`);
 			console.log("response:", response.data);
 			setTwoFASetupData(response.data);
 			setErrorMessage("");
@@ -22,12 +22,12 @@ function TwoFASetup({ setCurrentTwoFAItem }) {
 
 	async function saveSecretKeyToDatabase() {
 		try {
-			const response = await axios.post(`${process.env.FRONTEND_URL}/auth/twofa/save`, {
-				authToken: localStorage.getItem("authToken")
-				// secretKey: twoFAData?.secretKey,
-				// email: "test@testmail.com"
+			const response = await axios.post(`http://localhost:3000/api/auth/twofa/save`, {
+				secretKey: twoFAData.secretKey,
+				email: tokenContent.email
 			})
 			setErrorMessage("");
+			console.log("repsonse", response)
 			return response?.data;
 		}
 		catch (e) {
@@ -42,16 +42,14 @@ function TwoFASetup({ setCurrentTwoFAItem }) {
 		const formData = new FormData(e.currentTarget);
 		const formFields = Object.fromEntries(formData);
 		try {
-			const response = await axios.post("http://localhost:3000/auth/twofa/verify", {
+			const response = await axios.post("http://localhost:3000/api/auth/twofa/verify", {
 				...formFields,
-				authToken: localStorage.getItem("authToken")
-				// secretKey: twoFAData?.secretKey,
-				// email: "test@testmail.com"
+				secretKey: twoFAData?.secretKey,
 			})
 			console.log("twoFA verification response: ", response);
 			setErrorMessage("");
 			const savedItem = await saveSecretKeyToDatabase();
-			console.log(savedItem)
+			console.log("saved item", savedItem)
 			setCurrentTwoFAItem(savedItem)
 
 		}
@@ -66,7 +64,6 @@ function TwoFASetup({ setCurrentTwoFAItem }) {
 			<h2>Add Two Factor Authentication</h2>
 			{!twoFAData && <button onClick={generateQRCode}>Add 2FA</button>}
 
-			{/* Show QR Code when data is available */}
 			{twoFAData && (
 				<>
 					<p>Scan the QR code with your authenticator app</p>

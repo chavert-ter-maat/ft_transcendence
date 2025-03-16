@@ -1,21 +1,22 @@
 import { Injectable, Inject, HttpStatus, HttpException } from '@nestjs/common';
 import { User } from '../auth/auth.model';
 import { TwoFADto } from './dto/TwoFA.dto';
-import { AuthService } from '../auth/auth.service';
-import { JwtService } from '@nestjs/jwt';
+import { jwtDecode } from "jwt-decode";
+
 const QRCode = require('qrcode');
 const speakeasy = require('speakeasy');
 
 @Injectable()
 export class TwoFAService {
-	async saveToDb(data): Promise<number> {
-		console.log("create secret:", data)
-		const user = await User.update({ twoFASecretKey: data.secretKey }, { where: { email: data.email } });
-		console.log(user)
-		if (user['affectedCount'] == 0) {
-			throw new HttpException("secretKey could not be saved", HttpStatus.INTERNAL_SERVER_ERROR);
+	async saveToDb(data): Promise<User> {
+		try {
+			console.log("create secret:", data)
+			const user = await User.findOne({ where: { email: data.email } });
+			await user.update({ twoFASecretKey: data.secretKey });
+			return user;
+		} catch (e) {
+			throw new HttpException(`secretKey could not be saved: ${e} `, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-		return user['affectedCount'];
 	}
 
 
@@ -37,25 +38,23 @@ export class TwoFAService {
 	}
 
 	async verifyTwoFa(data): Promise<any> {
+
 		const isValidToken = speakeasy.totp.verify({
 			secret: data.secretKey,
 			encoding: 'base32',
 			token: data.token,
 		});
-
 		if (isValidToken) {
-			console.log("valid token")
-			// data = { userId: 1, email: email }
-			// return JwtService.sign(data)
-			// AuthService.signIn(data)
-			// const redirectUrl = `${process.env.FRONTEND_URL}/auth/42/callback?token=${accessToken}`;
-			// return res.redirect(redirectUrl);
+			return {
+				"verificationStatus": "verified"
+			}
 		}
 		throw new HttpException("Invalid token", HttpStatus.UNAUTHORIZED);
 	}
 
 	async deleteTwoFAItem(user: TwoFADto): Promise<any> {
-		const updateCount = await User.update({ twoFASecretKey: null }, { where: { email: user.email } });
+		console.log("user to be deleted: ", user)
+		const updateCount = await User.update({ twoFASecretKey: null }, { where: { email: user.email, twoFASecretKey: user.secretKey } });
 		console.log(updateCount)
 		if (!updateCount) {
 			throw new HttpException("No user found to be deleted", HttpStatus.INTERNAL_SERVER_ERROR)
