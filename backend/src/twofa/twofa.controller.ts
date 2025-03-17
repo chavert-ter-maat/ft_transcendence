@@ -23,10 +23,8 @@ export class TwoFAController {
 	}
 
 	@Post('validate')
-	async validateTwoFaFirstTime(@Body() data: VerifyTwoFADto, @Res() res) {
-		const accessToken = await this.twoFAService.validateTwoFAFirstTime(data);
-		const redirectUrl = `${process.env.FRONTEND_URL}/auth/42/callback?token=${accessToken}`;
-		res.redirect(redirectUrl);
+	async validateTwoFaFirstTime(@Body() data: VerifyTwoFADto) {
+		return this.twoFAService.validateTwoFAFirstTime(data);
 	}
 
 	@Post('setup/validate')

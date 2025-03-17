@@ -98,17 +98,17 @@ export class AuthController {
 
       // Save the OAuth tokens and ensure the user is created in the database
       const savedUser = await this.authService.saveToDatabase(user);
+      const { accessToken } = await this.authService.signIn(savedUser);
+      console.log("accessToken", accessToken)
 
       if (savedUser.twoFASecretKey) {
         console.log("2fa is activated")
         const sessionId = uuidv4()
-        const { accessToken } = await this.authService.signIn(savedUser);
         await savedUser.update({ sessionId, accessToken })
         const redirectUrl = `${process.env.FRONTEND_URL}/auth/verify-2fa?sessionId=${sessionId}`;
         return res.redirect(redirectUrl);
       }
       else {
-        const { accessToken } = await this.authService.signIn(savedUser);
         const redirectUrl = `${process.env.FRONTEND_URL}/auth/42/callback?token=${accessToken}`;
         return res.redirect(redirectUrl);
       }

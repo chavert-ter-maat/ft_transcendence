@@ -1,9 +1,11 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import axios from "axios";
+import { useNavigate } from 'react-router-dom';
 
 function VerifyTwoFA() {
 	const [errorMessage, setErrorMessage] = useState("");
 	const [successMessage, setSuccessMessage] = useState("");
+	const navigate = useNavigate();
 	// const [verifiedUser, setVerifiedUser] = useState(null);
 
 	// useEffect(() => {
@@ -36,12 +38,15 @@ function VerifyTwoFA() {
 				sessionId
 			});
 			console.log(response)
-			setSuccessMessage("Token validated successfully");
+			const accessToken = response.data.accessToken;
+			localStorage.setItem("authToken", accessToken)
+			setSuccessMessage("Token validated successfully, redirecting to userpage");
+			setTimeout(() => navigate('/userpage'), 3000);
 			setErrorMessage("");
 		} catch (error) {
 			setSuccessMessage("");
 			console.log(error)
-			setErrorMessage(error.response?.data?.message || "token validation failed");
+			setErrorMessage(error.response?.data?.message || `token validation failed: ${error}`);
 		}
 	};
 

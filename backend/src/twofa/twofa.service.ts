@@ -38,12 +38,12 @@ export class TwoFAService {
 	}
 
 	async validateTwoFA(data): Promise<any> {
-
 		const isValidToken = speakeasy.totp.verify({
 			secret: data.secretKey,
 			encoding: 'base32',
 			token: data.token,
 		});
+		console.log("is valid token", isValidToken)
 		if (isValidToken) {
 			return isValidToken;
 		}
@@ -55,19 +55,19 @@ export class TwoFAService {
 		const user = await User.findOne({ where: { sessionId: data.sessionId } });
 
 		if (user) {
-			try {
-				this.validateTwoFA(data)
-				console.log("2fa validated")
-				const accessToken = user.accessToken;
-				user.update({ sessionId: null })
-				return accessToken;
+			const isValidToken = speakeasy.totp.verify({
+				secret: user.twoFASecretKey,
+				encoding: 'base32',
+				token: data.token,
+			});
+
+			if (isValidToken) {
+				await user.update({ sessionId: null })
+				return user;
 			}
-			catch (e) {
-				throw new HttpException(e, HttpStatus.UNAUTHORIZED);
-			}
+			throw new HttpException("invalid token", HttpStatus.UNAUTHORIZED);
 		}
-
-
+		throw new HttpException("Invalid sessionId", HttpStatus.UNAUTHORIZED);
 	}
 
 	async deleteTwoFAItem(user: TwoFADto): Promise<any> {
