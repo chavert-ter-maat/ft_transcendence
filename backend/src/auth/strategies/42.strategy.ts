@@ -10,11 +10,11 @@ import { ConfigModule } from '@nestjs/config';
 @Injectable()
 export class FortyTwoStrategy extends PassportStrategy(Strategy, '42') {
   constructor() {
-	// console.log("client ID: ",  process.env.CLIENT_UID_42);
+	// console.log("client ID: ",  process.env.VITE_CLIENT_UID_42);
     super({
-      clientID: process.env.CLIENT_UID_42,
+      clientID: process.env.VITE_CLIENT_UID_42,
       clientSecret: process.env.CLIENT_SECRET_42,
-      callbackURL: `http://${process.env.VITE_HOST_NAME || 'localhost'}:3000/api/auth/42/callback`,
+      callbackURL: `http://${process.env.VITE_HOSTNAME || 'localhost'}:${process.env.VITE_BACKEND_PORT}/api/auth/42/callback`,
       scope: ['public'],
     });
   }

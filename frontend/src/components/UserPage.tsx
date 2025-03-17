@@ -12,7 +12,7 @@ const UserPage: React.FC = () => {
   const [successMessage, setSuccessMessage] = useState<string>('');
   const [avatar, setAvatar] = useState<File | null>(null); // State to store avatar image
 
-  const hostname = import.meta.env.VITE_HOST_NAME || 'localhost';
+  const hostname = import.meta.env.VITE_HOSTNAME || 'localhost';
   const apiUrl = `http://${hostname}:${import.meta.env.VITE_BACKEND_PORT}`;
   // Fetch user data when the component mounts
   useEffect(() => {

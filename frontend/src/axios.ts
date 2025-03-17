@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const hostname = import.meta.env.VITE_HOST_NAME || 'localhost';
+const hostname = import.meta.env.VITE_HOSTNAME || 'localhost';
 const apiUrl = `http://${hostname}:${import.meta.env.VITE_BACKEND_PORT}`;
 console.log('Axios API URL:', apiUrl); // Debug log
 

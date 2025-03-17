@@ -17,7 +17,7 @@ import { FortyTwoAuthGuard } from './guards/passport.guard'; // Correct import f
 import { AuthService } from './auth.service';
 import { User } from './auth.model';
 
-const hostname = process.env.VITE_HOST_NAME || 'localhost';
+const hostname = process.env.VITE_HOSTNAME || 'localhost';
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
