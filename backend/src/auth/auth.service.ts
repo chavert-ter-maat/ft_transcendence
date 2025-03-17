@@ -123,9 +123,15 @@ export class AuthService {
 			throw new Error('Display name is required');
 		}
 		const user = await User.findOne({ where: { userId } });
+		const userWithSameUsername = await User.findOne({ where: { displayName } });
+
 		if (!user) {
 			throw new UnauthorizedException('User not found');
 		}
+		else if (userWithSameUsername) {
+			throw new UnauthorizedException('displayName must be unique');
+		}
+
 		user.displayName = displayName;
 		await user.save();
 		return { userId: user.userId, username: user.username, displayName: user.displayName };
