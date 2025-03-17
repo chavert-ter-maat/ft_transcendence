@@ -68,14 +68,14 @@ const UserPage: React.FC = () => {
         }
       );
 
-    //   if (user) {
-    //     setUser({ ...user, displayName: newDisplayName });
-    //   }
+      //   if (user) {
+      //     setUser({ ...user, displayName: newDisplayName });
+      //   }
       setSuccessMessage('Display name updated successfully');
       setNewDisplayName('');
-	  setLoading(true);
+      setLoading(true);
     } catch (err) {
-      setError('Failed to update display name');
+      setError(err.response.data.message);
       console.error(err);
     }
   };
@@ -112,7 +112,7 @@ const UserPage: React.FC = () => {
         setError('No auth token found');
         return;
       }
-	  console.log("BEFORE:" + avatar);
+      console.log("BEFORE:" + avatar);
       const response = await axios.post(
         'http://localhost:3000/api/auth/upload-avatar', //magic value
         formData,
@@ -131,7 +131,7 @@ const UserPage: React.FC = () => {
 
       setSuccessMessage('Avatar updated successfully');
       setAvatar(null); // Clear the avatar after upload
-	  setLoading(true);
+      setLoading(true);
     } catch (err) {
       setError('Failed to upload avatar');
       console.error(err);
@@ -146,14 +146,14 @@ const UserPage: React.FC = () => {
     return <div>Error: {error}</div>;
   }
 
-	const handlegototchats = () => {
-		if (user)
-			navigate('/chat', {state: {user: user} });
-	};
-	const handlegototgame = () => {
-		if (user)
-			navigate('/game', {state: {user: user, requestedUser: null} });
-	};
+  const handlegototchats = () => {
+    if (user)
+      navigate('/chat', { state: { user: user } });
+  };
+  const handlegototgame = () => {
+    if (user)
+      navigate('/game', { state: { user: user, requestedUser: null } });
+  };
 
   return (
     <div style={{ padding: '20px' }}>
@@ -165,12 +165,12 @@ const UserPage: React.FC = () => {
           <p><strong>Email:</strong> {user.email}</p>
           <p><strong>Provider:</strong> {user.provider}</p>
           <p><strong>Display Name:</strong> {user.displayName}</p>
-		  <p><strong>Image Name:</strong> {user.imageName}</p>
-          
+          <p><strong>Image Name:</strong> {user.imageName}</p>
+
           {/* Display avatar if exists */}
           {user.imageName ? (
             <img
-				src={"data:image/png;base64, " + user.imageString} // Assuming the backend serves the avatar image, don't like this
+              src={"data:image/png;base64, " + user.imageString} // Assuming the backend serves the avatar image, don't like this
               alt={user.imageName}
               style={{ width: '100px', height: '100px', borderRadius: '50%' }}
             />
@@ -183,7 +183,7 @@ const UserPage: React.FC = () => {
               type="text"
               value={newDisplayName}
               onChange={(e) => setNewDisplayName(e.target.value)}
-              placeholder="Enter new display name"
+              placeholder="Enter display name"
             />
             <button onClick={handleDisplayNameChange}>Change Display Name</button>
           </div>
@@ -200,8 +200,8 @@ const UserPage: React.FC = () => {
       )}
 
       <button onClick={handleLogout}>Logout</button>
-	  <button onClick={handlegototchats}>Go to chats.</button>
-	  <button onClick={handlegototgame}>Go to game.</button>
+      <button onClick={handlegototchats}>Go to chats.</button>
+      <button onClick={handlegototgame}>Go to game.</button>
     </div>
   );
 };

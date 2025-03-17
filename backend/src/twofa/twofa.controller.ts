@@ -1,4 +1,4 @@
-import { Controller, Body, Post, Get, Delete, Query, Res } from '@nestjs/common';
+import { Controller, Body, Post, Get, Delete, Query } from '@nestjs/common';
 import { TwoFAService } from '../twofa/twofa.service';
 import { VerifyTwoFADto } from './dto/VerifyTwoFA.dto';
 import { TwoFADto } from './dto/TwoFA.dto';

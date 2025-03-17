@@ -1,7 +1,6 @@
-import { Injectable, Inject, HttpStatus, HttpException, ConsoleLogger } from '@nestjs/common';
+import { Injectable, HttpStatus, HttpException} from '@nestjs/common';
 import { User } from '../auth/auth.model';
 import { TwoFADto } from './dto/TwoFA.dto';
-import { jwtDecode } from "jwt-decode";
 
 const QRCode = require('qrcode');
 const speakeasy = require('speakeasy');

@@ -9,13 +9,14 @@ import {
   UnauthorizedException,
   UseInterceptors,
   UploadedFile,
+  HttpStatus,
+  HttpException
 } from '@nestjs/common';
 import { JwtAuthGuard } from './guards/42-auth.guards';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FortyTwoAuthGuard } from './guards/passport.guard';
 import { AuthService } from './auth.service';
 import { v4 as uuidv4 } from 'uuid';
-import { session } from 'passport';
 
 
 @Controller('auth')
@@ -74,15 +75,17 @@ export class AuthController {
   @Post('set-display-name')
   @UseGuards(JwtAuthGuard)
   async setDisplayName(@Req() req, @Body() body: { displayName: string }) {
-    const userId = req.user.userId; // Extract userId from JWT payload
+    const userId = req.user.userId;
     if (!userId) {
       throw new UnauthorizedException('User is not authenticated.');
     }
     const { displayName } = body;
 
-    // Check if the display name is valid
     if (!displayName || displayName.trim().length === 0) {
       throw new Error('Display name is required');
+    }
+    else if (displayName.trim().length > 128) {
+      throw new HttpException("display name can't be longer than 128 characters", HttpStatus.BAD_REQUEST);
     }
 
     const updatedUser = await this.authService.updateDisplayName(userId, displayName);
