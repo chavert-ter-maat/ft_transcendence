@@ -17,4 +17,5 @@ export interface LobbyProps {
   onGameStart: (gameMode: GameMode, gameId: string) => void;
   queueStatus: string;
   setQueueStatus: React.Dispatch<React.SetStateAction<string>>;
+  onBack?: () => void;
 }

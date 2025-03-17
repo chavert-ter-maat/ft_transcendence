@@ -6,6 +6,7 @@ import { joinGame } from "../socket";
 const CustomGameCreation: React.FC<LobbyProps> = ({
   onGameStart,
   setQueueStatus,
+  onBack,
 }) => {
   const [selectedMode, setSelectedMode] = useState<GameMode>("singleplayer");
 
@@ -39,7 +40,7 @@ const CustomGameCreation: React.FC<LobbyProps> = ({
         <button onClick={handleStartGame}>
           Start Game
         </button>
-        <button onClick={() => window.history.back()}>Back to Lobby</button>
+        <button onClick={onBack}>Go Back</button>
       </div>
     </div>
   );

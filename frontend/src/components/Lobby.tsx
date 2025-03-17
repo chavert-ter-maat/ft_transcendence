@@ -94,6 +94,7 @@ const Lobby: React.FC<LobbyProps> = ({
           onGameStart={onGameStart}
           setQueueStatus={setQueueStatus}
           queueStatus={queueStatus}
+          onBack={() => setShowCustomSetup(false)}
         />
       ) : (
         <>
@@ -140,7 +141,7 @@ const Lobby: React.FC<LobbyProps> = ({
         </div>
       )}
       {countdown !== null && <p>Game starts in: {countdown}</p>}
-      <button onClick={handleGoBack}>Go Back</button>
+      {!showCustomSetup && <button onClick={handleGoBack}>Go Back</button>}
     </div>
   );
 };
