@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { GameMode, LobbyProps } from "../types";
 import CustomGameCreation from "./CustomGameCreation";
+import { useNavigate } from "react-router-dom";
 import {
   getSocket,
   joinGame,
@@ -83,8 +84,10 @@ const Lobby: React.FC<LobbyProps> = ({
     setSelectedMode("singleplayer");
   };
 
+  const navigate = useNavigate();
+  
   const handleGoBack = () => {
-    window.history.back();
+    navigate('/userpage');
   };
 
   return (

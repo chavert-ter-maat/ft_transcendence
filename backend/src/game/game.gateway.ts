@@ -69,15 +69,22 @@ export class GameGateway
     @MessageBody() data: JoinGameDto,
   ) {
     if (data.gameMode === 'singleplayer') {
-      const gameId = this.gameService.createSinglePlayerGame(client.id);
+      const gameId = this.gameService.createSinglePlayerGame(
+        client.id,
+        data.enablePowerups,
+      );
       client.join(gameId);
       this.server.to(gameId).emit('gameStarted', gameId);
     } else if (data.gameMode === 'localMultiplayer') {
-      const gameId = this.gameService.createLocalMultiplayerGame(client.id);
+      const gameId = this.gameService.createLocalMultiplayerGame(
+        client.id,
+        data.enablePowerups,
+      );
       client.join(gameId);
       this.server.to(gameId).emit('gameStarted', gameId);
     } else if (data.gameMode === 'remoteMultiplayer') {
       client.emit('queueStatus', { status: 'waiting' });
+      this.queueService.addPlayerToQueue(client.id);
     }
   }
 

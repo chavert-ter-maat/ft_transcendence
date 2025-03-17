@@ -63,16 +63,20 @@ export class GameService {
           ? gameState.player1.id
           : gameState.player2.id;
 
-      await this.matchModel.create({
-        player1Id: gameState.player1.id,
-        player2Id: gameState.player2.id,
-        player1Score: gameState.player1.score,
-        player2Score: gameState.player2.score,
-        gameMode: gameState.gameMode,
-        startTime: gameState.gameStarted,
-        endTime: new Date(),
-        winnerId: winner,
-      });
+      const gameId = this.playerGameMap.get(gameState.player1.id);
+      if (gameId) {
+        await this.matchModel.create({
+          gameId,
+          player1Id: gameState.player1.id,
+          player2Id: gameState.player2.id,
+          player1Score: gameState.player1.score,
+          player2Score: gameState.player2.score,
+          gameMode: gameState.gameMode,
+          startTime: gameState.gameStarted,
+          endTime: new Date(),
+          winnerId: winner,
+        });
+      }
     }
   }
 
@@ -87,7 +91,10 @@ export class GameService {
     }
   }
 
-  private initializeGameState(gameMode: GameMode): GameState {
+  private initializeGameState(
+    gameMode: GameMode,
+    enablePowerups: boolean = true,
+  ): GameState {
     const initialPaddle: Paddle = {
       x: 0,
       y: 45,
@@ -124,13 +131,17 @@ export class GameService {
       gameStarted: new Date(),
       roundStartTime: Date.now(),
       gameMode,
+      enablePowerups,
       powerUps: [],
     };
   }
 
-  createSinglePlayerGame(playerId: string): string {
+  createSinglePlayerGame(
+    playerId: string,
+    enablePowerups: boolean = true,
+  ): string {
     const gameId = uuid();
-    const gameState = this.initializeGameState('singleplayer');
+    const gameState = this.initializeGameState('singleplayer', enablePowerups);
     gameState.player1.id = playerId;
     gameState.player2.id = 'Bot';
     this.games.set(gameId, gameState);
@@ -139,9 +150,15 @@ export class GameService {
     return gameId;
   }
 
-  createLocalMultiplayerGame(playerId: string): string {
+  createLocalMultiplayerGame(
+    playerId: string,
+    enablePowerups: boolean = true,
+  ): string {
     const gameId = uuid();
-    const gameState = this.initializeGameState('localMultiplayer');
+    const gameState = this.initializeGameState(
+      'localMultiplayer',
+      enablePowerups,
+    );
     gameState.player1.id = playerId;
     gameState.player2.id = 'Local Challenger';
     this.games.set(gameId, gameState);
@@ -153,7 +170,7 @@ export class GameService {
 
   createRemoteMultiplayerGame(player1Id: string, player2Id: string): string {
     const gameId = uuid();
-    const gameState = this.initializeGameState('remoteMultiplayer');
+    const gameState = this.initializeGameState('remoteMultiplayer', true);
     gameState.player1.id = player1Id;
     gameState.player2.id = player2Id;
     this.games.set(gameId, gameState);
@@ -300,6 +317,7 @@ export class GameService {
     }
 
     if (
+      game.enablePowerups &&
       game.powerUps.length < 2 &&
       now - (game.lastPowerUpSpawn || 0) >= 5000 &&
       now - game.roundStartTime >= 5000
@@ -459,7 +477,10 @@ export class GameService {
 
     const newGameId = uuid();
     const gameMode = existingGame.gameMode;
-    const gameState = this.initializeGameState(gameMode);
+    const gameState = this.initializeGameState(
+      gameMode,
+      existingGame.enablePowerups,
+    );
 
     if (gameMode === 'singleplayer') {
       gameState.player1.id = existingGame.player1.id;

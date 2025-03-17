@@ -9,16 +9,13 @@ const CustomGameCreation: React.FC<LobbyProps> = ({
   onBack,
 }) => {
   const [selectedMode, setSelectedMode] = useState<GameMode>("singleplayer");
+  const [enablePowerups, setEnablePowerups] = useState<boolean>(false);
 
   const handleStartGame = () => {
     setQueueStatus("inactive");
-    joinGame(
-      selectedMode,
-      undefined,
-      (gameId) => {
-        onGameStart(selectedMode, gameId);
-      }
-    );
+    joinGame(selectedMode, { enablePowerups }, (gameId) => {
+      onGameStart(selectedMode, gameId);
+    });
   };
 
   return (
@@ -35,11 +32,17 @@ const CustomGameCreation: React.FC<LobbyProps> = ({
             <option value="localMultiplayer">Local Multiplayer</option>
           </select>
         </div>
+        <div className="setting">
+          <label>Power-ups:</label>
+          <input
+            type="checkbox"
+            checked={enablePowerups}
+            onChange={(e) => setEnablePowerups(e.target.checked)}
+          />
+        </div>
       </div>
       <div className="buttons">
-        <button onClick={handleStartGame}>
-          Start Game
-        </button>
+        <button onClick={handleStartGame}>Start Game</button>
         <button onClick={onBack}>Go Back</button>
       </div>
     </div>

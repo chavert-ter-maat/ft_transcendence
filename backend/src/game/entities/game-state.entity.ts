@@ -43,6 +43,7 @@ export interface GameState {
   ball: Ball;
   gameStarted: Date;
   gameMode: GameMode;
+  enablePowerups: boolean;
   powerUp?: PowerUp;
   lastPowerUpSpawn?: number;
   roundStartTime?: number;

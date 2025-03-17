@@ -24,7 +24,7 @@ export const connectSocket = () => {
       reconnectionDelay: 2000,
       timeout: 10000,
       forceNew: false,
-      path: "/socket.io"
+      path: "/socket.io",
     });
 
     socket.on("connect", () => {
@@ -83,10 +83,10 @@ export const joinQueue = (gameMode: string) => {
 
 export const joinGame = (
   gameMode: string,
-  gameId: string | undefined,
+  gameOptions: { enablePowerups?: boolean } | undefined,
   callback: (gameId: string) => void
 ) => {
-  socket?.emit("joinGame", { gameMode, gameId });
+  socket?.emit("joinGame", { gameMode, ...gameOptions });
   if (gameMode === "remoteMultiplayer") {
     socket?.once("matchFound", (data: MatchFoundData) => {
       callback(data.gameId);
