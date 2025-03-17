@@ -111,7 +111,7 @@ export class AuthController {
   }
 
   //REMOVE THIS FUNCTION ITS FOR TESTING AND BYPASSES THE INTRA LOGIN
-  @Get('testAccount') 
+  @Get('testAccount')
 //   @UseGuards(FortyTwoAuthGuard)
   async callback_test(@Res() res) {
     try {
@@ -131,7 +131,7 @@ export class AuthController {
     }
   }
 
-  @Get('testAccount2') 
+  @Get('testAccount2')
 //   @UseGuards(FortyTwoAuthGuard)
   async callback_test2(@Res() res) {
     try {

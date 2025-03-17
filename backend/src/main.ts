@@ -10,7 +10,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
 
   const configService = app.get(ConfigService);
-  const backendPort = configService.get('BACKEND_PORT');
+  const backendPort = configService.get('VITE_BACKEND_PORT');
   const frontendPort = configService.get('FRONTEND_PORT');
 
   if (!backendPort || !frontendPort) {
