@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
-import axios from '../axios'; // Ensure axios is configured correctly
-import { useNavigate } from 'react-router-dom';
+import React from 'react';
 
 const Login: React.FC = () => {
-
-  const fortyTwoLoginUrl = import.meta.env.VITE_REDIRECT_URI_42;
-  console.log(fortyTwoLoginUrl);
-
+  const hostname = import.meta.env.VITE_HOSTNAME || 'localhost';
+  const fortyTwoLoginUrl = `https://api.intra.42.fr/oauth/authorize?client_id=${import.meta.env.VITE_CLIENT_UID_42}&redirect_uri=http%3A%2F%2F${hostname}%3A3000%2Fapi%2Fauth%2F42%2Fcallback&response_type=code`
+  const apiUrl = `http://${hostname}:${import.meta.env.VITE_BACKEND_PORT}`;
+  
+  console.log('API URL:', apiUrl); // Debug log
+  
   // Redirect to the backend's OAuth login endpoint for 42 authentication
   const handleOAuthLogin = (): void => {
     console.log("Redirecting to OAuth login...");
@@ -15,14 +15,12 @@ const Login: React.FC = () => {
 
   const loginTestAccount = (): void => {
     console.log("Redirecting to skip OAuth login and create test account...");
-	window.location.href = `http://localhost:3000/api/auth/testAccount`;
-    // window.location.href = fortyTwoLoginUrl;
+    window.location.href = `${apiUrl}/api/auth/testAccount`;
   };
 
   const loginTestAccount2 = (): void => {
     console.log("Redirecting to skip OAuth login and create test account...");
-	window.location.href = `http://localhost:3000/api/auth/testAccount2`;
-    // window.location.href = fortyTwoLoginUrl;
+    window.location.href = `${apiUrl}/api/auth/testAccount2`;
   };
 
 

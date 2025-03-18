@@ -1,4 +1,5 @@
-export interface JoinGameDto {
+export class JoinGameDto {
   gameMode: 'singleplayer' | 'localMultiplayer' | 'remoteMultiplayer';
   gameId?: string;
+  enablePowerups?: boolean;
 }

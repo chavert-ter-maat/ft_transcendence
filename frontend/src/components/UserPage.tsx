@@ -12,6 +12,8 @@ const UserPage: React.FC = () => {
   const [successMessage, setSuccessMessage] = useState<string>('');
   const [avatar, setAvatar] = useState<File | null>(null); // State to store avatar image
 
+  const hostname = import.meta.env.VITE_HOSTNAME || 'localhost';
+  const apiUrl = `http://${hostname}:${import.meta.env.VITE_BACKEND_PORT}`;
   // Fetch user data when the component mounts
   useEffect(() => {
     const fetchUserData = async () => {
@@ -22,7 +24,7 @@ const UserPage: React.FC = () => {
           return;
         }
 
-        const response = await axios.get('http://localhost:3000/api/auth/userInfo', { //magic value
+        const response = await axios.get(`${apiUrl}/api/auth/userInfo`, { //magic value
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -59,7 +61,7 @@ const UserPage: React.FC = () => {
       }
 
       await axios.post(
-        'http://localhost:3000/api/auth/set-display-name', //magic value 
+        `${apiUrl}/api/auth/set-display-name`, //magic value 
         { displayName: newDisplayName },
         {
           headers: {
@@ -114,7 +116,7 @@ const UserPage: React.FC = () => {
       }
 	  console.log("BEFORE:" + avatar);
       const response = await axios.post(
-        'http://localhost:3000/api/auth/upload-avatar', //magic value
+        `${apiUrl}/api/auth/upload-avatar`, //magic value
         formData,
         {
           headers: {

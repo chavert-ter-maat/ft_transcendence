@@ -12,6 +12,7 @@ export interface Player {
   paddle: Paddle;
   score: number;
   inGame: boolean;
+  activePowerups?: PowerUpEffect;
 }
 
 export interface Paddle {
@@ -29,10 +30,12 @@ export interface PowerUp {
   spawnTime: number;
 }
 
-export type GameMode =
-  | 'singleplayer'
-  | 'localMultiplayer'
-  | 'remoteMultiplayer';
+export interface PowerUpEffect {
+  endTime: number;
+  effect: PowerUpEffectTypes;
+}
+
+export type PowerUpEffectTypes = 'size';
 
 export interface GameState {
   player1: Player;
@@ -40,10 +43,15 @@ export interface GameState {
   ball: Ball;
   gameStarted: Date;
   gameMode: GameMode;
+  enablePowerups: boolean;
   powerUp?: PowerUp;
   lastPowerUpSpawn?: number;
   roundStartTime?: number;
-  powerUpTimeouts?: {
-    [playerId: string]: NodeJS.Timeout;
-  };
+  powerUps?: PowerUp[];
+  rematchRequests?: string[];
 }
+
+export type GameMode =
+  | 'singleplayer'
+  | 'localMultiplayer'
+  | 'remoteMultiplayer';

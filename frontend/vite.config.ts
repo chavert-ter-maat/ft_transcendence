@@ -9,12 +9,14 @@ export default defineConfig({
     },
   },
   server: {
-    host: "0.0.0.0",
-    port: 5173,
+    host: true,
+    port: Number(process.env.FRONTEND_PORT) || 5173,
+    allowedHosts: true,
     proxy: {
       "/socket.io": {
-        target: "ws://localhost:3000",
+        target: "http://backend:3000",
         ws: true,
+        changeOrigin: true,
       },
     },
   },

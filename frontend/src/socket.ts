@@ -10,11 +10,12 @@ import {
 } from "./types";
 
 let socket: Socket | null = null;
-const VITE_API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
+const SOCKET_URL = "/";
 
 export const connectSocket = () => {
   if (!socket) {
-    socket = io(VITE_API_URL, {
+    socket = io(SOCKET_URL, {
       withCredentials: true,
       transports: ["websocket"],
       autoConnect: true,
@@ -23,6 +24,7 @@ export const connectSocket = () => {
       reconnectionDelay: 2000,
       timeout: 10000,
       forceNew: false,
+      path: "/socket.io",
     });
 
     socket.on("connect", () => {
@@ -81,10 +83,10 @@ export const joinQueue = (gameMode: string) => {
 
 export const joinGame = (
   gameMode: string,
-  gameId: string | undefined,
+  gameOptions: { enablePowerups?: boolean } | undefined,
   callback: (gameId: string) => void
 ) => {
-  socket?.emit("joinGame", { gameMode, gameId });
+  socket?.emit("joinGame", { gameMode, ...gameOptions });
   if (gameMode === "remoteMultiplayer") {
     socket?.once("matchFound", (data: MatchFoundData) => {
       callback(data.gameId);

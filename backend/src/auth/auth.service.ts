@@ -67,7 +67,7 @@ export class AuthService {
   }
 
   async saveToDatabase(user: any): Promise<User> {
-    console.log('Saving OAuth tokens:', user); 
+    // console.log('Saving OAuth tokens:', user); 
   
     const { email, username, displayName = null, avatar = null, oauthToken = null, oauthRefreshToken = null, oauthExpiresAt = null, provider = '42' } = user;  // Change username to email
   

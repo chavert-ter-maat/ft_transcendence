@@ -17,6 +17,7 @@ import { FortyTwoAuthGuard } from './guards/passport.guard'; // Correct import f
 import { AuthService } from './auth.service';
 import { User } from './auth.model';
 
+const hostname = process.env.VITE_HOSTNAME || 'localhost';
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
@@ -92,7 +93,7 @@ export class AuthController {
   @UseGuards(FortyTwoAuthGuard)
   async callback(@Req() req, @Res() res) {
     try {
-      console.log('Callback received:', req.user);
+      // console.log('Callback received:', req.user);
       const user = req.user;
   
       // Save the OAuth tokens and ensure the user is created in the database
@@ -101,16 +102,16 @@ export class AuthController {
       // Generate the access token using the saved user's userId
       const { accessToken } = await this.authService.signIn(savedUser);
   
-      const redirectUrl = `${process.env.FRONTEND_URL}/auth/42/callback?token=${accessToken}`;
+      const redirectUrl = `http://${hostname}:${process.env.FRONTEND_PORT}/auth/42/callback?token=${accessToken}`;
       return res.redirect(redirectUrl);
     } catch (error) {
       console.error('Callback error:', error);
-      return res.redirect(`${process.env.FRONTEND_URL}/login?error=authentication_failed`);
+      return res.redirect(`http://${hostname}:${process.env.FRONTEND_PORT}/login?error=authentication_failed`);
     }
   }
 
   //REMOVE THIS FUNCTION ITS FOR TESTING AND BYPASSES THE INTRA LOGIN
-  @Get('testAccount') 
+  @Get('testAccount')
 //   @UseGuards(FortyTwoAuthGuard)
   async callback_test(@Res() res) {
     try {
@@ -122,15 +123,15 @@ export class AuthController {
       // Generate the access token using the saved user's userId
       const { accessToken } = await this.authService.signIn(savedUser);
   
-      const redirectUrl = `${process.env.FRONTEND_URL}/auth/42/callback?token=${accessToken}`;
+      const redirectUrl = `http://${hostname}:${process.env.FRONTEND_PORT}/auth/42/callback?token=${accessToken}`;
       return res.redirect(redirectUrl);
     } catch (error) {
       console.error('Callback error:', error);
-      return res.redirect(`${process.env.FRONTEND_URL}/login?error=authentication_failed`);
+      return res.redirect(`http://${hostname}:${process.env.FRONTEND_PORT}/login?error=authentication_failed`);
     }
   }
 
-  @Get('testAccount2') 
+  @Get('testAccount2')
 //   @UseGuards(FortyTwoAuthGuard)
   async callback_test2(@Res() res) {
     try {
@@ -142,11 +143,11 @@ export class AuthController {
       // Generate the access token using the saved user's userId
       const { accessToken } = await this.authService.signIn(savedUser);
   
-      const redirectUrl = `${process.env.FRONTEND_URL}/auth/42/callback?token=${accessToken}`;
+      const redirectUrl = `http://${hostname}:${process.env.FRONTEND_PORT}/auth/42/callback?token=${accessToken}`;
       return res.redirect(redirectUrl);
     } catch (error) {
       console.error('Callback error:', error);
-      return res.redirect(`${process.env.FRONTEND_URL}/login?error=authentication_failed`);
+      return res.redirect(`http://${hostname}:${process.env.FRONTEND_PORT}/login?error=authentication_failed`);
     }
   }
 }

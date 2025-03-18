@@ -14,7 +14,7 @@ import { Server } from 'socket.io';
 const SERVER_TICKRATE = 1000 / 60;
 
 const GAME_PARAMETERS = {
-  score_limit: 3,
+  score_limit: 2,
   ball: {
     initialX: 50,
     initialY: 50,
@@ -22,6 +22,10 @@ const GAME_PARAMETERS = {
     initialVelocityX: 0.5,
     initialVelocityY: 0.5,
     initialSpeed: 0.75,
+  },
+  paddles: {
+    size: 10,
+    speed: 1,
   },
 };
 
@@ -59,16 +63,20 @@ export class GameService {
           ? gameState.player1.id
           : gameState.player2.id;
 
-      await this.matchModel.create({
-        player1Id: gameState.player1.id,
-        player2Id: gameState.player2.id,
-        player1Score: gameState.player1.score,
-        player2Score: gameState.player2.score,
-        gameMode: gameState.gameMode,
-        startTime: gameState.gameStarted,
-        endTime: new Date(),
-        winnerId: winner,
-      });
+      const gameId = this.playerGameMap.get(gameState.player1.id);
+      if (gameId) {
+        await this.matchModel.create({
+          gameId,
+          player1Id: gameState.player1.id,
+          player2Id: gameState.player2.id,
+          player1Score: gameState.player1.score,
+          player2Score: gameState.player2.score,
+          gameMode: gameState.gameMode,
+          startTime: gameState.gameStarted,
+          endTime: new Date(),
+          winnerId: winner,
+        });
+      }
     }
   }
 
@@ -83,7 +91,10 @@ export class GameService {
     }
   }
 
-  private initializeGameState(gameMode: GameMode): GameState {
+  private initializeGameState(
+    gameMode: GameMode,
+    enablePowerups: boolean = true,
+  ): GameState {
     const initialPaddle: Paddle = {
       x: 0,
       y: 45,
@@ -107,24 +118,30 @@ export class GameService {
         paddle: { ...initialPaddle, x: 2 },
         score: 0,
         inGame: true,
+        activePowerups: undefined,
       },
       player2: {
         id: '',
         paddle: { ...initialPaddle, x: 96 },
         score: 0,
         inGame: true,
+        activePowerups: undefined,
       },
       ball: initialBall,
       gameStarted: new Date(),
       roundStartTime: Date.now(),
       gameMode,
-      powerUpTimeouts: {},
+      enablePowerups,
+      powerUps: [],
     };
   }
 
-  createSinglePlayerGame(playerId: string): string {
+  createSinglePlayerGame(
+    playerId: string,
+    enablePowerups: boolean = true,
+  ): string {
     const gameId = uuid();
-    const gameState = this.initializeGameState('singleplayer');
+    const gameState = this.initializeGameState('singleplayer', enablePowerups);
     gameState.player1.id = playerId;
     gameState.player2.id = 'Bot';
     this.games.set(gameId, gameState);
@@ -133,9 +150,15 @@ export class GameService {
     return gameId;
   }
 
-  createLocalMultiplayerGame(playerId: string): string {
+  createLocalMultiplayerGame(
+    playerId: string,
+    enablePowerups: boolean = true,
+  ): string {
     const gameId = uuid();
-    const gameState = this.initializeGameState('localMultiplayer');
+    const gameState = this.initializeGameState(
+      'localMultiplayer',
+      enablePowerups,
+    );
     gameState.player1.id = playerId;
     gameState.player2.id = 'Local Challenger';
     this.games.set(gameId, gameState);
@@ -147,7 +170,7 @@ export class GameService {
 
   createRemoteMultiplayerGame(player1Id: string, player2Id: string): string {
     const gameId = uuid();
-    const gameState = this.initializeGameState('remoteMultiplayer');
+    const gameState = this.initializeGameState('remoteMultiplayer', true);
     gameState.player1.id = player1Id;
     gameState.player2.id = player2Id;
     this.games.set(gameId, gameState);
@@ -222,13 +245,6 @@ export class GameService {
   removeGame(gameId: string) {
     const game = this.games.get(gameId);
     if (game) {
-      // Clear any active power-up timeouts
-      if (game.powerUpTimeouts) {
-        Object.values(game.powerUpTimeouts).forEach((timeout) => {
-          clearTimeout(timeout);
-        });
-      }
-
       if (game.player1?.id) {
         this.playerGameMap.delete(game.player1.id);
       }
@@ -286,32 +302,49 @@ export class GameService {
   private updateGame(gameId: string, game: GameState) {
     const now = Date.now();
     const isSinglePlayer = game.gameMode === 'singleplayer';
-    const roundStartTime = game.roundStartTime || now;
 
-    if (!game.powerUp && now - roundStartTime >= 2000) {
-      game.powerUp = {
+    [game.player1, game.player2].forEach((player) => {
+      if (player.activePowerups && now >= player.activePowerups.endTime) {
+        if (player.activePowerups.effect === 'size') {
+          player.paddle.height = GAME_PARAMETERS.paddles.size;
+        }
+        player.activePowerups = undefined;
+      }
+    });
+
+    if (!game.powerUps) {
+      game.powerUps = [];
+    }
+
+    if (
+      game.enablePowerups &&
+      game.powerUps.length < 2 &&
+      now - (game.lastPowerUpSpawn || 0) >= 5000 &&
+      now - game.roundStartTime >= 5000
+    ) {
+      game.powerUps.push({
         x: 20 + Math.random() * 60,
         y: 10 + Math.random() * 80,
         width: 3,
         spawnTime: now,
-      };
+      });
       game.lastPowerUpSpawn = now;
     }
 
-    if (game.powerUp && now - game.powerUp.spawnTime >= 5000) {
-      game.powerUp = undefined;
-    }
+    game.powerUps = game.powerUps.filter(
+      (powerUp) => now - powerUp.spawnTime < 8000,
+    );
 
-    if (game.powerUp) {
+    game.powerUps = game.powerUps.filter((powerUp) => {
       const ballLeft = game.ball.x - game.ball.radius;
       const ballRight = game.ball.x + game.ball.radius;
       const ballTop = game.ball.y - game.ball.radius;
       const ballBottom = game.ball.y + game.ball.radius;
 
-      const powerUpLeft = game.powerUp.x;
-      const powerUpRight = game.powerUp.x + game.powerUp.width;
-      const powerUpTop = game.powerUp.y;
-      const powerUpBottom = game.powerUp.y + game.powerUp.width;
+      const powerUpLeft = powerUp.x;
+      const powerUpRight = powerUp.x + powerUp.width;
+      const powerUpTop = powerUp.y;
+      const powerUpBottom = powerUp.y + powerUp.width;
 
       if (
         ballRight > powerUpLeft &&
@@ -321,33 +354,16 @@ export class GameService {
       ) {
         const affectedPlayer =
           game.ball.velocityX > 0 ? game.player1 : game.player2;
-        const originalHeight = 10;
 
-        // Clear existing timeout if there is one
-        if (game.powerUpTimeouts?.[affectedPlayer.id]) {
-          clearTimeout(game.powerUpTimeouts[affectedPlayer.id]);
-        }
-
-        affectedPlayer.paddle.height = originalHeight * 2;
-        const timeoutId = setTimeout(() => {
-          if (this.games.has(gameId)) {
-            const currentGame = this.games.get(gameId);
-            if (currentGame) {
-              affectedPlayer.paddle.height = originalHeight;
-              if (currentGame.powerUpTimeouts) {
-                delete currentGame.powerUpTimeouts[affectedPlayer.id];
-              }
-            }
-          }
-        }, 10000);
-        if (!game.powerUpTimeouts) {
-          game.powerUpTimeouts = {};
-        }
-        game.powerUpTimeouts[affectedPlayer.id] = timeoutId;
-        game.powerUp = undefined;
-        game.lastPowerUpSpawn = now;
+        affectedPlayer.activePowerups = {
+          endTime: Date.now() + 10000,
+          effect: 'size',
+        };
+        affectedPlayer.paddle.height = GAME_PARAMETERS.paddles.size * 2;
+        return false;
       }
-    }
+      return true;
+    });
 
     if (isSinglePlayer) {
       this.moveBotPaddle(game.player2.paddle, game.ball);
@@ -461,7 +477,10 @@ export class GameService {
 
     const newGameId = uuid();
     const gameMode = existingGame.gameMode;
-    const gameState = this.initializeGameState(gameMode);
+    const gameState = this.initializeGameState(
+      gameMode,
+      existingGame.enablePowerups,
+    );
 
     if (gameMode === 'singleplayer') {
       gameState.player1.id = existingGame.player1.id;
@@ -491,7 +510,7 @@ export class GameService {
       GAME_PARAMETERS.ball.initialVelocityY * (ball.velocityY > 0 ? -1 : 1);
     ball.speed = GAME_PARAMETERS.ball.initialSpeed;
 
-    game.powerUp = undefined;
+    game.powerUps = [];
     game.lastPowerUpSpawn = undefined;
 
     return Date.now();
