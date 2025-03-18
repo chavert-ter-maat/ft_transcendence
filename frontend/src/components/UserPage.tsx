@@ -43,7 +43,7 @@ const UserPage: React.FC = () => {
     };
 
     fetchUserData();
-  }, [loading]);
+  }, [loading, apiUrl]);
 
   const handleLogout = () => {
     localStorage.removeItem('authToken');

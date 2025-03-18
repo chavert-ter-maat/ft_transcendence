@@ -2,7 +2,7 @@ import logo from './8589-screaming-cat.png';
 import './App.css';
 import React from 'react';
 import { EditViewProps } from './Chat.interface';
-import axios from '../axios';
+import axios from '../../axios';
 import { GoBackToChat } from './UsersView';
 import { HeaderWrap } from "./Header";
 // import { useNavigate } from 'react-router-dom';

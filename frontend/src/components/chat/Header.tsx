@@ -1,6 +1,6 @@
 import React from 'react';
 import './App.css';
-import { User } from '../global.interface';
+import { User } from '../../global.interface';
 
 interface ChildProps {
 	user:	User;

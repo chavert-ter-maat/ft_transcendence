@@ -11,9 +11,9 @@ import {
   onGameStateUpdate,
   offGameStateUpdate,
   requestRematch,
-} from "../socket";
+} from "../../socket";
 import Scoreboard from "./Scoreboard";
-import { GameState, CoordinateCache, GameProps } from "../types";
+import { GameState, CoordinateCache, GameProps } from "../../types";
 
 const Game: React.FC<GameProps> = ({
   userId,

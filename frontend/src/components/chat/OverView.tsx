@@ -1,6 +1,6 @@
 import './App.css';
 import React from 'react';
-import axios from '../axios';
+import axios from '../../axios';
 import { UserStats, ChatOverviewProps, chat_stamp } from './Chat.interface';
 import { HeaderWrap } from "./Header";
 // import { useNavigate } from 'react-router-dom';

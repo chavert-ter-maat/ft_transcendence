@@ -1,14 +1,14 @@
 import './App.css';
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from "react-router-dom";
-import axios from '../axios';
+import axios from '../../axios';
 import { message_stamp, chat_stamp, user_stamp, UserStats } from './Chat.interface';
 import { ChatOverviewPage } from './OverView';
 import { MessagesView } from './MessageView';
 import { UsersView } from './UsersView';
 import { LoginView } from './LoginView';
 import { EditView } from './EditView';
-import { User } from '../global.interface';
+import { User } from '../../global.interface';
 
 let messages_input:	message_stamp[]	= [];
 let	chats_input:	chat_stamp[]	= [];

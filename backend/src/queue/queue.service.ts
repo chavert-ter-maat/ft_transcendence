@@ -1,7 +1,6 @@
 import { Injectable, Inject, forwardRef } from '@nestjs/common';
 import { GameService } from '../game/game.service';
 import { GameGateway } from '../game/game.gateway';
-import { User } from 'src/auth/auth.model';
 
 @Injectable()
 export class QueueService {

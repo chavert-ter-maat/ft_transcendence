@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { getSocket } from '../socket';
+import { useState, useEffect } from "react";
+import { getSocket } from "../socket";
 
 export const useSocketStatus = () => {
   const [isConnected, setIsConnected] = useState(false);
@@ -7,7 +7,7 @@ export const useSocketStatus = () => {
 
   useEffect(() => {
     const socket = getSocket();
-    
+
     const handleConnect = () => {
       setIsConnected(true);
       setSocketId(socket?.id || null);
@@ -30,6 +30,5 @@ export const useSocketStatus = () => {
       socket?.off("disconnect", handleDisconnect);
     };
   }, []);
-
   return { isConnected, socketId };
 };

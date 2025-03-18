@@ -1,14 +1,14 @@
 import React, { useState } from "react";
-import "./App_game.css";
-import Lobby from "./components/game/Lobby";
-import Game from "./components/game/Game";
-import { GameMode } from "./types";
-import SocketStatus from "./components/socketStatus";
-import { useSocketStatus } from "./hooks/useSocketStatus";
+import "./GameContainer.css";
+import Lobby from "./Lobby";
+import Game from "./Game";
+import { GameMode } from "../../types";
+import SocketStatus from "../socketStatus";
+import { useSocketStatus } from "../../hooks/useSocketStatus";
 import { useLocation } from "react-router-dom";
-import { User } from "./global.interface";
+import { User } from "../../global.interface";
 
-const App_game: React.FC = () => {
+const GameContainer: React.FC = () => {
   const state = useLocation().state as { user: User; requestedUser: User };
 
   const [gameStarted, setGameStarted] = useState(false);
@@ -26,9 +26,6 @@ const App_game: React.FC = () => {
     setGameStarted(selectedGameId !== "");
   };
 
-  // console.log("App_game", state.user.username);
-  // @mhaan requested player here.
-  // console.log("Invited player", state.requestedUser?.username);
   return (
     <div className="app">
       <SocketStatus isConnected={isConnected} socketId={socketId} />
@@ -52,4 +49,4 @@ const App_game: React.FC = () => {
   );
 };
 
-export default App_game;
+export default GameContainer;
