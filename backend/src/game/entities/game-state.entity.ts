@@ -54,4 +54,5 @@ export interface GameState {
 export type GameMode =
   | 'singleplayer'
   | 'localMultiplayer'
-  | 'remoteMultiplayer';
+  | 'remoteMultiplayer'
+  | 'privateMatch';

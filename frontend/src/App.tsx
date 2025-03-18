@@ -1,11 +1,16 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import Login from './components/Login';
-import UserPage from './components/UserPage';
-import AuthCallback from './components/AuthCallback';
-import ProtectedRoute from './components/ProtectedRoute';
-import Chat from './chat/Chat';
-import App_game from './App_game';
+import React from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+import Login from "./components/Login";
+import UserPage from "./components/UserPage";
+import AuthCallback from "./components/AuthCallback";
+import ProtectedRoute from "./components/ProtectedRoute";
+import Chat from "./chat/Chat";
+import App_game from "./App_game";
 
 function App(): JSX.Element {
   return (
@@ -14,8 +19,8 @@ function App(): JSX.Element {
         <Route path="/" element={<Navigate to="/login" />} />
         <Route path="/login" element={<Login />} />
         <Route path="/auth/42/callback" element={<AuthCallback />} />
-		{/* <Route path="/game" element={<App_game />} /> */}
-		{/* <Route path="/chat" element={<Chat />} /> */}
+        {/* <Route path="/game" element={<App_game />} /> */}
+        {/* <Route path="/chat" element={<Chat />} /> */}
         <Route
           path="/userpage"
           element={
@@ -24,7 +29,7 @@ function App(): JSX.Element {
             </ProtectedRoute>
           }
         />
-		<Route
+        <Route
           path="/chat"
           element={
             <ProtectedRoute>
@@ -32,7 +37,7 @@ function App(): JSX.Element {
             </ProtectedRoute>
           }
         />
-		<Route
+        <Route
           path="/game"
           element={
             <ProtectedRoute>

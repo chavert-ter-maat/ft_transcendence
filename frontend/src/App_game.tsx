@@ -25,6 +25,7 @@ const App_game: React.FC = () => {
     const handleConnect = () => {
       setIsConnected(true);
       setSocketId(socket?.id || null);
+      console.log("Connected! Socket ID:", socket?.id);
     };
 
     const handleDisconnect = () => {
@@ -55,9 +56,9 @@ const App_game: React.FC = () => {
     setGameStarted(selectedGameId !== "");
   };
 
-  console.log("App_game", state.user.username);
+  // console.log("App_game", state.user.username);
   // @mhaan requested player here.
-  console.log("Invited player", state.requestedUser?.username);
+  // console.log("Invited player", state.requestedUser?.username);
   return (
     <div className="app">
       <SocketStatus isConnected={isConnected} socketId={socketId} />

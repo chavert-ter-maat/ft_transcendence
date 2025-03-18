@@ -58,7 +58,7 @@ export class GameService {
 
   private async saveMatchResult(gameState: GameState) {
     if (gameState.gameMode === 'remoteMultiplayer') {
-      const winner =
+      const winner: string =
         gameState.player1.score > gameState.player2.score
           ? gameState.player1.id
           : gameState.player2.id;
@@ -164,6 +164,18 @@ export class GameService {
     this.games.set(gameId, gameState);
     this.playerGameMap.set(playerId, gameId);
     this.playerGameMap.set(gameState.player2.id, gameId);
+    this.startGameLoop(gameId);
+    return gameId;
+  }
+
+  createPrivateGame(player1Id: string, player2Id: string): string {
+    const gameId = uuid();
+    const gameState = this.initializeGameState('privateMatch', true);
+    gameState.player1.id = player1Id;
+    gameState.player2.id = player2Id;
+
+    this.playerGameMap.set(player1Id, gameId);
+    this.playerGameMap.set(player2Id, gameId);
     this.startGameLoop(gameId);
     return gameId;
   }

@@ -23,8 +23,8 @@ const Lobby: React.FC<LobbyProps> = ({
   const [showCustomSetup, setShowCustomSetup] = useState(false);
 
   useEffect(() => {
-    const handleCountdown = (data: { gameId: string; duration: number }) => {
-      setCountdown(data.duration);
+    const handleCountdown = (data: { gameId: string; waitTime: number }) => {
+      setCountdown(data.waitTime);
       const interval = setInterval(() => {
         setCountdown((prev) => {
           if (prev && prev > 1) {
