@@ -13,7 +13,7 @@ import { Server, Socket } from 'socket.io';
 import { GameService } from './game.service';
 import { MovePaddleDto } from './dto/move-paddle.dto';
 import { JoinGameDto } from './dto/joinGame.dto';
-import { QueueService } from 'src/queue/queue.service';
+import { QueueService } from 'src/game/queue/queue.service';
 
 @WebSocketGateway({
   cors: {

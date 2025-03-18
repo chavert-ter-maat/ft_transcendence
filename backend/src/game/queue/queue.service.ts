@@ -1,6 +1,6 @@
 import { Injectable, Inject, forwardRef } from '@nestjs/common';
-import { GameService } from '../game/game.service';
-import { GameGateway } from '../game/game.gateway';
+import { GameService } from '../game.service';
+import { GameGateway } from '../game.gateway';
 
 @Injectable()
 export class QueueService {
