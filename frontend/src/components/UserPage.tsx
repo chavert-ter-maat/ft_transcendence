@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { User } from "../global.interface";
+import SocketStatus from './socketStatus';
+import { useSocketStatus } from '../hooks/useSocketStatus';
 
 const UserPage: React.FC = () => {
   const navigate = useNavigate();
@@ -11,8 +13,10 @@ const UserPage: React.FC = () => {
   const [newDisplayName, setNewDisplayName] = useState<string>('');
   const [successMessage, setSuccessMessage] = useState<string>('');
   const [avatar, setAvatar] = useState<File | null>(null); // State to store avatar image
+  const { isConnected, socketId } = useSocketStatus();
 
   const hostname = import.meta.env.VITE_HOSTNAME || 'localhost';
+
   const apiUrl = `http://${hostname}:${import.meta.env.VITE_BACKEND_PORT}`;
   // Fetch user data when the component mounts
   useEffect(() => {
@@ -159,6 +163,7 @@ const UserPage: React.FC = () => {
 
   return (
     <div style={{ padding: '20px' }}>
+      <SocketStatus isConnected={isConnected} socketId={socketId} />
       <h1>Welcome to Your User Page</h1>
       {user ? (
         <div>
