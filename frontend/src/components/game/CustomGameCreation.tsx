@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import "../App_game.css";
-import { GameMode, LobbyProps } from "../types";
-import { joinGame } from "../socket";
+import "./GameContainer.css";
+import { GameMode, LobbyProps } from "../../types";
+import { joinGame } from "../../socket";
 
 const CustomGameCreation: React.FC<LobbyProps> = ({
   onGameStart,
@@ -13,7 +13,7 @@ const CustomGameCreation: React.FC<LobbyProps> = ({
 
   const handleStartGame = () => {
     setQueueStatus("inactive");
-    joinGame(selectedMode, { enablePowerups }, (gameId) => {
+    joinGame(selectedMode, { enablePowerups }, (gameId: string) => {
       onGameStart(selectedMode, gameId);
     });
   };
