@@ -1,0 +1,86 @@
+name: ft_transcendence
+services:
+  db:
+    image: postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 1s
+      timeout: 2s
+      retries: 10
+    restart: always
+    env_file:
+      - .env
+    container_name: db
+    volumes:
+      - ${DB_LOCATION}
+    ports:
+      - "5432:5432"
+    networks:
+      - app-network
+
+  frontend:
+    container_name: frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: ${NODE_ENV:-production}
+    ports:
+      - "0.0.0.0:5173:5173"
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend/src:/app/frontend/src
+    networks:
+      - app-network
+    env_file:
+      - .env
+    environment:
+      - VITE_HOST_NAME=${HOSTNAME}
+    develop:
+      watch:
+        - action: sync
+          path: ./frontend/src
+          target: ./frontend/src
+  backend:
+    container_name: backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: ${NODE_ENV:-production}
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      - VITE_HOST_NAME=${HOSTNAME}
+    volumes:
+      - ./backend/src:/app/backend/src
+    networks:
+      - app-network
+    develop:
+      watch:
+        - action: sync
+          path: ./backend/src
+          target: ./backend/src
+
+  pgadmin:
+    image: dpage/pgadmin4
+    restart: always
+    container_name: pgadmin4
+    depends_on:
+      - db
+    env_file:
+      - .env
+    ports:
+      - "5050:80"
+    profiles: ["dev"]
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
