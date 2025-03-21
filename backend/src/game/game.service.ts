@@ -33,7 +33,7 @@ const GAME_PARAMETERS = {
 export class GameService {
   constructor(
     @InjectModel(Match)
-    private matchModel: typeof Match,
+    readonly matchModel: typeof Match,
     @Inject(forwardRef(() => QueueService))
     readonly queueService: QueueService,
   ) {
@@ -43,7 +43,7 @@ export class GameService {
           `Player Mappings: ${this.playerGameMap.size} | ` +
           `Queue Length: ${this.queueService.queueLength}`,
       );
-    }, 10000);
+    }, 60000);
   }
 
   private server: Server | null = null;
@@ -526,6 +526,16 @@ export class GameService {
     game.lastPowerUpSpawn = undefined;
 
     return Date.now();
+  }
+
+  async getLeaderboard() {
+    const matches = await this.matchModel.findAll({
+      where: {
+        gameMode: 'remoteMultiplayer',
+      },
+      raw: true, // This ensures we get plain objects
+    });
+    return matches;
   }
 
   private getPlayerIndex(playerId: string, gameId: string): number {

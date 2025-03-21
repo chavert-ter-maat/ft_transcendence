@@ -10,6 +10,7 @@ import AuthCallback from "./components/AuthCallback";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Chat from "./components/chat/Chat";
 import GameContainer from "./components/game/GameContainer";
+import Leaderboard from "./components/game/Leaderboard";
 
 const App: React.FC = () => {
   return (
@@ -39,6 +40,14 @@ const App: React.FC = () => {
           element={
             <ProtectedRoute>
               <GameContainer />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/leaderboard"
+          element={
+            <ProtectedRoute>
+              <Leaderboard />
             </ProtectedRoute>
           }
         />
