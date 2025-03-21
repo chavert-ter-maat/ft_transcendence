@@ -1,14 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import axios from '../../axios';
-
-interface LeaderboardEntry {
-  playerId: string;
-  wins: number;
-  losses: number;
-  totalGames: number;
-  totalScore: number;
-  winRate: string;
-}
+import React, { useEffect, useState } from "react";
+import axios from "../../axios";
+import { LeaderboardEntry } from "../../types/leaderboard.types";
 
 const Leaderboard: React.FC = () => {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
@@ -19,14 +11,16 @@ const Leaderboard: React.FC = () => {
     const fetchLeaderboard = async () => {
       try {
         setLoading(true);
-        const response = await axios.get<LeaderboardEntry[]>('/api/game/leaderboard');
+        const response = await axios.get<LeaderboardEntry[]>(
+          "/api/game/leaderboard"
+        );
         if (Array.isArray(response.data)) {
           setLeaderboard(response.data);
         } else {
-          throw new Error('Invalid leaderboard data received');
+          throw new Error("Invalid leaderboard data received");
         }
       } catch (err) {
-        setError('Failed to load leaderboard data');
+        setError("Failed to load leaderboard data");
         console.error(err);
       } finally {
         setLoading(false);
