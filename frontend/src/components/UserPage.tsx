@@ -13,7 +13,7 @@ const UserPage: React.FC = () => {
   const [newDisplayName, setNewDisplayName] = useState<string>("");
   const [successMessage, setSuccessMessage] = useState<string>("");
   const [avatar, setAvatar] = useState<File | null>(null); // State to store avatar image
-  const { isConnected, socketId } = useSocketStatus();
+  const { isConnected, socketId } = useSocketStatus(user?.username);
 
   const hostname = import.meta.env.VITE_HOSTNAME || "localhost";
 

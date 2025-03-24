@@ -2,6 +2,7 @@ import { Injectable, Logger, Inject, forwardRef } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Match } from './entities/match.entity';
 import { QueueService } from './queue/queue.service';
+import { GameGateway } from './game.gateway';
 import {
   GameState,
   Paddle,
@@ -36,6 +37,8 @@ export class GameService {
     readonly matchModel: typeof Match,
     @Inject(forwardRef(() => QueueService))
     readonly queueService: QueueService,
+    @Inject('GameGateway')
+    private readonly gameGateway: GameGateway,
   ) {
     setInterval(() => {
       this.logger.log(
@@ -58,24 +61,27 @@ export class GameService {
 
   private async saveMatchResult(gameState: GameState) {
     if (gameState.gameMode === 'remoteMultiplayer') {
-      const winner: string =
-        gameState.player1.score > gameState.player2.score
-          ? gameState.player1.id
-          : gameState.player2.id;
-
-      const gameId = this.playerGameMap.get(gameState.player1.id);
-      if (gameId) {
-        await this.matchModel.create({
-          gameId,
-          player1Id: gameState.player1.id,
-          player2Id: gameState.player2.id,
-          player1Score: gameState.player1.score,
-          player2Score: gameState.player2.score,
-          gameMode: gameState.gameMode,
-          startTime: gameState.gameStarted,
-          endTime: new Date(),
-          winnerId: winner,
-        });
+      try {
+        // Use usernames directly from GameState
+        const gameId = this.playerGameMap.get(gameState.player1.id);
+        if (gameId) {
+          await this.matchModel.create({
+            gameId,
+            player1Username: gameState.player1.username,
+            player2Username: gameState.player2.username,
+            player1Score: gameState.player1.score,
+            player2Score: gameState.player2.score,
+            gameMode: gameState.gameMode,
+            startTime: gameState.gameStarted,
+            endTime: new Date(),
+            winnerUsername:
+              gameState.player1.score > gameState.player2.score
+                ? gameState.player1.username
+                : gameState.player2.username,
+          });
+        }
+      } catch (error) {
+        this.logger.error('Error saving match result:', error);
       }
     }
   }
@@ -115,6 +121,7 @@ export class GameService {
     return {
       player1: {
         id: '',
+        username: '',
         paddle: { ...initialPaddle, x: 2 },
         score: 0,
         inGame: true,
@@ -122,6 +129,7 @@ export class GameService {
       },
       player2: {
         id: '',
+        username: '',
         paddle: { ...initialPaddle, x: 96 },
         score: 0,
         inGame: true,
@@ -533,7 +541,6 @@ export class GameService {
       where: {
         gameMode: 'remoteMultiplayer',
       },
-      raw: true, // This ensures we get plain objects
     });
     return matches;
   }

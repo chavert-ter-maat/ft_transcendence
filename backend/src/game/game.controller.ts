@@ -12,16 +12,16 @@ export class GameController {
     const playerStats = new Map();
 
     matches.forEach((match) => {
-      if (!playerStats.has(match.player1Id)) {
-        playerStats.set(match.player1Id, {
+      if (!playerStats.has(match.player1Username)) {
+        playerStats.set(match.player1Username, {
           wins: 0,
           losses: 0,
           totalGames: 0,
           totalScore: 0,
         });
       }
-      if (!playerStats.has(match.player2Id)) {
-        playerStats.set(match.player2Id, {
+      if (!playerStats.has(match.player2Username)) {
+        playerStats.set(match.player2Username, {
           wins: 0,
           losses: 0,
           totalGames: 0,
@@ -29,10 +29,10 @@ export class GameController {
         });
       }
 
-      const player1Stats = playerStats.get(match.player1Id);
-      const player2Stats = playerStats.get(match.player2Id);
+      const player1Stats = playerStats.get(match.player1Username);
+      const player2Stats = playerStats.get(match.player2Username);
 
-      if (match.winnerId === match.player1Id) {
+      if (match.winnerUsername === match.player1Username) {
         player1Stats.wins++;
         player2Stats.losses++;
       } else {
@@ -47,8 +47,8 @@ export class GameController {
     });
 
     const leaderboardData = Array.from(playerStats.entries()).map(
-      ([playerId, stats]) => ({
-        playerId,
+      ([username, stats]) => ({
+        username,
         wins: stats.wins,
         losses: stats.losses,
         totalGames: stats.totalGames,

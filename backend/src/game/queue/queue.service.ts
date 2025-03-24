@@ -81,6 +81,14 @@ export class QueueService {
           return;
         }
 
+        const player1Username = this.gameGateway.getUsernameById(player1);
+        const player2Username = this.gameGateway.getUsernameById(player2);
+
+        console.log('Creating game with players:', {
+          player1: { id: player1, username: player1Username },
+          player2: { id: player2, username: player2Username },
+        });
+
         const gameId = this.gameService.createRemoteMultiplayerGame(
           player1,
           player2,

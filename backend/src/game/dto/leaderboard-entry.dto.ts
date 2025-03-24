@@ -1,5 +1,5 @@
 export class LeaderboardEntryDto {
-  playerId: string;
+  username: string;
   wins: number;
   losses: number;
   totalGames: number;

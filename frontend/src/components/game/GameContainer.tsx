@@ -15,7 +15,7 @@ const GameContainer: React.FC = () => {
   const [gameMode, setGameMode] = useState<GameMode>("singleplayer");
   const [gameId, setGameId] = useState("");
   const [queueStatus, setQueueStatus] = useState("inactive");
-  const { isConnected, socketId } = useSocketStatus();
+  const { isConnected, socketId } = useSocketStatus(state.user.username);
 
   const handleGameStart = (
     selectedGameMode: GameMode,

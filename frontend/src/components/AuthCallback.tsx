@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { connectSocket } from "../socket";
 
 const urlParams = new URLSearchParams(window.location.search);
 
@@ -27,7 +26,6 @@ const AuthCallback: React.FC = () => {
         "localStorage.getItem(authToken):",
         localStorage.getItem("authToken")
       );
-      connectSocket();
       navigate("/userpage");
     } else {
       setError("No authentication token received");

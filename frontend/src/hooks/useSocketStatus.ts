@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import { getSocket } from "../socket";
 
-export const useSocketStatus = () => {
+export const useSocketStatus = (username?: string) => {
   const [isConnected, setIsConnected] = useState(false);
   const [socketId, setSocketId] = useState<string | null>(null);
 
   useEffect(() => {
-    const socket = getSocket();
+    const socket = getSocket(username);
 
     const handleConnect = () => {
       setIsConnected(true);
@@ -29,6 +29,6 @@ export const useSocketStatus = () => {
       socket?.off("connect", handleConnect);
       socket?.off("disconnect", handleDisconnect);
     };
-  }, []);
+  }, [username]);
   return { isConnected, socketId };
 };

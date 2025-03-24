@@ -13,7 +13,7 @@ let socket: Socket | null = null;
 
 const SOCKET_URL = "/";
 
-export const connectSocket = () => {
+export const connectSocket = (username?: string) => {
   if (!socket) {
     socket = io(SOCKET_URL, {
       withCredentials: true,
@@ -25,6 +25,9 @@ export const connectSocket = () => {
       timeout: 10000,
       forceNew: false,
       path: "/socket.io",
+      auth: {
+        username: username
+      }
     });
 
     socket.on("connect", () => {
@@ -46,9 +49,9 @@ export const disconnectSocket = () => {
   }
 };
 
-export const getSocket = (): Socket => {
+export const getSocket = (username?: string): Socket => {
   if (!socket) {
-    socket = connectSocket();
+    socket = connectSocket(username);
   }
   return socket;
 };
@@ -106,7 +109,7 @@ const MOVE_THROTTLE = 16;
 export const movePaddle = (
   gameId: string,
   direction: "up" | "down",
-  player?: number
+  player?: number,
 ) => {
   const now = performance.now();
   const playerKey: PlayerKey = player
@@ -143,12 +146,12 @@ export const onGameStateUpdate = (callback: (gameState: GameState) => void) => {
 export const offGameStateUpdate = () => {
   socket?.off("gameState");
 };
-
 export const requestRematch = (
   gameId: string,
+  username?: string,
   onError?: (message: string) => void
 ) => {
-  const socket = getSocket();
+  const socket = getSocket(username);
   if (socket) {
     socket.emit("requestRematch", { gameId });
 
