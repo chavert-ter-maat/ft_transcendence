@@ -151,11 +151,13 @@ export class GameService {
   ): string {
     const gameId = uuid();
     const gameState = this.initializeGameState('singleplayer', enablePowerups);
+
     gameState.player1.id = playerId;
     gameState.player1.username =
       this.gameGateway.getUsernameById(playerId) || 'Unknown';
     gameState.player2.id = 'Bot';
     gameState.player2.username = 'Bot';
+
     this.games.set(gameId, gameState);
     this.playerGameMap.set(gameState.player1.id, gameId);
     this.startGameLoop(gameId);
@@ -171,8 +173,12 @@ export class GameService {
       'localMultiplayer',
       enablePowerups,
     );
+
     gameState.player1.id = playerId;
+    gameState.player1.username =
+      this.gameGateway.getUsernameById(playerId) || 'Unknown';
     gameState.player2.id = 'Local Challenger';
+
     this.games.set(gameId, gameState);
     this.playerGameMap.set(playerId, gameId);
     this.playerGameMap.set(gameState.player2.id, gameId);
