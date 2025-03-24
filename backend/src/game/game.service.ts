@@ -62,7 +62,6 @@ export class GameService {
   private async saveMatchResult(gameState: GameState) {
     if (gameState.gameMode === 'remoteMultiplayer') {
       try {
-        // Use usernames directly from GameState
         const gameId = this.playerGameMap.get(gameState.player1.id);
         if (gameId) {
           await this.matchModel.create({
@@ -109,12 +108,14 @@ export class GameService {
       speed: 1,
     };
 
+    const angle = (Math.random() * 90 - 45) * (Math.PI / 180);
+    const direction = Math.random() < 0.5 ? -1 : 1;
     const initialBall: Ball = {
       x: GAME_PARAMETERS.ball.initialX,
       y: GAME_PARAMETERS.ball.initialY,
       radius: GAME_PARAMETERS.ball.radius,
-      velocityX: GAME_PARAMETERS.ball.initialVelocityX,
-      velocityY: GAME_PARAMETERS.ball.initialVelocityY,
+      velocityX: direction * GAME_PARAMETERS.ball.initialSpeed,
+      velocityY: GAME_PARAMETERS.ball.initialSpeed * Math.sin(angle),
       speed: GAME_PARAMETERS.ball.initialSpeed,
     };
 
@@ -183,7 +184,6 @@ export class GameService {
     const gameId = uuid();
     const gameState = this.initializeGameState('privateMatch', true);
 
-    // Get usernames from GameGateway's mapping
     const player1Username = this.gameGateway.getUsernameById(player1Id);
     const player2Username = this.gameGateway.getUsernameById(player2Id);
 
@@ -208,7 +208,6 @@ export class GameService {
     const gameId = uuid();
     const gameState = this.initializeGameState('remoteMultiplayer', true);
 
-    // Get usernames from GameGateway's mapping
     const player1Username = this.gameGateway.getUsernameById(player1Id);
     const player2Username = this.gameGateway.getUsernameById(player2Id);
 
@@ -549,10 +548,11 @@ export class GameService {
   private resetBall(ball: Ball, game: GameState) {
     ball.x = GAME_PARAMETERS.ball.initialX;
     ball.y = GAME_PARAMETERS.ball.initialY;
-    ball.velocityX =
-      GAME_PARAMETERS.ball.initialVelocityX * (ball.velocityX > 0 ? -1 : 1);
-    ball.velocityY =
-      GAME_PARAMETERS.ball.initialVelocityY * (ball.velocityY > 0 ? -1 : 1);
+
+    const direction = ball.velocityX > 0 ? -1 : 1;
+    ball.velocityX = direction * GAME_PARAMETERS.ball.initialSpeed;
+    const angle = (Math.random() * 90 - 45) * (Math.PI / 180);
+    ball.velocityY = GAME_PARAMETERS.ball.initialSpeed * Math.sin(angle);
     ball.speed = GAME_PARAMETERS.ball.initialSpeed;
 
     game.powerUps = [];
