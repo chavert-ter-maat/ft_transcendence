@@ -255,14 +255,10 @@ const Game: React.FC<GameProps> = ({
   const handleRematchClick = () => {
     setRematchRequested(true);
     setRematchError(null);
-    requestRematch(
-      gameId,
-      userId,
-      (errorMessage: string) => {
-        setRematchRequested(false);
-        setRematchError(errorMessage);
-      }
-    );
+    requestRematch(gameId, userId, (errorMessage: string) => {
+      setRematchRequested(false);
+      setRematchError(errorMessage);
+    });
   };
 
   const handleServerRematch = useCallback((rematchGameId: string) => {
@@ -376,11 +372,12 @@ const Game: React.FC<GameProps> = ({
         player2Name={
           gameMode === "localMultiplayer"
             ? "Local Challenger"
-            : gameMode === "remoteMultiplayer" && gameState?.player2.id === getSocket()?.id
-              ? gameState?.player2.username || "Unknown"
-              : gameMode === "singleplayer" && !gameState?.player2.id
-                ? "Bot"
-                : gameState?.player2.username || "Unknown"
+            : gameMode === "remoteMultiplayer" &&
+              gameState?.player2.id === getSocket()?.id
+            ? gameState?.player2.username || "Unknown"
+            : gameMode === "singleplayer" && !gameState?.player2.id
+            ? "Bot"
+            : gameState?.player2.username || "Unknown"
         }
       />
       <canvas ref={canvasRef} width={800} height={600} />
