@@ -37,7 +37,7 @@ export class GameService {
     readonly matchModel: typeof Match,
     @Inject(forwardRef(() => QueueService))
     readonly queueService: QueueService,
-    @Inject('GameGateway')
+    @Inject(forwardRef(() => GameGateway))
     private readonly gameGateway: GameGateway,
   ) {
     setInterval(() => {
@@ -151,7 +151,10 @@ export class GameService {
     const gameId = uuid();
     const gameState = this.initializeGameState('singleplayer', enablePowerups);
     gameState.player1.id = playerId;
+    gameState.player1.username =
+      this.gameGateway.getUsernameById(playerId) || 'Unknown';
     gameState.player2.id = 'Bot';
+    gameState.player2.username = 'Bot';
     this.games.set(gameId, gameState);
     this.playerGameMap.set(gameState.player1.id, gameId);
     this.startGameLoop(gameId);
@@ -179,20 +182,42 @@ export class GameService {
   createPrivateGame(player1Id: string, player2Id: string): string {
     const gameId = uuid();
     const gameState = this.initializeGameState('privateMatch', true);
-    gameState.player1.id = player1Id;
-    gameState.player2.id = player2Id;
 
+    // Get usernames from GameGateway's mapping
+    const player1Username = this.gameGateway.getUsernameById(player1Id);
+    const player2Username = this.gameGateway.getUsernameById(player2Id);
+
+    gameState.player1.id = player1Id;
+    gameState.player1.username = player1Username || 'Unknown';
+
+    gameState.player2.id = player2Id;
+    gameState.player2.username = player2Username || 'Unknown';
+
+    this.games.set(gameId, gameState);
     this.playerGameMap.set(player1Id, gameId);
     this.playerGameMap.set(player2Id, gameId);
     this.startGameLoop(gameId);
     return gameId;
   }
 
+  getGames(): Map<string, GameState> {
+    return this.games;
+  }
+
   createRemoteMultiplayerGame(player1Id: string, player2Id: string): string {
     const gameId = uuid();
     const gameState = this.initializeGameState('remoteMultiplayer', true);
+
+    // Get usernames from GameGateway's mapping
+    const player1Username = this.gameGateway.getUsernameById(player1Id);
+    const player2Username = this.gameGateway.getUsernameById(player2Id);
+
     gameState.player1.id = player1Id;
+    gameState.player1.username = player1Username || 'Unknown';
+
     gameState.player2.id = player2Id;
+    gameState.player2.username = player2Username || 'Unknown';
+
     this.games.set(gameId, gameState);
 
     this.playerGameMap.set(player1Id, gameId);

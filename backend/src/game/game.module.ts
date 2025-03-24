@@ -22,8 +22,8 @@ import { User } from '../auth/auth.model';
       useClass: GameGateway,
     },
     {
-      provide: 'GameGateway',
-      useExisting: forwardRef(() => GameGateway),
+      provide: GameGateway,
+      useClass: GameGateway,
     },
   ],
   controllers: [GameController],

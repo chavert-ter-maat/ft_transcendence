@@ -14,7 +14,7 @@ let socket: Socket | null = null;
 const SOCKET_URL = "/";
 
 export const connectSocket = (username?: string) => {
-  if (!socket) {
+  if (!socket && username) {
     socket = io(SOCKET_URL, {
       withCredentials: true,
       transports: ["websocket"],
@@ -49,8 +49,8 @@ export const disconnectSocket = () => {
   }
 };
 
-export const getSocket = (username?: string): Socket => {
-  if (!socket) {
+export const getSocket = (username?: string): Socket | null => {
+  if (!socket && username) {
     socket = connectSocket(username);
   }
   return socket;
@@ -151,6 +151,11 @@ export const requestRematch = (
   username?: string,
   onError?: (message: string) => void
 ) => {
+  if (!username) {
+    onError?.("Username is required for rematch");
+    return;
+  }
+  
   const socket = getSocket(username);
   if (socket) {
     socket.emit("requestRematch", { gameId });
@@ -160,6 +165,8 @@ export const requestRematch = (
         onError(data.message);
       }
     });
+  } else {
+    onError?.("Could not establish socket connection");
   }
 };
 

@@ -57,6 +57,15 @@ export class GameGateway
     if (username) {
       this.logger.log(`Setting username for ${client.id}: ${username}`);
       this.usernames.set(client.id, username);
+
+      for (const [gameId, game] of this.gameService.getGames()) {
+        if (game.player1.id === client.id) {
+          game.player1.username = username;
+        }
+        if (game.player2.id === client.id) {
+          game.player2.username = username;
+        }
+      }
     } else {
       this.logger.warn(`No username provided for socket ${client.id}`);
     }
