@@ -12,7 +12,7 @@ import {
 import { v4 as uuid } from 'uuid';
 import { Server } from 'socket.io';
 
-const SERVER_TICKRATE = 1000 / 60;
+const SERVER_TICKRATE = 1000 / 30;
 
 const GAME_PARAMETERS = {
   score_limit: 2,
