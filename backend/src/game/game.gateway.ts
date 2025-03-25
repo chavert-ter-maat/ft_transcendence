@@ -23,7 +23,7 @@ import { QueueService } from 'src/game/queue/queue.service';
     allowedHeaders: ['Content-Type', 'Authorization'],
   },
   transports: ['websocket'],
-  pingInterval: 2000,
+  pingInterval: 3000,
   pingTimeout: 5000,
 })
 export class GameGateway

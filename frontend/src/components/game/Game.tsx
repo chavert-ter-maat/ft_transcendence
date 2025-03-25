@@ -16,7 +16,7 @@ import Scoreboard from "./Scoreboard";
 import { GameState, CoordinateCache, GameProps } from "../../types";
 
 
-const moveInterval = 1000/30;
+const moveInterval = 1000/60;
 
 const Game: React.FC<GameProps> = ({
   userId,
