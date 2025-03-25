@@ -13,6 +13,9 @@ let socket: Socket | null = null;
 
 const SOCKET_URL = "/";
 
+const MOVE_THROTTLE = 1000/60;
+const STATE_UPDATE_THROTTLE = 1000/60;
+
 export const connectSocket = (username?: string) => {
   if (!socket && username) {
     socket = io(SOCKET_URL, {
@@ -104,7 +107,6 @@ const lastMoveTimes: Record<PlayerKey, number> = {
   player2: 0,
   default: 0,
 };
-const MOVE_THROTTLE = 16;
 
 export const movePaddle = (
   gameId: string,
@@ -131,7 +133,6 @@ export const movePaddle = (
 };
 
 let lastGameStateTime = 0;
-const STATE_UPDATE_THROTTLE = 16;
 
 export const onGameStateUpdate = (callback: (gameState: GameState) => void) => {
   socket?.on("gameState", (gameState: GameState) => {

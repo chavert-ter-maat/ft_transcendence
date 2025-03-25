@@ -15,6 +15,9 @@ import {
 import Scoreboard from "./Scoreboard";
 import { GameState, CoordinateCache, GameProps } from "../../types";
 
+
+const moveInterval = 1000/30;
+
 const Game: React.FC<GameProps> = ({
   userId,
   gameMode,
@@ -55,7 +58,6 @@ const Game: React.FC<GameProps> = ({
 
   const processPaddleMovement = useCallback(() => {
     const currentTime = Date.now();
-    const moveInterval = 16;
 
     if (currentTime - lastMoveTimeRef.current >= moveInterval) {
       if (gameMode === "localMultiplayer") {
