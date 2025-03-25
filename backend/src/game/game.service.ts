@@ -15,7 +15,7 @@ import { Server } from 'socket.io';
 const SERVER_TICKRATE = 1000 / 30;
 
 const GAME_PARAMETERS = {
-  score_limit: 2,
+  score_limit: 3,
   ball: {
     initialX: 50,
     initialY: 50,
