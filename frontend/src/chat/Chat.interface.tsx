@@ -26,6 +26,11 @@ export interface user_stamp	{
 	timestamp:	string
 };
 
+export interface friend_stamp{
+	stamp_:		user_stamp,
+	status:		string
+}
+
 export interface UserStats {
 	username:		string;
 	password:		string;
@@ -39,7 +44,9 @@ export interface UserStats {
 	page_admin:		boolean;
 	page_creator:	boolean;
 	selected_user:	string;
+	invited_by:		string;
 	user?:			User;
+	friend_view:	boolean;
 }
 
 export interface StringState {
@@ -47,13 +54,20 @@ export interface StringState {
 	setState:	React.Dispatch<React.SetStateAction<string>>;
 }
 
+export interface booleanState {
+	state:		boolean;
+	setState:	React.Dispatch<React.SetStateAction<boolean>>;
+}
+
 export interface ChatOverviewProps {
 	logged_in_user:	UserStats;
 	chats_input:	chat_stamp[];
 	setLoaded:		React.Dispatch<React.SetStateAction<boolean>>;
 	setSwitch:		React.Dispatch<React.SetStateAction<number>>;
-	input1:			StringState;
-	input2:			StringState;
+	modal:			booleanState;
+	invite:			booleanState;
+	input_field1:	React.MutableRefObject<string>;
+	input_field2:	React.MutableRefObject<string>;
 }
 
 export interface MessagesViewProps {
@@ -61,7 +75,9 @@ export interface MessagesViewProps {
 	messages_input:	message_stamp[];
 	setLoaded:		React.Dispatch<React.SetStateAction<boolean>>;
 	setSwitch:		React.Dispatch<React.SetStateAction<number>>;
-	input1:			StringState;
+	modal:			booleanState;
+	invite:			booleanState;
+	input_field1:	React.MutableRefObject<string>;
 }
 
 export interface UsersViewProps {
@@ -69,8 +85,20 @@ export interface UsersViewProps {
 	users_input:	user_stamp[];
 	setLoaded:		React.Dispatch<React.SetStateAction<boolean>>;
 	setSwitch:		React.Dispatch<React.SetStateAction<number>>;
-	input1:			StringState;
-	password1:		StringState;
+	modal:			booleanState;
+	invite:			booleanState;
+	input_field1:	React.MutableRefObject<string>;
+	password_field:	React.MutableRefObject<string>;
+}
+
+export interface FriendsViewProps {
+	logged_in_user:	UserStats;
+	friends_input:	friend_stamp[];
+	setLoaded:		React.Dispatch<React.SetStateAction<boolean>>;
+	setSwitch:		React.Dispatch<React.SetStateAction<number>>;
+	modal:			booleanState;
+	invite:			booleanState;
+	input_field1:	React.MutableRefObject<string>;
 }
 
 export interface LoginViewProps {
@@ -78,8 +106,9 @@ export interface LoginViewProps {
 	messages_input:	message_stamp[];
 	setLoaded:		React.Dispatch<React.SetStateAction<boolean>>;
 	setSwitch:		React.Dispatch<React.SetStateAction<number>>;
-	input1:			StringState;
-	password1:		StringState;
+	modal:			booleanState;
+	invite:			booleanState;
+	password_field:	React.MutableRefObject<string>;
 }
 
 export interface EditViewProps {
@@ -88,8 +117,10 @@ export interface EditViewProps {
 	setSwitch:		React.Dispatch<React.SetStateAction<number>>;
 	requestedUserInfo:	User;
 	naviagte:		ReturnType<typeof useNavigate>;
-	input1:			StringState;
-	password1:		StringState;
+	modal:			booleanState;
+	invite:			booleanState;
+	input_field1:	React.MutableRefObject<string>;
+	input_field2:	React.MutableRefObject<string>;
 }
 
 export interface UserName {

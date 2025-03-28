@@ -1,6 +1,6 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { User } from 'src/auth/auth.model'; // Import the User model
+import { User, user_stamp } from 'src/auth/auth.model'; // Import the User model
 import * as bcrypt from 'bcrypt'; // Import bcrypt to compare hashed passwords
 import * as path from 'path'; // Path operations
 
@@ -55,7 +55,7 @@ export class AuthService {
   async createUser(email: string, password: string): Promise<User> {  // Change username to email
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
-    const user = await User.create({ email, password: hashedPassword, blocked_users: [] });  // Change username to email
+    const user = await User.create({ email, password: hashedPassword, blocked_users: [], friends: [] });  // Change username to email
     return user;
   }
 
@@ -70,6 +70,7 @@ export class AuthService {
     // console.log('Saving OAuth tokens:', user); 
   
     const { email, username, displayName = null, avatar = null, oauthToken = null, oauthRefreshToken = null, oauthExpiresAt = null, provider = '42' } = user;  // Change username to email
+	const me_stamp: user_stamp =  {name_: user.username, admin_: false, timestamp: Date()}
   
 	console.log("user adding:", email, username);
 
@@ -90,7 +91,9 @@ export class AuthService {
         oauthRefreshToken,
         oauthExpiresAt,
         provider,
+		me_stamp: me_stamp,
 		blocked_users: [],
+		friends: [],
       });
     } else {
       // Update the user if already exists

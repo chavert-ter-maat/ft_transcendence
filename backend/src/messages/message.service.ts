@@ -32,6 +32,8 @@ export class MessageService {
 	async check_block(username: string, get_user: string): Promise <User | null>{ //humm
 		const user = await User.findOne({ where: { username: get_user } })
 		if (user){
+			user.blocked_users = user.blocked_users.filter( (blocked) => (blocked.timestamp > Date.now() || blocked.forever) );
+			await user.save();
 			if (user.blocked_users.findIndex((usery) => (usery.username == username)) != -1)
 				return (null);
 		}
@@ -97,6 +99,32 @@ export class MessageService {
 		return {array: user_overview, admin_: admin_, creator_: creator_};
 	}
 
+	async get_friends_from_db(username: string): Promise<user_stamp [] > {
+		const user = await this.get_user(username);
+		let user_overview: user_stamp [] = [];
+		let admin_: boolean = false;
+		let creator_: boolean = false;
+		if (user)
+		{
+			user_overview = user.friends;
+		}
+		return (user_overview);
+	}
+
+	async add_friend_invite(username: string, add_username: string): Promise<boolean> {
+		if (this.check_bad_input(username) || this.check_bad_input(add_username))
+			throw new ConflictException('Invalid input.');
+		const user = await this.get_user(username);
+		if (user)
+		{
+			const add_user = await this.check_block(username, add_username);
+			if (!add_user || add_username === user.username)
+				return (false);//throw new NotFoundException("User not found");
+			return (true);
+		}
+		return (false);
+	}
+
 	async filter_mute(chat: Chat, username: string): Promise<Boolean>	{
 		chat.muted_users = chat.muted_users.filter( (muted) => (muted.timestamp > Date.now() || muted.forever) );
 		await chat.save();
@@ -154,6 +182,38 @@ export class MessageService {
 		}
 		message_overview = await this.filter_block(message_overview, user);
 		return (message_overview);
+	}
+
+	async add_friend_internal(user: User, add_username: string, username: string): Promise<boolean> {
+		const add_user = await this.check_block(username, add_username);
+		if (!add_user || add_username === user.username)
+			throw new NotFoundException("User not found");
+		if (!add_user.friends.some(friend => friend.name_ === user.username))
+		{
+			add_user.friends.push({name_: user.username, admin_: false, timestamp: Date()});
+			add_user.changed('friends', true);
+			await add_user.save();
+		}
+		if (!user.friends.some(friend => friend.name_ === add_username))
+		{
+			user.friends.push({name_: add_username, admin_: false, timestamp: Date()});
+			user.changed('friends', true);
+			await user.save();
+		}
+		return (true);
+	}
+
+	async remove_friend_internal(user: User, remove_username: string, username: string): Promise<boolean> {
+		const add_user = await this.check_block(username, remove_username);
+		if (!add_user || remove_username === user.username)
+			throw new NotFoundException("User not found");
+		add_user.friends = add_user.friends.filter(friends => friends.name_ !== username);
+		add_user.changed('friends', true);
+		await add_user.save();
+		user.friends = user.friends.filter(friends => friends.name_ !== remove_username);
+		user.changed('friends', true);
+		await user.save();
+		return (true);
 	}
 
 	async add_user_internal(existingChat: Chat, add_username: string, username: string): Promise<boolean> {
@@ -314,6 +374,30 @@ export class MessageService {
 		return ([]);
 	}
 
+	async add_friend(chatname: string, username: string, add_username: string): Promise<user_stamp []> {
+		if (this.check_bad_input(username) || this.check_bad_input(add_username))
+			throw new ConflictException('Invalid input.');
+		const user = await this.get_user(username);
+		if (user)
+		{
+			if (await this.add_friend_internal(user, add_username, username))
+				return ([user.friends[user.friends.length - 1], user.me_stamp]);
+		}
+		return ([]);
+	}
+
+	async remove_friend(chatname: string, username: string, remove_username: string): Promise<user_stamp []> {
+		if (this.check_bad_input(username) || this.check_bad_input(remove_username))
+			throw new ConflictException('Invalid input.');
+		const user = await this.get_user(username);
+		if (user)
+		{
+			if (await this.remove_friend_internal(user, remove_username, username))
+				return ([{name_: remove_username, admin_: false, timestamp: Date()}, user.me_stamp]);
+		}
+		return ([]);
+	}
+
 	async leave_chat(chatname: string, username: string, password: string): Promise<user_stamp []> {
 		if (this.check_bad_input(username) || this.check_bad_input(chatname))
 			throw new ConflictException('Invalid input.');
@@ -395,7 +479,6 @@ export class MessageService {
 		const existingChat = await this.get_chat_with_permissions(username, chatname);
 		if (existingChat && existingChat.creator == username)
 		{
-			// existingChat.salt = await bcrypt.genSalt(10);
     		const hashed_password_chat = await bcrypt.hash(password_chat, existingChat.salt);
 			existingChat.password = hashed_password_chat;
 			existingChat.public = true;
