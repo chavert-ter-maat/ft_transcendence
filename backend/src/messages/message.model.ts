@@ -84,6 +84,12 @@ export class Chat extends Model<ChatAtributes> implements ChatAtributes {
 	public password!: string;
 
 	@Column({
+		type: DataType.STRING,
+		allowNull: false,
+	})
+	public salt!: string;
+
+	@Column({
 		type: DataType.BOOLEAN,
 		allowNull: false,
 	})

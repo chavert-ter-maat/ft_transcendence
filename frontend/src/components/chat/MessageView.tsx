@@ -1,23 +1,17 @@
 import a from './talking_cat_d.jpeg';
 import b from './talking_cat_ab.jpeg';
 import './App.css';
-import React from 'react';
-import axios from '../../axios';
+import React, {useRef} from 'react';
+import axios from '../axios';
 import { UserStats, MessagesViewProps, message_stamp } from './Chat.interface';
 import { HeaderWrap } from "./Header";
 
 export const GoToChatOverview = (	logged_in_user: UserStats,
 		setLoaded: React.Dispatch<React.SetStateAction<boolean>>,
-		setSwitch: React.Dispatch<React.SetStateAction<number>>,
-		messages_input: message_stamp[],
-		setInput: React.Dispatch<React.SetStateAction<string>> ) => {
+		setSwitch: React.Dispatch<React.SetStateAction<number>>) => {
 	logged_in_user.chatname = "";
-	messages_input = [];
 	setSwitch(0);
-	setInput("");
 	setLoaded(false);
-	logged_in_user.loaded = false;
-	logged_in_user.loading = false;
 }
 
 interface MessageStamp_int { 
@@ -28,7 +22,7 @@ interface MessageStamp_int {
 function MESSAGE_RENDER({messagey, logged_in_user}: MessageStamp_int ): React.ReactElement {
 	let	style:	string;
 	let img:	string;
-	// console.log(messagey.key_);
+
 	if (logged_in_user.username === messagey.name_)
 	{
 		style = "App-message_Jojo";
@@ -65,18 +59,16 @@ function MESSAGE_LIST( {messages, logged_in_user} : MessageList_int ) {
 	);
 }
 
-export const MessagesView: React.FC<MessagesViewProps> = ({ logged_in_user, messages_input, setLoaded, setSwitch, input1 }) => {
+export const MessagesView: React.FC<MessagesViewProps> = ({ logged_in_user, messages_input, setLoaded, setSwitch, modal, invite, input_field1 }) => {
 	if (!logged_in_user.user)
 		throw new Error("No user");
 	
 	const addNewMessage = async (): Promise<boolean> => {
 		try {
-			//console.log("Chat added:" + logged_in_user.username + "_" + logged_in_user.chatname);
 			await axios.post('/api/messages/new_message',
 				{username: logged_in_user.username,  password: logged_in_user.chat_password, chatname: logged_in_user.chatname,
-					message_: input1.state, name_: logged_in_user.username,
+					message_: input_field1.current.value, name_: logged_in_user.username,
 					user_: "App-message_" + logged_in_user.username, timestamp: Date(), pic_: "a", key_: 0});
-			//console.log("Chat added:" + response.data.message);
 			return true;
 		} catch (err: any) {
 			if (!err?.response) {
@@ -91,17 +83,14 @@ export const MessagesView: React.FC<MessagesViewProps> = ({ logged_in_user, mess
 	}
 
 	function	enterOnMessage(event: any) { //any is bad practice
-		if (input1.state !== "")
+		if (input_field1.current.value !== "")
 			addNewMessage();
-		input1.setState("");
+		input_field1.current.value = "";
 		event.preventDefault();
 	}
 
 	function GoToPrevPage() {
-		//console.log("Previous page:" + logged_in_user.chatname);
 		setLoaded(false);
-		logged_in_user.loaded = false;
-		logged_in_user.loading = false;
 		if (logged_in_user.page_offset > 0)
 		{
 			logged_in_user.page_offset -= 20;
@@ -110,30 +99,24 @@ export const MessagesView: React.FC<MessagesViewProps> = ({ logged_in_user, mess
 	}
 
 	function GoToNextPage() {
-		//console.log("Next page:" + logged_in_user.chatname);
 		setLoaded(false);
-		logged_in_user.loaded = false;
-		logged_in_user.loading = false;
 		if (!logged_in_user.end_reached)
 			logged_in_user.page_offset += 20;
 	}
 
 	function GoToEditChat() {
-		//console.log("Edit this chat:" + logged_in_user.chatname);
 		setSwitch(2);
 		setLoaded(false);
-		input1.setState("");
-		logged_in_user.loaded = false;
-		logged_in_user.loading = false;
+		input_field1.current.value = "";
 	}
 
 	const JSX_content = (
 		<>
 			<h2>{logged_in_user.chatname}</h2>
-			<button onClick={() => GoToChatOverview(logged_in_user, setLoaded, setSwitch, messages_input, input1.setState)} className={"App-chat_name_button"}> Go to chat overview. </button>
+			<button onClick={() => GoToChatOverview(logged_in_user, setLoaded, setSwitch, messages_input)} className={"App-chat_name_button"}> Go to chat overview. </button>
 			<form onSubmit={enterOnMessage}>
-				<input type="text" value={input1.state} onChange={(e) => input1.setState(e.target.value)} />
-				<input type="submit" value="Message" />
+			<input type="text" ref={input_field1} onChange={(e) => input_field1.current.value=e.target.value} />
+			<input type="submit" value="Message" />
 			</form>
 			<button onClick={() => GoToPrevPage()}> Go to previous page. </button>
 			<button onClick={() => GoToEditChat()}> Edit this chat: {logged_in_user.chatname}. </button>
@@ -141,11 +124,10 @@ export const MessagesView: React.FC<MessagesViewProps> = ({ logged_in_user, mess
 		</>
 	);
 
-	// return message view:
 	return (
 		<div className="App">
-		<HeaderWrap user={logged_in_user.user} insert={JSX_content}/>
-			<ol>
+		<HeaderWrap user={logged_in_user.user} insert={JSX_content} modal={modal} invite={invite} invited_by={logged_in_user.invited_by}/>
+		<ol>
 				<MESSAGE_LIST messages={messages_input} logged_in_user={logged_in_user}/>
 			</ol>
 		</div>

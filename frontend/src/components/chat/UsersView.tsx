@@ -1,4 +1,4 @@
-import logo from './8589-screaming-cat.png';
+// import logo from './8589-screaming-cat.png';
 import './App.css';
 import React from 'react';
 import axios from '../../axios';
@@ -18,23 +18,19 @@ interface	UserStampList_int {
 export const GoBackToChat = (	logged_in_user: UserStats,
 		setLoaded: React.Dispatch<React.SetStateAction<boolean>>,
 		setSwitch: React.Dispatch<React.SetStateAction<number>>,
-		setInput: React.Dispatch<React.SetStateAction<string>>,
-		setPassword: React.Dispatch<React.SetStateAction<string>> ) => {
-	//console.log("Going back to chat:" + logged_in_user.chatname);
+		input_field1:	React.MutableRefObject<string>,
+		password_field:	React.MutableRefObject<string>) => {
 	setSwitch(1);
 	setLoaded(false);
-	setInput("");
-	setPassword("");
-	logged_in_user.loaded = false;
-	logged_in_user.loading = false;
+	input_field1 = "";
+	password_field = "";
 }
 
-export const UsersView: React.FC<UsersViewProps> = ({ logged_in_user, users_input, setLoaded, setSwitch, input1, password1 }) => {
+export const UsersView: React.FC<UsersViewProps> = ({ logged_in_user, users_input, setLoaded, setSwitch, modal, invite, input_field1, password_field }) => {
 	if (!logged_in_user.user)
 		throw new Error("No user");
 	
 	function USERSTAMP_RENDER({usery, logged_in_user}: UserStamp_int ): React.ReactElement {
-		// console.log(usery.name_);
 		if (usery.name_ !== logged_in_user.username)
 			return (
 				<div>
@@ -46,7 +42,7 @@ export const UsersView: React.FC<UsersViewProps> = ({ logged_in_user, users_inpu
 			return (
 				<div>
 					<li className={"App-chat_name"}>{usery.name_}</li>
-					<button onClick={() => ButtonGoAddMuteOrBlock(usery.name_)} className={"App-chat_name_button"}> Go to userpage. </button>
+					<button onClick={() => ButtonGoAddMuteOrBlock(usery.name_)} className={"App-chat_name_button"}> Go my own page. </button>
 				</div>
 		)
 	}
@@ -64,18 +60,16 @@ export const UsersView: React.FC<UsersViewProps> = ({ logged_in_user, users_inpu
 
 	function ButtonGoAddMuteOrBlock(username: string) {
 		logged_in_user.selected_user = username;
+		logged_in_user.friend_view = false;
 		setLoaded(false);
 		setSwitch(5);
-		logged_in_user.loaded = false;
-		logged_in_user.loading = false;
-		//console.log("add as mute or block:" + username);
 	}
 
 	const makePublic = async (): Promise<boolean> => {
 		try {
 			await axios.post('/api/messages/make_public',
-				{chatname: logged_in_user.chatname,  creator: logged_in_user.username, password_chat: password1.state});
-			//console.log("Password setted:" + response.data.message);
+				{chatname: logged_in_user.chatname,  creator: logged_in_user.username, password_chat: password_field.current.value});
+				password_field.current.value = "";
 			return true;
 		} catch (err: any) {
 			if (!err?.response) {
@@ -92,8 +86,7 @@ export const UsersView: React.FC<UsersViewProps> = ({ logged_in_user, users_inpu
 	const addNewUser = async (): Promise<boolean> => {
 		try {
 			await axios.post('/api/messages/add_user',
-				{chatname: logged_in_user.chatname,  creator: logged_in_user.username, add_user: input1.state});
-			//console.log("User added:" + response.data.message);
+				{chatname: logged_in_user.chatname,  creator: logged_in_user.username, add_user: input_field1.current.value});
 			return true;
 		} catch (err: any) {
 			if (!err?.response) {
@@ -111,10 +104,7 @@ export const UsersView: React.FC<UsersViewProps> = ({ logged_in_user, users_inpu
 		try {
 			await axios.post('/api/messages/leave_chat',
 				{chatname: chatname_leaving,  username: logged_in_user.username, password: logged_in_user.password});
-			//console.log("Chat left:" + response.data.message);
 			setLoaded(false);
-			logged_in_user.loaded = false;
-			logged_in_user.loading = false;
 			return true;
 		} catch (err: any) {
 			if (!err?.response) {
@@ -129,17 +119,15 @@ export const UsersView: React.FC<UsersViewProps> = ({ logged_in_user, users_inpu
 	}
 
 	async function	setPublic(event: any) {
-		//console.log("Publicize chat:" + logged_in_user.chatname);
 		makePublic();
 		event.preventDefault();
 	}
 
 	async function	addUser(event: any) {
-		//console.log("add user input is:" + input1.state + ", chatname:" + logged_in_user.chatname);
-		if (input1.state !== "")
+		if (input_field1.current.value !== "")
 		{
 			addNewUser();
-			input1.setState("");
+			input_field1.current.value = "";
 		}
 		event.preventDefault();
 	}
@@ -149,23 +137,22 @@ export const UsersView: React.FC<UsersViewProps> = ({ logged_in_user, users_inpu
 		logged_in_user.chatname = "";
 		// messages_input = []; might be needed
 		setSwitch(0);
-		input1.setState("");
+		input_field1.current.value = "";
+		password_field.current.value = "";
 		setLoaded(false);
-		logged_in_user.loaded = false;
-		logged_in_user.loading = false;
 	}
 
 	const JSX_content = (
 		<>
 			<h2>Editing: {logged_in_user.chatname}</h2>
-			<button onClick={() => GoBackToChat(logged_in_user, setLoaded, setSwitch, input1.setState, password1.setState)} className={"App-chat_name_button"}> Go to chat. </button>
+			<button onClick={() => GoBackToChat(logged_in_user, setLoaded, setSwitch, input_field1, password_field)} className={"App-chat_name_button"}> Go to chat. </button>
 			<button onClick={() => LeaveChat()}> Leave this chat. </button>
 			{logged_in_user.page_admin && <form onSubmit={addUser}>
-				<input type="text" placeholder="Enter username to add to chat" value={input1.state} onChange={(e) => input1.setState(e.target.value)} />
+				<input type="text" placeholder="Enter username to add to chat" ref={input_field1} onChange={(e) => input_field1.current.value=e.target.value} />
 				<input type="submit" value="Add user" />
 			</form>}
 			{(logged_in_user.page_creator && !logged_in_user.chatname.startsWith("DM"))&& <form onSubmit={setPublic}>
-				<input type="password" placeholder="Enter password to chat" value={password1.state} onChange={(e) => password1.setState(e.target.value)} />
+				<input type="password" placeholder="Enter password to chat" ref={password_field} onChange={(e) => password_field.current.value=e.target.value} />
 				<input type="submit" value="Set public, with password." />
 			</form>}
 		</>
@@ -173,21 +160,7 @@ export const UsersView: React.FC<UsersViewProps> = ({ logged_in_user, users_inpu
 
 	return (
 		<div className="App">
-			<HeaderWrap user={logged_in_user.user} insert={JSX_content}/>
-			{/* <header className="App-header">
-			<img src={logo} className="App-logo" alt="logo" /> */}
-			{/* <h2>Editing: {logged_in_user.chatname}</h2>
-			<button onClick={() => GoBackToChat(logged_in_user, setLoaded, setSwitch, input1.setState, password1.setState)} className={"App-chat_name_button"}> Go to chat. </button>
-			<button onClick={() => LeaveChat()}> Leave this chat. </button>
-			{logged_in_user.page_admin && <form onSubmit={addUser}>
-				<input type="text" placeholder="Enter username to add to chat" value={input1.state} onChange={(e) => input1.setState(e.target.value)} />
-				<input type="submit" value="Add user" />
-			</form>}
-			{logged_in_user.page_creator && <form onSubmit={setPublic}>
-				<input type="password" placeholder="Enter password to chat" value={password1.state} onChange={(e) => password1.setState(e.target.value)} />
-				<input type="submit" value="Set public, with password." />
-			</form>} */}
-			{/* </header> */}
+			<HeaderWrap user={logged_in_user.user} insert={JSX_content} modal={modal} invite={invite} invited_by={logged_in_user.invited_by}/>
 			<ol>
 				<USERSTAMP_LIST users={users_input} logged_in_user={logged_in_user}/>
 			</ol>

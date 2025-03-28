@@ -71,6 +71,7 @@ interface AddMessageToSelectChat {
 interface chat_stamp	{ name_: string, unread_: number, timestamp: string, users: string[], index: number, DM: boolean};
 interface message_stamp	{ message_: string, name_: string, user_ : string, timestamp: string, pic_: string, key_: number };
 interface user_stamp	{ name_: string, admin_: boolean, timestamp: string };
+interface friend_stamp	{ stamp_: user_stamp, status: string };
 
 function sleep(ms: number) {
 	return new Promise((resolve) => setTimeout(resolve, ms));
@@ -97,33 +98,45 @@ export class MessageController {
 
 	add_users( user_input: [user_stamp[], string]): string
 	{
-		//console.log("adding users:");
-		//console.log(user_input[0]);
 		let i_ru: number = 0;
 		const online_relevant_users = this.online_users.find_online_users_by_channel(user_input[1]);
 		while (i_ru < user_input[0].length)
 		{
-				//console.log(user_input[0][i_ru] + "is online");
 				if (!this.notify_users.includes(user_input[0][i_ru].name_)
 					&& online_relevant_users.find((value) => value.username == user_input[0][i_ru].name_))
-				{
-					//console.log(user_input[0][i_ru] + "is added");
 					this.notify_users.push(user_input[0][i_ru].name_);
-				}
 			i_ru++;
 		}
-		//console.log("result");
-		//console.log(this.notify_users);
 		return (user_input[1]);
+	}
+
+	async notify_friends( username: string )
+	{
+		const friend_user_array: user_stamp [] = await this.MessageService.get_friends_from_db(username);
+		const friend_array: friend_stamp [] = this.get_friends_statusses(friend_user_array);
+		friend_array.filter(friend => friend.status === "online").forEach(friend => this.add_users([[{name_: friend.stamp_.name_, admin_: false, timestamp: Date()}], ""]) );
 	}
 
 	async check_notification(sleep_ms: number, username: string): Promise<boolean> // might have to protect from unauthroized usage
 	{
-		if (this.notify_users && this.notify_users.includes(username))
+		if (this.online_users.find_online_user(username)?.invited_by && this.online_users.find_online_user(username)?.invited_by !== "")
+			return (true);
+		else if (this.notify_users && this.notify_users.includes(username))
 			return (true);
 		else
 			await sleep(sleep_ms);
 		return (false);
+	}
+
+	get_friends_statusses(friend_user_list: user_stamp []): friend_stamp []
+	{
+		const friend_stamp_list: friend_stamp [] = friend_user_list.map(friend => {
+			let status: string = "offline";
+			if (this.online_users.find_online_user(friend.name_))
+				status = "online";
+			return { stamp_: friend, status: status};
+		});
+		return (friend_stamp_list);
 	}
 
 	@Get()
@@ -132,20 +145,24 @@ export class MessageController {
 
 	@Post('apply_for_update')
 	@UseGuards(JwtAuthGuard)
-	async apply_for_update(@Body() user: SelectChat): Promise<{ notification: boolean }> {
-		this.online_users.add_online_user(user.username, user.chatname)
+	async apply_for_update(@Body() user: SelectChat): Promise<{ notification: boolean, invite: string }> {
+		const new_apply: boolean = this.online_users.add_online_user(user.username, user.chatname)
+		if (new_apply)
+		{
+			this.add_users([[{name_: user.username, admin_: false, timestamp: Date()}], ""]);
+			this.notify_friends(user.username);
+		}
 		for (let i = 0; i < 4; i++)
 		{
 			const update = await this.check_notification(250, user.username);
 			if (update)
 			{
-				//console.log(user.username + "update?" + update);
 				this.remove_user(user.username);
-				return {notification : true};
+				return {notification : true, invite : this.online_users.pop_invite(user.username) };
 			}
 		}
-		this.online_users.remove_disconnected_users(Date.now() - 10000);
-		return { notification: false };
+		this.online_users.remove_disconnected_users(Date.now() - 2500).forEach(disconnected_user => {this.notify_friends(disconnected_user.username)});
+		return { notification: false, invite : "" };
 	}
 
 	@Post('get_chats')
@@ -158,6 +175,27 @@ export class MessageController {
 	@UseGuards(JwtAuthGuard)
 	async get_users(@Body() username: SelectChat): Promise<{ array: user_stamp [], admin_: boolean, creator_: boolean }> {
 		return ( await this.MessageService.get_users_from_db(username.username, username.chatname) );	
+	}
+
+	@Post('get_friends')
+	@UseGuards(JwtAuthGuard)
+	async get_friends(@Body() username: SelectChat): Promise<{ array_: friend_stamp [] }> {
+		const friend_user_array: user_stamp [] = await this.MessageService.get_friends_from_db(username.username);
+		const friend_array: friend_stamp [] = this.get_friends_statusses(friend_user_array);
+		return {array_: friend_array};	
+	}
+
+	@Post('invite_friend')
+	@UseGuards(JwtAuthGuard)
+	async invite_friend(@Body() add_user : AddUser): Promise<{ invited: boolean }> {
+		try {
+			const invitable: boolean = await this.MessageService.add_friend_invite(add_user.creator, add_user.add_user);
+			if (invitable && this.online_users.add_invite(add_user.add_user, add_user.creator))
+				return {invited: true};
+		} catch (error) {
+			return {invited: false};
+		}
+		return {invited: false};
 	}
 
 	@Post('get_messages')
@@ -180,6 +218,20 @@ export class MessageController {
 	@UseGuards(JwtAuthGuard)
 	async add_user_to_chat(@Body() add_user : AddUser): Promise<{ message: string }> {
 		this.add_users([await this.MessageService.add_user(add_user.chatname, add_user.creator, add_user.add_user), add_user.chatname]);
+		return { message: add_user.chatname + "_" + add_user.creator + "_" + add_user.add_user};
+	}
+
+	@Post("add_friend")
+	@UseGuards(JwtAuthGuard)
+	async add_user_as_friend(@Body() add_user : AddUser): Promise<{ message: string }> {
+		this.add_users([await this.MessageService.add_friend(add_user.chatname, add_user.creator, add_user.add_user), add_user.chatname]);
+		return { message: add_user.chatname + "_" + add_user.creator + "_" + add_user.add_user};
+	}
+
+	@Post("remove_friend")
+	@UseGuards(JwtAuthGuard)
+	async remove_user_as_friend(@Body() add_user : AddUser): Promise<{ message: string }> {
+		this.add_users([await this.MessageService.remove_friend(add_user.chatname, add_user.creator, add_user.add_user), add_user.chatname]);
 		return { message: add_user.chatname + "_" + add_user.creator + "_" + add_user.add_user};
 	}
 

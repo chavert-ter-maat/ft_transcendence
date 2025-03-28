@@ -16,6 +16,8 @@ interface BlockUser {
 	forever:		boolean;
 }
 
+export interface user_stamp	{ name_: string, admin_: boolean, timestamp: string };
+
 @Table
 export class User extends Model<User> {
 	@PrimaryKey
@@ -104,11 +106,20 @@ export class User extends Model<User> {
 	@Column(DataType.STRING)
 	imageString: string;
 
+	@Column(DataType.JSON)
+	me_stamp: user_stamp;
+
 	@Column({
 		type:			DataType.ARRAY(DataType.JSON),
 		allowNull:		false,
 	})
 	public blocked_users!: BlockUser[];
+
+	@Column({
+		type:			DataType.ARRAY(DataType.JSON),
+		allowNull:		false,
+	})
+	public friends!: user_stamp[];
   
 	@BelongsToMany(() => Chat, { 
 		through: () => UserChat,
