@@ -13,7 +13,7 @@ import { Server, Socket } from 'socket.io';
 import { GameService } from './game.service';
 import { MovePaddleDto } from './dto/move-paddle.dto';
 import { JoinGameDto } from './dto/joinGame.dto';
-import { QueueService } from 'src/queue/queue.service';
+import { QueueService } from 'src/game/queue/queue.service';
 
 @WebSocketGateway({
   cors: {
@@ -23,7 +23,7 @@ import { QueueService } from 'src/queue/queue.service';
     allowedHeaders: ['Content-Type', 'Authorization'],
   },
   transports: ['websocket'],
-  pingInterval: 1000,
+  pingInterval: 3000,
   pingTimeout: 5000,
 })
 export class GameGateway
@@ -33,6 +33,7 @@ export class GameGateway
   @WebSocketServer()
   server: Server;
   public connectedSockets = new Map<string, Socket>();
+  private usernames = new Map<string, string>();
 
   constructor(
     @Inject(forwardRef(() => GameService))
@@ -50,17 +51,45 @@ export class GameGateway
   handleConnection(client: Socket) {
     this.logger.log(`Client connected: ${client.id}`);
     this.connectedSockets.set(client.id, client);
+
+    const username = client.handshake.auth.username;
+    this.logger.log(`Socket ${client.id} auth:`, client.handshake.auth);
+    if (username) {
+      this.logger.log(`Setting username for ${client.id}: ${username}`);
+      this.usernames.set(client.id, username);
+
+      for (const [gameId, game] of this.gameService.getGames()) {
+        if (game.player1.id === client.id) {
+          game.player1.username = username;
+        }
+        if (game.player2.id === client.id) {
+          game.player2.username = username;
+        }
+      }
+    } else {
+      this.logger.warn(`No username provided for socket ${client.id}`);
+    }
   }
 
   handleDisconnect(client: Socket) {
     this.logger.log(`Client disconnected: ${client.id}`);
     this.connectedSockets.delete(client.id);
+    this.usernames.delete(client.id);
     this.queueService.removePlayerFromQueue(client.id);
     this.gameService.handleDisconnect(client.id);
 
     client.rooms.forEach((room) => {
       client.leave(room);
     });
+  }
+
+  getUsernameById(socketId: string): string | undefined {
+    const username = this.usernames.get(socketId);
+    this.logger.log(
+      `Looking up username for ${socketId}: ${username || 'not found'}`,
+    );
+    this.logger.debug('Current usernames:', Object.fromEntries(this.usernames));
+    return username;
   }
 
   @SubscribeMessage('joinGame')

@@ -7,10 +7,10 @@ export class Match extends Model {
   gameId: string;
 
   @Column
-  player1Id: string;
+  player1Username: string;
 
   @Column
-  player2Id: string;
+  player2Username: string;
 
   @Column
   player1Score: number;
@@ -28,5 +28,5 @@ export class Match extends Model {
   endTime: Date;
 
   @Column
-  winnerId: string;
+  winnerUsername: string;
 }

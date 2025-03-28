@@ -12,12 +12,12 @@ all: up
 
 up:
 	@mkdir -p $(DB_DATA)
-	NODE_ENV=production ${DOCKER_COMPOSE} up --build
+	NODE_ENV=production ${DOCKER_COMPOSE} up
 
 dev:
 	@mkdir -p $(DB_DATA)
-	NODE_ENV=development HOSTNAME=$(shell hostname) ${DOCKER_COMPOSE} --profile dev up --build
-#NODE_ENV=development ${DOCKER_COMPOSE} --profile dev up --build
+	NODE_ENV=development HOSTNAME=$(shell hostname) ${DOCKER_COMPOSE} --profile dev up
+#NODE_ENV=development ${DOCKER_COMPOSE} --profile dev up
 
 test: down build up
 
@@ -45,8 +45,10 @@ clean:
 	@rm -rf $(DB_DATA) || true
 
 re: clean up
+	NODE_ENV=production ${DOCKER_COMPOSE} up --build
 
 redev: clean dev
+	NODE_ENV=development HOSTNAME=$(shell hostname) ${DOCKER_COMPOSE} --profile dev up --build
 
 prune: clean
 	@docker system prune -a --volumes -f

@@ -13,8 +13,11 @@ let socket: Socket | null = null;
 
 const SOCKET_URL = "/";
 
-export const connectSocket = () => {
-  if (!socket) {
+const MOVE_THROTTLE = 1000/60;
+const STATE_UPDATE_THROTTLE = 1000/60;
+
+export const connectSocket = (username?: string) => {
+  if (!socket && username) {
     socket = io(SOCKET_URL, {
       withCredentials: true,
       transports: ["websocket"],
@@ -25,6 +28,9 @@ export const connectSocket = () => {
       timeout: 10000,
       forceNew: false,
       path: "/socket.io",
+      auth: {
+        username: username
+      }
     });
 
     socket.on("connect", () => {
@@ -46,9 +52,9 @@ export const disconnectSocket = () => {
   }
 };
 
-export const getSocket = (): Socket => {
-  if (!socket) {
-    socket = connectSocket();
+export const getSocket = (username?: string): Socket | null => {
+  if (!socket && username) {
+    socket = connectSocket(username);
   }
   return socket;
 };
@@ -101,12 +107,11 @@ const lastMoveTimes: Record<PlayerKey, number> = {
   player2: 0,
   default: 0,
 };
-const MOVE_THROTTLE = 16;
 
 export const movePaddle = (
   gameId: string,
   direction: "up" | "down",
-  player?: number
+  player?: number,
 ) => {
   const now = performance.now();
   const playerKey: PlayerKey = player
@@ -128,7 +133,6 @@ export const movePaddle = (
 };
 
 let lastGameStateTime = 0;
-const STATE_UPDATE_THROTTLE = 16;
 
 export const onGameStateUpdate = (callback: (gameState: GameState) => void) => {
   socket?.on("gameState", (gameState: GameState) => {
@@ -143,12 +147,17 @@ export const onGameStateUpdate = (callback: (gameState: GameState) => void) => {
 export const offGameStateUpdate = () => {
   socket?.off("gameState");
 };
-
 export const requestRematch = (
   gameId: string,
+  username?: string,
   onError?: (message: string) => void
 ) => {
-  const socket = getSocket();
+  if (!username) {
+    onError?.("Username is required for rematch");
+    return;
+  }
+  
+  const socket = getSocket(username);
   if (socket) {
     socket.emit("requestRematch", { gameId });
 
@@ -157,6 +166,8 @@ export const requestRematch = (
         onError(data.message);
       }
     });
+  } else {
+    onError?.("Could not establish socket connection");
   }
 };
 

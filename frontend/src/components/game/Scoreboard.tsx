@@ -3,24 +3,24 @@ import React from "react";
 interface ScoreboardProps {
   player1Score: number;
   player2Score: number;
-  player1Id: string;
-  player2Id: string;
+  player1Name: string;
+  player2Name: string;
 }
 
 const Scoreboard: React.FC<ScoreboardProps> = ({
   player1Score,
   player2Score,
-  player1Id,
-  player2Id,
+  player1Name,
+  player2Name,
 }) => {
   return (
     <div className="scoreboard">
       <div className="score-item">
-        <span className="player-name">{player1Id}:</span>
+        <span className="player-name">{player1Name}:</span>
         <span className="score">{player1Score}</span>
       </div>
       <div className="score-item">
-        <span className="player-name">{player2Id}:</span>
+        <span className="player-name">{player2Name}:</span>
         <span className="score">{player2Score}</span>
       </div>
     </div>

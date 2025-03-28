@@ -1,6 +1,6 @@
 import './App.css';
 import React, {useRef} from 'react';
-import axios from '../axios';
+import axios from '../../axios';
 import { UserStats, ChatOverviewProps, chat_stamp } from './Chat.interface';
 import { HeaderWrap } from "./Header";
 import { goToFriends } from './FriendsView';

@@ -4,7 +4,7 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { GameModule } from './game/game.module';
-import { QueueModule } from './queue/queue.module';
+import { QueueModule } from './game/queue/queue.module';
 import { ConfigModule } from '@nestjs/config';
 import { User } from './auth/auth.model';
 import { Chat } from './messages/message.model';

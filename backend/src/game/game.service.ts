@@ -1,7 +1,8 @@
 import { Injectable, Logger, Inject, forwardRef } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Match } from './entities/match.entity';
-import { QueueService } from '../queue/queue.service';
+import { QueueService } from './queue/queue.service';
+import { GameGateway } from './game.gateway';
 import {
   GameState,
   Paddle,
@@ -11,17 +12,17 @@ import {
 import { v4 as uuid } from 'uuid';
 import { Server } from 'socket.io';
 
-const SERVER_TICKRATE = 1000 / 60;
+const SERVER_TICKRATE = 1000 / 30;
 
 const GAME_PARAMETERS = {
-  score_limit: 2,
+  score_limit: 3,
   ball: {
     initialX: 50,
     initialY: 50,
     radius: 2,
     initialVelocityX: 0.5,
     initialVelocityY: 0.5,
-    initialSpeed: 0.75,
+    initialSpeed: 1,
   },
   paddles: {
     size: 10,
@@ -33,9 +34,11 @@ const GAME_PARAMETERS = {
 export class GameService {
   constructor(
     @InjectModel(Match)
-    private matchModel: typeof Match,
+    readonly matchModel: typeof Match,
     @Inject(forwardRef(() => QueueService))
     readonly queueService: QueueService,
+    @Inject(forwardRef(() => GameGateway))
+    private readonly gameGateway: GameGateway,
   ) {
     setInterval(() => {
       this.logger.log(
@@ -43,7 +46,7 @@ export class GameService {
           `Player Mappings: ${this.playerGameMap.size} | ` +
           `Queue Length: ${this.queueService.queueLength}`,
       );
-    }, 10000);
+    }, 60000);
   }
 
   private server: Server | null = null;
@@ -58,24 +61,26 @@ export class GameService {
 
   private async saveMatchResult(gameState: GameState) {
     if (gameState.gameMode === 'remoteMultiplayer') {
-      const winner =
-        gameState.player1.score > gameState.player2.score
-          ? gameState.player1.id
-          : gameState.player2.id;
-
-      const gameId = this.playerGameMap.get(gameState.player1.id);
-      if (gameId) {
-        await this.matchModel.create({
-          gameId,
-          player1Id: gameState.player1.id,
-          player2Id: gameState.player2.id,
-          player1Score: gameState.player1.score,
-          player2Score: gameState.player2.score,
-          gameMode: gameState.gameMode,
-          startTime: gameState.gameStarted,
-          endTime: new Date(),
-          winnerId: winner,
-        });
+      try {
+        const gameId = this.playerGameMap.get(gameState.player1.id);
+        if (gameId) {
+          await this.matchModel.create({
+            gameId,
+            player1Username: gameState.player1.username,
+            player2Username: gameState.player2.username,
+            player1Score: gameState.player1.score,
+            player2Score: gameState.player2.score,
+            gameMode: gameState.gameMode,
+            startTime: gameState.gameStarted,
+            endTime: new Date(),
+            winnerUsername:
+              gameState.player1.score > gameState.player2.score
+                ? gameState.player1.username
+                : gameState.player2.username,
+          });
+        }
+      } catch (error) {
+        this.logger.error('Error saving match result:', error);
       }
     }
   }
@@ -103,18 +108,21 @@ export class GameService {
       speed: 1,
     };
 
+    const angle = (Math.random() * 90 - 45) * (Math.PI / 180);
+    const direction = Math.random() < 0.5 ? -1 : 1;
     const initialBall: Ball = {
       x: GAME_PARAMETERS.ball.initialX,
       y: GAME_PARAMETERS.ball.initialY,
       radius: GAME_PARAMETERS.ball.radius,
-      velocityX: GAME_PARAMETERS.ball.initialVelocityX,
-      velocityY: GAME_PARAMETERS.ball.initialVelocityY,
+      velocityX: direction * GAME_PARAMETERS.ball.initialSpeed,
+      velocityY: GAME_PARAMETERS.ball.initialSpeed * Math.sin(angle),
       speed: GAME_PARAMETERS.ball.initialSpeed,
     };
 
     return {
       player1: {
         id: '',
+        username: '',
         paddle: { ...initialPaddle, x: 2 },
         score: 0,
         inGame: true,
@@ -122,6 +130,7 @@ export class GameService {
       },
       player2: {
         id: '',
+        username: '',
         paddle: { ...initialPaddle, x: 96 },
         score: 0,
         inGame: true,
@@ -142,8 +151,13 @@ export class GameService {
   ): string {
     const gameId = uuid();
     const gameState = this.initializeGameState('singleplayer', enablePowerups);
+
     gameState.player1.id = playerId;
+    gameState.player1.username =
+      this.gameGateway.getUsernameById(playerId) || 'Unknown';
     gameState.player2.id = 'Bot';
+    gameState.player2.username = 'Bot';
+
     this.games.set(gameId, gameState);
     this.playerGameMap.set(gameState.player1.id, gameId);
     this.startGameLoop(gameId);
@@ -159,8 +173,12 @@ export class GameService {
       'localMultiplayer',
       enablePowerups,
     );
+
     gameState.player1.id = playerId;
+    gameState.player1.username =
+      this.gameGateway.getUsernameById(playerId) || 'Unknown';
     gameState.player2.id = 'Local Challenger';
+
     this.games.set(gameId, gameState);
     this.playerGameMap.set(playerId, gameId);
     this.playerGameMap.set(gameState.player2.id, gameId);
@@ -168,11 +186,43 @@ export class GameService {
     return gameId;
   }
 
+  createPrivateGame(player1Id: string, player2Id: string): string {
+    const gameId = uuid();
+    const gameState = this.initializeGameState('privateMatch', true);
+
+    const player1Username = this.gameGateway.getUsernameById(player1Id);
+    const player2Username = this.gameGateway.getUsernameById(player2Id);
+
+    gameState.player1.id = player1Id;
+    gameState.player1.username = player1Username || 'Unknown';
+
+    gameState.player2.id = player2Id;
+    gameState.player2.username = player2Username || 'Unknown';
+
+    this.games.set(gameId, gameState);
+    this.playerGameMap.set(player1Id, gameId);
+    this.playerGameMap.set(player2Id, gameId);
+    this.startGameLoop(gameId);
+    return gameId;
+  }
+
+  getGames(): Map<string, GameState> {
+    return this.games;
+  }
+
   createRemoteMultiplayerGame(player1Id: string, player2Id: string): string {
     const gameId = uuid();
     const gameState = this.initializeGameState('remoteMultiplayer', true);
+
+    const player1Username = this.gameGateway.getUsernameById(player1Id);
+    const player2Username = this.gameGateway.getUsernameById(player2Id);
+
     gameState.player1.id = player1Id;
+    gameState.player1.username = player1Username || 'Unknown';
+
     gameState.player2.id = player2Id;
+    gameState.player2.username = player2Username || 'Unknown';
+
     this.games.set(gameId, gameState);
 
     this.playerGameMap.set(player1Id, gameId);
@@ -294,7 +344,7 @@ export class GameService {
               this.playerGameMap.delete(game.player2.id);
             }
           }
-        }, 11000);
+        }, 15000);
       }
     }, SERVER_TICKRATE);
   }
@@ -428,7 +478,7 @@ export class GameService {
       const direction = ball.x < 50 ? 1 : -1;
       ball.velocityX = direction * ball.speed * Math.cos(angleRad);
       ball.velocityY = ball.speed * Math.sin(angleRad);
-      ball.speed += 0.05;
+      ball.speed += 0.1;
       ball.speed = Math.min(ball.speed, 2.0);
     }
   }
@@ -484,11 +534,22 @@ export class GameService {
 
     if (gameMode === 'singleplayer') {
       gameState.player1.id = existingGame.player1.id;
+      gameState.player1.username =
+        this.gameGateway.getUsernameById(existingGame.player1.id) || 'Unknown';
+      gameState.player2.id = 'Bot';
+      gameState.player2.username = 'Bot';
       this.playerGameMap.delete(existingGame.player1.id);
       this.playerGameMap.set(existingGame.player1.id, newGameId);
     } else {
       gameState.player1.id = existingGame.player1.id;
+      gameState.player1.username =
+        this.gameGateway.getUsernameById(existingGame.player1.id) || 'Unknown';
       gameState.player2.id = existingGame.player2.id;
+      gameState.player2.username =
+        gameMode === 'localMultiplayer'
+          ? 'Local Challenger'
+          : this.gameGateway.getUsernameById(existingGame.player2.id) ||
+            'Unknown';
       this.playerGameMap.delete(existingGame.player1.id);
       this.playerGameMap.delete(existingGame.player2.id);
       this.playerGameMap.set(existingGame.player1.id, newGameId);
@@ -504,16 +565,26 @@ export class GameService {
   private resetBall(ball: Ball, game: GameState) {
     ball.x = GAME_PARAMETERS.ball.initialX;
     ball.y = GAME_PARAMETERS.ball.initialY;
-    ball.velocityX =
-      GAME_PARAMETERS.ball.initialVelocityX * (ball.velocityX > 0 ? -1 : 1);
-    ball.velocityY =
-      GAME_PARAMETERS.ball.initialVelocityY * (ball.velocityY > 0 ? -1 : 1);
+
+    const direction = ball.velocityX > 0 ? -1 : 1;
+    ball.velocityX = direction * GAME_PARAMETERS.ball.initialSpeed;
+    const angle = (Math.random() * 90 - 45) * (Math.PI / 180);
+    ball.velocityY = GAME_PARAMETERS.ball.initialSpeed * Math.sin(angle);
     ball.speed = GAME_PARAMETERS.ball.initialSpeed;
 
     game.powerUps = [];
     game.lastPowerUpSpawn = undefined;
 
     return Date.now();
+  }
+
+  async getLeaderboard() {
+    const matches = await this.matchModel.findAll({
+      where: {
+        gameMode: 'remoteMultiplayer',
+      },
+    });
+    return matches;
   }
 
   private getPlayerIndex(playerId: string, gameId: string): number {

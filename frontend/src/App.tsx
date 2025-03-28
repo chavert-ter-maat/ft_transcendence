@@ -1,21 +1,24 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import Login from './components/Login';
-import UserPage from './components/UserPage';
-import AuthCallback from './components/AuthCallback';
-import ProtectedRoute from './components/ProtectedRoute';
-import Chat from './chat/Chat';
-import App_game from './App_game';
+import React from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+} from "react-router-dom";
+import Login from "./components/Login";
+import UserPage from "./components/UserPage";
+import AuthCallback from "./components/AuthCallback";
+import ProtectedRoute from "./components/ProtectedRoute";
+import Chat from "./components/chat/Chat";
+import GameContainer from "./components/game/GameContainer";
+import Leaderboard from "./components/leaderboard/Leaderboard";
 
-function App(): JSX.Element {
+const App: React.FC = () => {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Navigate to="/login" />} />
+        <Route index element={<Login />} />
         <Route path="/login" element={<Login />} />
         <Route path="/auth/42/callback" element={<AuthCallback />} />
-		{/* <Route path="/game" element={<App_game />} /> */}
-		{/* <Route path="/chat" element={<Chat />} /> */}
         <Route
           path="/userpage"
           element={
@@ -24,7 +27,7 @@ function App(): JSX.Element {
             </ProtectedRoute>
           }
         />
-		<Route
+        <Route
           path="/chat"
           element={
             <ProtectedRoute>
@@ -32,17 +35,25 @@ function App(): JSX.Element {
             </ProtectedRoute>
           }
         />
-		<Route
+        <Route
           path="/game"
           element={
             <ProtectedRoute>
-              <App_game />
+              <GameContainer />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/leaderboard"
+          element={
+            <ProtectedRoute>
+              <Leaderboard />
             </ProtectedRoute>
           }
         />
       </Routes>
     </Router>
   );
-}
+};
 
 export default App;

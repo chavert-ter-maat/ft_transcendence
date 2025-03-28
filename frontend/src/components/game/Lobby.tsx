@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { GameMode, LobbyProps } from "../types";
+import { GameMode, LobbyProps } from "../../types";
 import CustomGameCreation from "./CustomGameCreation";
 import { useNavigate } from "react-router-dom";
 import {
@@ -11,7 +11,7 @@ import {
   offMatchFound,
   onQueueStatus,
   offQueueStatus,
-} from "../socket";
+} from "../../socket";
 
 const Lobby: React.FC<LobbyProps> = ({
   onGameStart,
@@ -23,8 +23,8 @@ const Lobby: React.FC<LobbyProps> = ({
   const [showCustomSetup, setShowCustomSetup] = useState(false);
 
   useEffect(() => {
-    const handleCountdown = (data: { gameId: string; duration: number }) => {
-      setCountdown(data.duration);
+    const handleCountdown = (data: { gameId: string; waitTime: number }) => {
+      setCountdown(data.waitTime);
       const interval = setInterval(() => {
         setCountdown((prev) => {
           if (prev && prev > 1) {

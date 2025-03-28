@@ -1,5 +1,6 @@
 export interface Player {
   id: string;
+  username?: string;
   paddle: Paddle;
   score: number;
   inGame: boolean;

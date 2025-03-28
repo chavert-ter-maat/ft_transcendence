@@ -1,6 +1,6 @@
 import { Injectable, Inject, forwardRef } from '@nestjs/common';
-import { GameService } from '../game/game.service';
-import { GameGateway } from '../game/game.gateway';
+import { GameService } from '../game.service';
+import { GameGateway } from '../game.gateway';
 
 @Injectable()
 export class QueueService {
@@ -58,15 +58,15 @@ export class QueueService {
       if (socket1) socket1.join(tempLobby);
       if (socket2) socket2.join(tempLobby);
 
-      const duration = 5;
-
       this.gameGateway.server
         .to([player1, player2])
         .emit('queueStatus', { status: 'matched' });
 
+      const waitTime = 5;
+
       this.gameGateway.server
         .to([player1, player2])
-        .emit('countdown', { gameId: null, duration });
+        .emit('countdown', { gameId: null, waitTime });
 
       setTimeout(() => {
         if (!socket1?.connected || !socket2?.connected) {
@@ -81,6 +81,14 @@ export class QueueService {
           return;
         }
 
+        const player1Username = this.gameGateway.getUsernameById(player1);
+        const player2Username = this.gameGateway.getUsernameById(player2);
+
+        console.log('Creating game with players:', {
+          player1: { id: player1, username: player1Username },
+          player2: { id: player2, username: player2Username },
+        });
+
         const gameId = this.gameService.createRemoteMultiplayerGame(
           player1,
           player2,
@@ -91,7 +99,42 @@ export class QueueService {
         socket2?.join(gameId);
 
         this.gameGateway.server.to(gameId).emit('matchFound', { gameId });
-      }, duration * 1000);
+      }, waitTime * 1000);
     }
+  }
+
+  startPrivateGame(player1: string, player2: string) {
+    if (!player1 || !player2) {
+      return;
+    }
+
+    const socket1 = this.gameGateway.connectedSockets.get(player1);
+    const socket2 = this.gameGateway.connectedSockets.get(player2);
+
+    const tempLobby = `lobby-${player1}-${player2}`;
+    if (socket1) socket1.join(tempLobby);
+    if (socket2) socket2.join(tempLobby);
+
+    this.gameGateway.server
+      .to([player1, player2])
+      .emit('queueStatus', { status: 'matched' });
+
+    const waitTime = 5;
+
+    this.gameGateway.server
+      .to([player1, player2])
+      .emit('countdown', { gameId: null, waitTime });
+
+    setTimeout(() => {
+      if (!socket1?.connected || !socket2?.connected) {
+        return;
+      }
+
+      const gameId = this.gameService.createPrivateGame(player1, player2);
+      this.gameService.addPlayerToGame(gameId, player2);
+
+      socket1?.join(gameId);
+      socket2?.join(gameId);
+    }, waitTime * 1000);
   }
 }

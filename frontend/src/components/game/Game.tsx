@@ -1,19 +1,18 @@
-import React, {
-  useState,
-  useEffect,
-  useRef,
-  useCallback,
-  useMemo,
-} from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
   getSocket,
   movePaddle,
   onGameStateUpdate,
   offGameStateUpdate,
   requestRematch,
-} from "../socket";
+} from "../../socket";
 import Scoreboard from "./Scoreboard";
-import { GameState, CoordinateCache, GameProps } from "../types";
+import { GameState, CoordinateCache, GameProps } from "../../types";
+
+const INTERPOLATION_DELAY = 100;
+const FRAME_RATE = 60;
+const FRAME_TIME = 1000 / FRAME_RATE;
+const SERVER_TICKRATE = 1000 / 30; // Match backend tick rate (30 ticks per second)
 
 const Game: React.FC<GameProps> = ({
   userId,
@@ -29,6 +28,12 @@ const Game: React.FC<GameProps> = ({
   const [rematchError, setRematchError] = useState<string | null>(null);
   const [opponentDisconnected, setOpponentDisconnected] = useState(false);
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
+  const [previousGameState, setPreviousGameState] = useState<GameState | null>(
+    null
+  );
+
+  const lastFrameTimeRef = useRef<number>(performance.now());
+  const lastStateTimeRef = useRef<number>(performance.now());
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const contextRef = useRef<CanvasRenderingContext2D | null>(null);
@@ -42,20 +47,85 @@ const Game: React.FC<GameProps> = ({
     }
   }, [gameId]);
 
-  const handleKeyDown = useCallback((e: KeyboardEvent) => {
-    if (["ArrowUp", "ArrowDown", "w", "s"].includes(e.key)) {
-      e.preventDefault();
-    }
-    keyRef.current[e.key] = true;
-  }, []);
+  useEffect(() => {
+    const socket = getSocket();
+    if (!socket) return;
 
-  const handleKeyUp = useCallback((e: KeyboardEvent) => {
-    keyRef.current[e.key] = false;
-  }, []);
+    socket.on("gameState", (newGameState: GameState) => {
+      setPreviousGameState(gameState);
+      setGameState(newGameState);
+      lastStateTimeRef.current = performance.now();
+    });
+  }, [gameState]);
+
+  const interpolateState = useCallback(
+    (
+      prevState: GameState | null,
+      nextState: GameState | null,
+      factor: number
+    ): GameState | null => {
+      if (!prevState || !nextState) return nextState;
+
+      const ballPositionDelta = Math.abs(nextState.ball.x - prevState.ball.x);
+      const isBallReset = ballPositionDelta > 50;
+
+      return {
+        ...nextState,
+        ball: isBallReset
+          ? nextState.ball
+          : {
+              ...nextState.ball,
+              x:
+                prevState.ball.x +
+                (nextState.ball.x - prevState.ball.x) * factor,
+              y:
+                prevState.ball.y +
+                (nextState.ball.y - prevState.ball.y) * factor,
+            },
+        player1: {
+          ...nextState.player1,
+          paddle: {
+            ...nextState.player1.paddle,
+            y:
+              prevState.player1.paddle.y +
+              (nextState.player1.paddle.y - prevState.player1.paddle.y) *
+                factor,
+          },
+        },
+        player2: {
+          ...nextState.player2,
+          paddle: {
+            ...nextState.player2.paddle,
+            y:
+              prevState.player2.paddle.y +
+              (nextState.player2.paddle.y - prevState.player2.paddle.y) *
+                factor,
+          },
+        },
+      };
+    },
+    []
+  );
+
+  const predictState = useCallback(
+    (state: GameState, deltaTime: number): GameState => {
+      const predictedState = { ...state };
+      const ticksPassed = Math.floor(deltaTime / SERVER_TICKRATE);
+
+      predictedState.ball = {
+        ...state.ball,
+        x: state.ball.x + state.ball.velocityX * ticksPassed,
+        y: state.ball.y + state.ball.velocityY * ticksPassed,
+      };
+
+      return predictedState;
+    },
+    []
+  );
 
   const processPaddleMovement = useCallback(() => {
-    const currentTime = Date.now();
-    const moveInterval = 16;
+    const currentTime = performance.now();
+    const moveInterval = FRAME_TIME;
 
     if (currentTime - lastMoveTimeRef.current >= moveInterval) {
       if (gameMode === "localMultiplayer") {
@@ -111,34 +181,6 @@ const Game: React.FC<GameProps> = ({
     []
   );
 
-  const coordinates = useMemo(() => {
-    if (!canvasRef.current || !gameState) return null;
-    const canvas = canvasRef.current;
-
-    const powerUps = gameState.powerUps
-      ? gameState.powerUps.map((powerUp) => ({
-          x: powerUp.x * canvas.width * 0.01,
-          y: powerUp.y * canvas.height * 0.01,
-          width: powerUp.width * canvas.width * 0.01,
-          height: powerUp.width * canvas.width * 0.01,
-        }))
-      : [];
-
-    return {
-      player1: calculateCoordinates(gameState.player1.paddle, canvas),
-      player2: calculateCoordinates(gameState.player2.paddle, canvas),
-      ball: calculateCoordinates(
-        {
-          ...gameState.ball,
-          height: gameState.ball.radius * 2,
-          width: gameState.ball.radius * 2,
-        },
-        canvas
-      ),
-      powerUps,
-    };
-  }, [gameState, calculateCoordinates]);
-
   const drawPaddle = useCallback(
     (context: CanvasRenderingContext2D, coords: CoordinateCache) => {
       context.fillStyle = "#FFF";
@@ -165,45 +207,86 @@ const Game: React.FC<GameProps> = ({
     []
   );
 
-  const renderGame = useCallback(() => {
-    const canvas = canvasRef.current;
-    const context = contextRef.current;
-    if (!canvas || !context || !coordinates || !gameState) return;
+  const renderGame = useCallback(
+    (stateToRender: GameState) => {
+      const canvas = canvasRef.current;
+      const context = contextRef.current;
+      if (!canvas || !context) return;
 
-    context.fillStyle = "#000";
-    context.fillRect(0, 0, canvas.width, canvas.height);
+      context.fillStyle = "#000";
+      context.fillRect(0, 0, canvas.width, canvas.height);
 
-    if (coordinates.powerUps?.length > 0) {
-      coordinates.powerUps.forEach((powerUp) => {
-        drawPowerup(context, powerUp);
-      });
-    }
+      const currentCoords = {
+        player1: calculateCoordinates(stateToRender.player1.paddle, canvas),
+        player2: calculateCoordinates(stateToRender.player2.paddle, canvas),
+        ball: calculateCoordinates(
+          {
+            ...stateToRender.ball,
+            height: stateToRender.ball.radius * 2,
+            width: stateToRender.ball.radius * 2,
+          },
+          canvas
+        ),
+        powerUps: stateToRender.powerUps
+          ? stateToRender.powerUps.map((powerUp) => ({
+              x: powerUp.x * canvas.width * 0.01,
+              y: powerUp.y * canvas.height * 0.01,
+              width: powerUp.width * canvas.width * 0.01,
+              height: powerUp.width * canvas.width * 0.01,
+            }))
+          : [],
+      };
 
-    drawPaddle(context, coordinates.player1);
-    drawPaddle(context, coordinates.player2);
-    drawBall(context, coordinates.ball);
-  }, [coordinates, gameState, drawPaddle, drawBall, drawPowerup]);
-
-  const setupAnimationLoop = useCallback(() => {
-    if (animationFrameRef.current) {
-      cancelAnimationFrame(animationFrameRef.current);
-    }
-
-    const animate = () => {
-      processPaddleMovement();
-      renderGame();
-      animationFrameRef.current = requestAnimationFrame(animate);
-    };
-
-    animationFrameRef.current = requestAnimationFrame(animate);
-
-    return () => {
-      if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current);
-        animationFrameRef.current = undefined;
+      if (currentCoords.powerUps.length > 0) {
+        currentCoords.powerUps.forEach((powerUp) => {
+          drawPowerup(context, powerUp);
+        });
       }
-    };
-  }, [processPaddleMovement, renderGame]);
+
+      drawPaddle(context, currentCoords.player1);
+      drawPaddle(context, currentCoords.player2);
+      drawBall(context, currentCoords.ball);
+    },
+    [calculateCoordinates, drawPaddle, drawBall, drawPowerup]
+  );
+
+  const gameLoop = useCallback(() => {
+    const now = performance.now();
+    lastFrameTimeRef.current = now;
+
+    processPaddleMovement();
+
+    if (gameState) {
+      const timeSinceLastState = now - lastStateTimeRef.current;
+
+      if (timeSinceLastState <= INTERPOLATION_DELAY) {
+        const alpha = timeSinceLastState / INTERPOLATION_DELAY;
+        const interpolatedState = interpolateState(
+          previousGameState,
+          gameState,
+          alpha
+        );
+        if (interpolatedState) {
+          renderGame(interpolatedState);
+        }
+      } else {
+        const predictedState = predictState(
+          gameState,
+          timeSinceLastState - INTERPOLATION_DELAY
+        );
+        renderGame(predictedState);
+      }
+    }
+
+    animationFrameRef.current = requestAnimationFrame(gameLoop);
+  }, [
+    gameState,
+    previousGameState,
+    processPaddleMovement,
+    interpolateState,
+    predictState,
+    renderGame,
+  ]);
 
   useEffect(() => {
     const socket = getSocket();
@@ -213,7 +296,7 @@ const Game: React.FC<GameProps> = ({
       "gameOver",
       (data: { winner: string; rematchTimeout: number }) => {
         setWinner(data.winner);
-        setTimeLeft(Math.ceil((data.rematchTimeout - Date.now()) / 1000));
+        setTimeLeft(10);
       }
     );
 
@@ -243,6 +326,17 @@ const Game: React.FC<GameProps> = ({
     return () => clearInterval(timerId);
   }, [timeLeft]);
 
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    if (["ArrowUp", "ArrowDown", "w", "s"].includes(e.key)) {
+      e.preventDefault();
+    }
+    keyRef.current[e.key] = true;
+  }, []);
+
+  const handleKeyUp = useCallback((e: KeyboardEvent) => {
+    keyRef.current[e.key] = false;
+  }, []);
+
   const handleLeaveGame = useCallback(() => {
     const socket = getSocket();
     if (socket) {
@@ -255,7 +349,7 @@ const Game: React.FC<GameProps> = ({
   const handleRematchClick = () => {
     setRematchRequested(true);
     setRematchError(null);
-    requestRematch(gameId, (errorMessage) => {
+    requestRematch(gameId, userId, (errorMessage: string) => {
       setRematchRequested(false);
       setRematchError(errorMessage);
     });
@@ -313,12 +407,18 @@ const Game: React.FC<GameProps> = ({
   useEffect(() => {
     if (!gameState) return;
 
-    const cleanupAnimation = setupAnimationLoop();
+    lastFrameTimeRef.current = performance.now();
+    lastStateTimeRef.current = performance.now();
+
+    animationFrameRef.current = requestAnimationFrame(gameLoop);
 
     return () => {
-      cleanupAnimation();
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = undefined;
+      }
     };
-  }, [gameState, setupAnimationLoop]);
+  }, [gameState, gameLoop]);
 
   if (winner || opponentDisconnected) {
     return (
@@ -326,7 +426,12 @@ const Game: React.FC<GameProps> = ({
         {winner ? (
           <>
             <h2>Game Over!</h2>
-            <p>{winner === "player1" ? "Player 1" : "Player 2"} wins!</p>
+            <p>
+              {winner === "player1"
+                ? gameState?.player1.username
+                : gameState?.player2.username}{" "}
+              wins!
+            </p>
           </>
         ) : (
           <>
@@ -364,11 +469,20 @@ const Game: React.FC<GameProps> = ({
       <Scoreboard
         player1Score={gameState?.player1.score || 0}
         player2Score={gameState?.player2.score || 0}
-        player1Id={userId}
-        player2Id={
-          gameMode === "singleplayer" && !gameState?.player2.id
+        player1Name={
+          gameMode === "singleplayer" || gameMode === "localMultiplayer"
+            ? gameState?.player1.username || "Player 1"
+            : gameState?.player1.username || "Unknown"
+        }
+        player2Name={
+          gameMode === "localMultiplayer"
+            ? "Local Challenger"
+            : gameMode === "remoteMultiplayer" &&
+              gameState?.player2.id === getSocket()?.id
+            ? gameState?.player2.username || "Unknown"
+            : gameMode === "singleplayer" && !gameState?.player2.id
             ? "Bot"
-            : gameState?.player2.id || ""
+            : gameState?.player2.username || "Unknown"
         }
       />
       <canvas ref={canvasRef} width={800} height={600} />

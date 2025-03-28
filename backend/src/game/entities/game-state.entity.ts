@@ -9,6 +9,7 @@ export interface Ball {
 
 export interface Player {
   id: string;
+  username: string;
   paddle: Paddle;
   score: number;
   inGame: boolean;
@@ -54,4 +55,5 @@ export interface GameState {
 export type GameMode =
   | 'singleplayer'
   | 'localMultiplayer'
-  | 'remoteMultiplayer';
+  | 'remoteMultiplayer'
+  | 'privateMatch';

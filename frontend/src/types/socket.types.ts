@@ -6,7 +6,7 @@ export interface MatchFoundData {
 
 export interface CountdownData {
   gameId: string;
-  duration: number;
+  waitTime: number;
 }
 
 export interface QueueStatusData {

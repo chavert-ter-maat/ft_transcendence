@@ -1,5 +1,5 @@
 import React from 'react';
-import { User } from '../global.interface';
+import { User } from '../../global.interface';
 import { useNavigate } from 'react-router-dom'; 
 
 export interface message_stamp	{

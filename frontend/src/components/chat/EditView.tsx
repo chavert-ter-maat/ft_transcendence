@@ -1,7 +1,7 @@
 import './App.css';
 import React from 'react';
 import { EditViewProps } from './Chat.interface';
-import axios from '../axios';
+import axios from '../../axios';
 import { HeaderWrap } from "./Header";
 
 export const GoBackToUserView = (	logged_in_user: UserStats,

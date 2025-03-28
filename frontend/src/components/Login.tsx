@@ -5,8 +5,8 @@ const Login: React.FC = () => {
   const fortyTwoLoginUrl = `https://api.intra.42.fr/oauth/authorize?client_id=${import.meta.env.VITE_CLIENT_UID_42}&redirect_uri=http%3A%2F%2F${hostname}%3A3000%2Fapi%2Fauth%2F42%2Fcallback&response_type=code`
   const apiUrl = `http://${hostname}:${import.meta.env.VITE_BACKEND_PORT}`;
   
-  console.log('API URL:', apiUrl); // Debug log
-  
+  console.log('API URL:', apiUrl);
+
   // Redirect to the backend's OAuth login endpoint for 42 authentication
   const handleOAuthLogin = (): void => {
     console.log("Redirecting to OAuth login...");
