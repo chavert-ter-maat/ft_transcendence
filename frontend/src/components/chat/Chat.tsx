@@ -1,7 +1,7 @@
 import './App.css';
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from "react-router-dom";
-import axios from '../axios';
+import axios from '../../axios';
 import { message_stamp, chat_stamp, user_stamp, UserStats, friend_stamp } from './Chat.interface';
 import { ChatOverviewPage } from './OverView';
 import { MessagesView } from './MessageView';

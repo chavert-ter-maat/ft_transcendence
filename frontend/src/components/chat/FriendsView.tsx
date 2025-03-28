@@ -1,7 +1,7 @@
 import logo from './8589-screaming-cat.png';
 import './App.css';
 import React, {useRef} from 'react';
-import axios from '../axios';
+import axios from '../../axios';
 import { UserStats, friend_stamp, FriendsViewProps } from './Chat.interface';
 import { HeaderWrap } from "./Header";
 import { GoToChatOverview } from './MessageView';

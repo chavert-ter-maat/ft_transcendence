@@ -2,7 +2,7 @@ import a from './talking_cat_d.jpeg';
 import b from './talking_cat_ab.jpeg';
 import './App.css';
 import React, {useRef} from 'react';
-import axios from '../axios';
+import axios from '../../axios';
 import { UserStats, MessagesViewProps, message_stamp } from './Chat.interface';
 import { HeaderWrap } from "./Header";
 
