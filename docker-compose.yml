@@ -3,7 +3,7 @@ services:
   db:
     image: postgres
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
       interval: 1s
       timeout: 2s
       retries: 10
@@ -12,9 +12,7 @@ services:
       - .env
     container_name: db
     volumes:
-      - ${DB_LOCATION}
-    ports:
-      - "5432:5432"
+      - postgres_data:/var/lib/postgresql/data
     networks:
       - app-network
 
@@ -84,3 +82,7 @@ services:
 networks:
   app-network:
     driver: bridge
+  
+volumes:
+  postgres_data:
+    driver: local

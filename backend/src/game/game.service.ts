@@ -15,14 +15,14 @@ import { Server } from 'socket.io';
 const SERVER_TICKRATE = 1000 / 30;
 
 const GAME_PARAMETERS = {
-  score_limit: 2,
+  score_limit: 3,
   ball: {
     initialX: 50,
     initialY: 50,
     radius: 2,
     initialVelocityX: 0.5,
     initialVelocityY: 0.5,
-    initialSpeed: 0.75,
+    initialSpeed: 1,
   },
   paddles: {
     size: 10,
@@ -478,7 +478,7 @@ export class GameService {
       const direction = ball.x < 50 ? 1 : -1;
       ball.velocityX = direction * ball.speed * Math.cos(angleRad);
       ball.velocityY = ball.speed * Math.sin(angleRad);
-      ball.speed += 0.05;
+      ball.speed += 0.1;
       ball.speed = Math.min(ball.speed, 2.0);
     }
   }
