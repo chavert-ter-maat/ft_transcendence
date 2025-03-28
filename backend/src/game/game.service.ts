@@ -534,11 +534,22 @@ export class GameService {
 
     if (gameMode === 'singleplayer') {
       gameState.player1.id = existingGame.player1.id;
+      gameState.player1.username =
+        this.gameGateway.getUsernameById(existingGame.player1.id) || 'Unknown';
+      gameState.player2.id = 'Bot';
+      gameState.player2.username = 'Bot';
       this.playerGameMap.delete(existingGame.player1.id);
       this.playerGameMap.set(existingGame.player1.id, newGameId);
     } else {
       gameState.player1.id = existingGame.player1.id;
+      gameState.player1.username =
+        this.gameGateway.getUsernameById(existingGame.player1.id) || 'Unknown';
       gameState.player2.id = existingGame.player2.id;
+      gameState.player2.username =
+        gameMode === 'localMultiplayer'
+          ? 'Local Challenger'
+          : this.gameGateway.getUsernameById(existingGame.player2.id) ||
+            'Unknown';
       this.playerGameMap.delete(existingGame.player1.id);
       this.playerGameMap.delete(existingGame.player2.id);
       this.playerGameMap.set(existingGame.player1.id, newGameId);

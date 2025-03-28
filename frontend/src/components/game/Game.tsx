@@ -9,9 +9,8 @@ import {
 import Scoreboard from "./Scoreboard";
 import { GameState, CoordinateCache, GameProps } from "../../types";
 
-// Game timing constants
-const INTERPOLATION_DELAY = 100; // 100ms interpolation buffer
-const FRAME_RATE = 60; // Target client frame rate
+const INTERPOLATION_DELAY = 100;
+const FRAME_RATE = 60;
 const FRAME_TIME = 1000 / FRAME_RATE;
 
 const Game: React.FC<GameProps> = ({
@@ -32,7 +31,6 @@ const Game: React.FC<GameProps> = ({
     null
   );
 
-  // Timing references
   const lastFrameTimeRef = useRef<number>(performance.now());
   const lastStateTimeRef = useRef<number>(performance.now());
 
@@ -104,7 +102,6 @@ const Game: React.FC<GameProps> = ({
       const predictedState = { ...state };
       const deltaSeconds = deltaTime / 1000;
 
-      // Predict ball position based on velocity
       predictedState.ball = {
         ...state.ball,
         x: state.ball.x + state.ball.velocityX * deltaSeconds * 60, // Scale by 60 to match server time scale
@@ -118,7 +115,7 @@ const Game: React.FC<GameProps> = ({
 
   const processPaddleMovement = useCallback(() => {
     const currentTime = performance.now();
-    const moveInterval = FRAME_TIME; // Sync with frame rate
+    const moveInterval = FRAME_TIME;
 
     if (currentTime - lastMoveTimeRef.current >= moveInterval) {
       if (gameMode === "localMultiplayer") {
@@ -206,11 +203,9 @@ const Game: React.FC<GameProps> = ({
       const context = contextRef.current;
       if (!canvas || !context) return;
 
-      // Clear the canvas
       context.fillStyle = "#000";
       context.fillRect(0, 0, canvas.width, canvas.height);
 
-      // Calculate coordinates for the current state
       const currentCoords = {
         player1: calculateCoordinates(stateToRender.player1.paddle, canvas),
         player2: calculateCoordinates(stateToRender.player2.paddle, canvas),
@@ -232,7 +227,6 @@ const Game: React.FC<GameProps> = ({
           : [],
       };
 
-      // Draw game elements
       if (currentCoords.powerUps.length > 0) {
         currentCoords.powerUps.forEach((powerUp) => {
           drawPowerup(context, powerUp);
@@ -250,14 +244,12 @@ const Game: React.FC<GameProps> = ({
     const now = performance.now();
     lastFrameTimeRef.current = now;
 
-    // Process input with frame timing
     processPaddleMovement();
 
     if (gameState) {
       const timeSinceLastState = now - lastStateTimeRef.current;
 
       if (timeSinceLastState <= INTERPOLATION_DELAY) {
-        // Interpolate between previous and current state
         const alpha = timeSinceLastState / INTERPOLATION_DELAY;
         const interpolatedState = interpolateState(
           previousGameState,
@@ -268,7 +260,6 @@ const Game: React.FC<GameProps> = ({
           renderGame(interpolatedState);
         }
       } else {
-        // Predict state based on last known state
         const predictedState = predictState(
           gameState,
           timeSinceLastState - INTERPOLATION_DELAY
@@ -406,7 +397,6 @@ const Game: React.FC<GameProps> = ({
   useEffect(() => {
     if (!gameState) return;
 
-    // Start game loop
     lastFrameTimeRef.current = performance.now();
     lastStateTimeRef.current = performance.now();
 
@@ -426,7 +416,7 @@ const Game: React.FC<GameProps> = ({
         {winner ? (
           <>
             <h2>Game Over!</h2>
-            <p>{winner === "player1" ? "Player 1" : "Player 2"} wins!</p>
+            <p>{winner === "player1" ? gameState?.player1.username : gameState?.player2.username} wins!</p>
           </>
         ) : (
           <>
