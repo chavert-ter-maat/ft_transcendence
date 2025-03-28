@@ -12,6 +12,7 @@ import { GameState, CoordinateCache, GameProps } from "../../types";
 const INTERPOLATION_DELAY = 100;
 const FRAME_RATE = 60;
 const FRAME_TIME = 1000 / FRAME_RATE;
+const SERVER_TICKRATE = 1000 / 30; // Match backend tick rate (30 ticks per second)
 
 const Game: React.FC<GameProps> = ({
   userId,
@@ -109,12 +110,12 @@ const Game: React.FC<GameProps> = ({
   const predictState = useCallback(
     (state: GameState, deltaTime: number): GameState => {
       const predictedState = { ...state };
-      const deltaSeconds = deltaTime / 1000;
+      const ticksPassed = Math.floor(deltaTime / SERVER_TICKRATE);
 
       predictedState.ball = {
         ...state.ball,
-        x: state.ball.x + state.ball.velocityX * deltaSeconds * 60, // Scale by 60 to match server time scale
-        y: state.ball.y + state.ball.velocityY * deltaSeconds * 60,
+        x: state.ball.x + state.ball.velocityX * ticksPassed,
+        y: state.ball.y + state.ball.velocityY * ticksPassed,
       };
 
       return predictedState;
