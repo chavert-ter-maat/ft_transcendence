@@ -344,7 +344,7 @@ export class GameService {
               this.playerGameMap.delete(game.player2.id);
             }
           }
-        }, 11000);
+        }, 15000);
       }
     }, SERVER_TICKRATE);
   }

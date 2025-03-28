@@ -65,13 +65,22 @@ const Game: React.FC<GameProps> = ({
     ): GameState | null => {
       if (!prevState || !nextState) return nextState;
 
+      const ballPositionDelta = Math.abs(nextState.ball.x - prevState.ball.x);
+      const isBallReset = ballPositionDelta > 50;
+
       return {
         ...nextState,
-        ball: {
-          ...nextState.ball,
-          x: prevState.ball.x + (nextState.ball.x - prevState.ball.x) * factor,
-          y: prevState.ball.y + (nextState.ball.y - prevState.ball.y) * factor,
-        },
+        ball: isBallReset
+          ? nextState.ball
+          : {
+              ...nextState.ball,
+              x:
+                prevState.ball.x +
+                (nextState.ball.x - prevState.ball.x) * factor,
+              y:
+                prevState.ball.y +
+                (nextState.ball.y - prevState.ball.y) * factor,
+            },
         player1: {
           ...nextState.player1,
           paddle: {
@@ -286,7 +295,7 @@ const Game: React.FC<GameProps> = ({
       "gameOver",
       (data: { winner: string; rematchTimeout: number }) => {
         setWinner(data.winner);
-        setTimeLeft(Math.ceil((data.rematchTimeout - Date.now()) / 1000));
+        setTimeLeft(10);
       }
     );
 
@@ -416,7 +425,12 @@ const Game: React.FC<GameProps> = ({
         {winner ? (
           <>
             <h2>Game Over!</h2>
-            <p>{winner === "player1" ? gameState?.player1.username : gameState?.player2.username} wins!</p>
+            <p>
+              {winner === "player1"
+                ? gameState?.player1.username
+                : gameState?.player2.username}{" "}
+              wins!
+            </p>
           </>
         ) : (
           <>
