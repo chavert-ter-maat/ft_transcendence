@@ -1,29 +1,14 @@
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from 'react-router-dom';
+import PopUpModal from '../PopUpModal/PopUpModal'
 
 function VerifyTwoFA() {
-	const [errorMessage, setErrorMessage] = useState("");
-	const [successMessage, setSuccessMessage] = useState("");
+	const [modal, setModal] = useState({ show: false, content: "", isError: false })
+	// const [show, setShow] = useState(false)
+	// const [message, setMessage] = useState("")
+
 	const navigate = useNavigate();
-	// const [verifiedUser, setVerifiedUser] = useState(null);
-
-	// useEffect(() => {
-	// 	const fetchVerifiedUser = async () => {
-	// 		try {
-	// 			const url = new URL(document.URL)
-	// 			const secretKey = url.searchParams.get("secretKey")
-	// 			const response = await axios.get(`http://localhost:3000/api/auth/twofa/item`, {
-	// 				params: { secretKey: secretKey }
-	// 			});
-	// 			setVerifiedUser(response.data);
-	// 		} catch (error) {
-	// 			setErrorMessage(error.response?.data?.message || "Failed to fetch user");
-	// 		}
-	// 	};
-
-	// 	fetchVerifiedUser();
-	// }, []);
 
 	const handleVerification = async (e) => {
 		e.preventDefault();
@@ -40,13 +25,13 @@ function VerifyTwoFA() {
 			console.log(response)
 			const accessToken = response.data.accessToken;
 			localStorage.setItem("authToken", accessToken)
-			setSuccessMessage("Token validated successfully, redirecting to userpage");
+			const args = { show: true, content: "Successful validation", isError: false }
+			setModal(args);
 			setTimeout(() => navigate('/userpage'), 3000);
-			setErrorMessage("");
 		} catch (error) {
-			setSuccessMessage("");
 			console.log(error)
-			setErrorMessage(error.response?.data?.message || `token validation failed: ${error}`);
+			const args = { show: true, content: error.response?.data?.message || `Validation failed: ${error}`, isError: true }
+			setModal(args);
 		}
 	};
 
@@ -58,8 +43,9 @@ function VerifyTwoFA() {
 				<br />
 				<button type="submit">Verify</button>
 			</form>
-			{errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
-			{successMessage && <p style={{ color: "green" }}>{successMessage}</p>}
+			{/* {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>} */}
+			{modal.show && <PopUpModal modal={modal} setModal={setModal} />}
+			{/* {successMessage && <p style={{ color: "green" }}>{successMessage}</p>} */}
 		</div>
 	);
 }

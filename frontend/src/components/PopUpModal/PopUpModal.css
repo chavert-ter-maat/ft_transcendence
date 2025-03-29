@@ -1,0 +1,38 @@
+.pop-up-bg{
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.338);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pop-up-modal {
+    height: 200px;
+    width: 400px;
+    position: relative;
+    border-radius: 5px;
+    background: white;
+    color: black;
+}
+
+.pop-up-close{
+    position: absolute;
+    top: 3px;
+    right: 10px;
+    cursor: pointer;
+}
+
+.pop-up-title{
+    padding-top: 15px;
+    font-size: 17px;
+    font-weight: 700;
+}
+
+.pop-up-content {
+    padding: 25px 15px 25px 15px;
+    
+}
