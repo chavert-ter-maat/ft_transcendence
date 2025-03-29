@@ -19,6 +19,7 @@ import { AuthService } from './auth.service';
 import { v4 as uuidv4 } from 'uuid';
 
 
+
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) { }
@@ -99,7 +100,6 @@ export class AuthController {
       console.log('Callback received:', req.user);
       const user = req.user;
 
-      // Save the OAuth tokens and ensure the user is created in the database
       const savedUser = await this.authService.saveToDatabase(user);
       const { accessToken } = await this.authService.signIn(savedUser);
       console.log("accessToken", accessToken)

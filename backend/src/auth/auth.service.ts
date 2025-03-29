@@ -68,19 +68,16 @@ export class AuthService {
 	}
 
 	async saveToDatabase(user: any): Promise<User> {
-		console.log('Saving OAuth tokens:', user);
+		console.log('user to be saved:', user);
 
 		const {
 			email,
 			username,
-			displayName = null,
-			avatar = null,
 			oauthToken = null,
 			oauthRefreshToken = null,
 			oauthExpiresAt = null,
-			provider = '42' } = user;  // Change username to email
-
-		console.log(`User information from 42 -> username: ${username}, email: ${email}`);
+			provider = '42'
+		} = user;  // Change username to email
 
 		if (!email) {  // Change username to email
 			throw new Error('Email is required to save OAuth tokens.');
@@ -89,34 +86,24 @@ export class AuthService {
 		let existingUser = await User.findOne({ where: { email } });  // Check for email
 
 		if (!existingUser) {
+			console.log("user not found, creating a new one")
 			// Create the user if it doesn't exist
-			existingUser = await User.create({
-				email,
-				username,  // Save username as well
-				displayName,
-				avatar,
-				oauthToken,
-				oauthRefreshToken,
-				oauthExpiresAt,
-				provider,
-				blocked_users: [],
+			user = await User.create({
+				...user
 			});
+
+
+			return user
+
 		} else {
-			// Update the user if already exists
+			console.log("user exists")
 			existingUser.oauthToken = oauthToken;
 			existingUser.oauthRefreshToken = oauthRefreshToken;
-			if (displayName && !existingUser.displayName) {
-				existingUser.displayName = displayName;
-			}
-			if (avatar && !existingUser.avatar) {
-				existingUser.avatar = avatar;
-			}
 			await existingUser.save();
+			return existingUser;
 		}
 
-		return existingUser;  // Return the user with the userId
 	}
-	// }
 
 	async updateDisplayName(userId: number, displayName: string): Promise<Partial<User>> {
 		if (!displayName) {

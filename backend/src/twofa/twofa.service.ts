@@ -1,6 +1,7 @@
-import { Injectable, HttpStatus, HttpException} from '@nestjs/common';
+import { Injectable, HttpStatus, HttpException } from '@nestjs/common';
 import { User } from '../auth/auth.model';
 import { TwoFADto } from './dto/TwoFA.dto';
+const Cryptr = require('cryptr');
 
 const QRCode = require('qrcode');
 const speakeasy = require('speakeasy');
@@ -11,7 +12,15 @@ export class TwoFAService {
 		try {
 			console.log("create secret:", data)
 			const user = await User.findOne({ where: { email: data.email } });
-			await user.update({ twoFASecretKey: data.secretKey });
+
+			console.log("userid", `ft_transcendence_${user.userId}`)
+			console.log("secretkey", data.secretKey)
+
+			const cryptr = new Cryptr(`ft_transcendence_${user.userId}`);
+			const encryptedSecretKey = cryptr.encrypt(data.secretKey);
+
+			console.log("encrypted key:", encryptedSecretKey)
+			await user.update({ twoFASecretKey: encryptedSecretKey });
 			return user;
 		} catch (e) {
 			throw new HttpException(`secretKey could not be saved: ${e} `, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -53,9 +62,12 @@ export class TwoFAService {
 	async validateTwoFAFirstTime(data): Promise<any> {
 		const user = await User.findOne({ where: { sessionId: data.sessionId } });
 
+		const cryptr = new Cryptr(`ft_transcendence_${user.userId}`);
+		const decryptedSecretKey = cryptr.decrypt(user.twoFASecretKey);
+
 		if (user) {
 			const isValidToken = speakeasy.totp.verify({
-				secret: user.twoFASecretKey,
+				secret: decryptedSecretKey,
 				encoding: 'base32',
 				token: data.token,
 			});
@@ -71,7 +83,7 @@ export class TwoFAService {
 
 	async deleteTwoFAItem(user: TwoFADto): Promise<any> {
 		console.log("user to be deleted: ", user)
-		const updateCount = await User.update({ twoFASecretKey: null }, { where: { email: user.email, twoFASecretKey: user.secretKey } });
+		const updateCount = await User.update({ twoFASecretKey: null }, { where: { email: user.email } });
 		console.log(updateCount)
 		if (!updateCount) {
 			throw new HttpException("No user found to be deleted", HttpStatus.INTERNAL_SERVER_ERROR)

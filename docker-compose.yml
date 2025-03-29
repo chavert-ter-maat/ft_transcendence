@@ -12,7 +12,7 @@ services:
       - .env
     container_name: db
     volumes:
-      - ${DB_LOCATION}
+      - "${DB_LOCATION}:/var/lib/postgresql/data"
     ports:
       - "5432:5432"
     networks:

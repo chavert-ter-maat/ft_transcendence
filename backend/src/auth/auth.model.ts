@@ -106,12 +106,13 @@ export class User extends Model<User> {
 
 	@Column({
 		type: DataType.ARRAY(DataType.JSON),
-		allowNull: false,
+		defaultValue: [],
+		allowNull: true,
 	})
 	public blocked_users!: BlockUser[];
 
 	@Column({
-		type: DataType.STRING,
+		type: DataType.STRING(512),
 		allowNull: true,
 	})
 	twoFASecretKey: string;

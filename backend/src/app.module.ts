@@ -38,7 +38,6 @@ import { TwoFAModule } from './twofa/towfa.module'
       autoLoadModels: true,
       synchronize: true,
       logging: false,
-      sync: { force: true },
     }),
 
     GameModule,
