@@ -69,7 +69,7 @@ export class AuthController {
       // Return the avatar URL in the response
       return { avatar: updatedUser.avatar }; // Returning the avatar URL to be used on the front-end
     } catch (error) {
-      throw new HttpException(`Failed to upload avatar: ${error.message}`, ); 
+      throw new HttpException(`Failed to upload avatar: ${error.message}`, HttpStatus.BAD_REQUEST); 
     }
   }
 
