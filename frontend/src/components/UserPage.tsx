@@ -169,6 +169,7 @@ const UserPage: React.FC = () => {
         <button onClick={handleLogout}>Logout</button>
         <button onClick={() => navigate('/chat', { state: { user } })}>Go to Chats</button>
         <button onClick={() => navigate('/game', { state: { user, requestedUser: null } })}>Go to Game</button>
+        <button onClick={() => navigate('/2fa-dashboard', { state: { user } })}>2fa settings</button>
       </div>
     </div>
   );

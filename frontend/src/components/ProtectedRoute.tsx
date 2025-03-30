@@ -13,7 +13,6 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const token = localStorage.getItem('authToken');
   const urlParams = new URLSearchParams(window.location.search);
   const currentPath = window.location.pathname;
-  const sessionId = urlParams.get('sessionId');
 
   const redirectWithMessage = (message: string, path: string) => {
     setModal({ show: true, content: message, isError: true });

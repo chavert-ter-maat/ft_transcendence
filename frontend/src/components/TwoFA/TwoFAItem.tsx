@@ -35,7 +35,7 @@ function CurrentTwoFASetup({ currentTwoFAItem, setCurrentTwoFAItem }) {
 						<td>{currentTwoFAItem.twoFASecretKey.substr(0, 5) + "*****" + currentTwoFAItem.twoFASecretKey.substr(-5)}</td>
 						<td>{currentTwoFAItem.createdAt || "N/A"}</td>
 						<td>
-							<button className="delete-button" onClick={handleDeleteTwoFA}>❌</button>
+							<button className="delete-button" onClick={handleDeleteTwoFA}>X</button>
 						</td>
 					</tr>
 				</tbody>

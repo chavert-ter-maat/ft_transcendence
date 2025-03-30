@@ -1,14 +1,13 @@
-import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './components/Login';
 import UserPage from './components/UserPage';
 import AuthCallback from './components/AuthCallback';
 import ProtectedRoute from './components/ProtectedRoute';
-import SemiProtectedRoute from './components/SemiProtectedRoute';
 import Chat from './chat/Chat';
 import App_game from './App_game';
 import TwoFADashboard from './components/TwoFA/TwoFADashboard';
 import VerifyTwoFA from './components/TwoFA/TwoFAVerification';
+import NotFound from './components/NotFound/NotFound';
 
 function App(): JSX.Element {
   return (
@@ -59,6 +58,7 @@ function App(): JSX.Element {
             </ProtectedRoute>
           }
         />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>
   );
