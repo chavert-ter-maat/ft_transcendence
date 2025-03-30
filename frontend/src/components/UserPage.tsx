@@ -2,14 +2,14 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { User } from "../global.interface";
+import PopUpModal from '../components/PopUpModal/PopUpModal'
 
 const UserPage: React.FC = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string>('');
+  const [modal, setModal] = useState({ show: false, content: "", isError: false })
   const [newDisplayName, setNewDisplayName] = useState<string>('');
-  const [successMessage, setSuccessMessage] = useState<string>('');
   const [avatar, setAvatar] = useState<File | null>(null); // State to store avatar image
 
   // Fetch user data when the component mounts
@@ -18,7 +18,7 @@ const UserPage: React.FC = () => {
       try {
         const token = localStorage.getItem('authToken');
         if (!token) {
-          setError('No auth token found');
+          setModal({ show: true, content: "No auth token found", isError: true })
           return;
         }
 
@@ -29,8 +29,7 @@ const UserPage: React.FC = () => {
         });
         setUser(response.data);
       } catch (err) {
-        setError('Failed to fetch user data');
-        console.error(err);
+        setModal({ show: true, content: `Failed to fetch user data: ${err}`, isError: true })
       } finally {
         setLoading(false);
       }
@@ -47,14 +46,14 @@ const UserPage: React.FC = () => {
 
   const handleDisplayNameChange = async () => {
     if (!newDisplayName) {
-      setError('Display name cannot be empty');
+      setModal({ show: true, content: "Display name cannot be empty", isError: true })
       return;
     }
 
     try {
       const token = localStorage.getItem('authToken');
       if (!token) {
-        setError('No auth token found');
+        setModal({ show: true, content: "No authToken found", isError: true })
         return;
       }
 
@@ -68,28 +67,26 @@ const UserPage: React.FC = () => {
         }
       );
 
-      //   if (user) {
-      //     setUser({ ...user, displayName: newDisplayName });
-      //   }
-      setSuccessMessage('Display name updated successfully');
+      setModal({ show: true, content: "Display name updated successfully", isError: false })
       setNewDisplayName('');
       setLoading(true);
     } catch (err) {
-      setError(err.response.data.message);
+      setModal({ show: true, content: err.response.data.message || "Generic display name error", isError: true })
       console.error(err);
     }
   };
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files ? e.target.files[0] : null;
+    const allowedSize = 5 * 1024 * 1024
     if (file) {
       // Simple file validation (optional)
-      if (file.size > 500000) { // Example: 5MB max size
-        setError('File size exceeds 0.5MB');
+      if (file.size > allowedSize) { // Example: 5MB max size
+        setModal({ show: true, content: "File exceeds the maximum size of 5MB", isError: true })
         return;
       }
       if (!file.type.startsWith('image/')) {
-        setError('Please upload an image file');
+        setModal({ show: true, content: "File must be of type image", isError: true })
         return;
       }
       console.log('Selected file:', file);
@@ -99,7 +96,7 @@ const UserPage: React.FC = () => {
 
   const handleAvatarUpload = async () => {
     if (!avatar) {
-      setError('Please select an avatar image');
+      setModal({ show: true, content: "No avatar has been selected", isError: true })
       return;
     }
 
@@ -109,7 +106,7 @@ const UserPage: React.FC = () => {
     try {
       const token = localStorage.getItem('authToken');
       if (!token) {
-        setError('No auth token found');
+        setModal({ show: true, content: "No authToken found", isError: true })
         return;
       }
       console.log("BEFORE:" + avatar);
@@ -129,21 +126,17 @@ const UserPage: React.FC = () => {
         setUser({ ...user, avatar: response.data.avatar });
       }
 
-      setSuccessMessage('Avatar updated successfully');
+      setModal({ show: true, content: "Avatar updated successfully", isError: false })
       setAvatar(null); // Clear the avatar after upload
       setLoading(true);
     } catch (err) {
-      setError('Failed to upload avatar');
+      setModal({ show: true, content: `Failed to upload avatar due to: ${err}`, isError: true })
       console.error(err);
     }
   };
 
   if (loading) {
     return <div>Loading...</div>;
-  }
-
-  if (error) {
-    return <div>Error: {error}</div>;
   }
 
   const handlegototchats = () => {
@@ -158,7 +151,7 @@ const UserPage: React.FC = () => {
   return (
     <div style={{ padding: '20px' }}>
       <h1>Welcome to Your User Page</h1>
-      {user ? (
+      {user && (
         <div>
           <p><strong>User ID:</strong> {user.userId}</p>
           <p><strong>Username:</strong> {user.username}</p>
@@ -167,7 +160,6 @@ const UserPage: React.FC = () => {
           <p><strong>Display Name:</strong> {user.displayName}</p>
           <p><strong>Image Name:</strong> {user.imageName}</p>
 
-          {/* Display avatar if exists */}
           {user.imageName ? (
             <img
               src={"data:image/png;base64, " + user.imageString} // Assuming the backend serves the avatar image, don't like this
@@ -192,16 +184,14 @@ const UserPage: React.FC = () => {
             <input type="file" accept="image/png" onChange={handleAvatarChange} />
             <button onClick={handleAvatarUpload}>Upload Avatar</button>
           </div>
-
-          {successMessage && <p style={{ color: 'green' }}>{successMessage}</p>}
+          {modal.show && <PopUpModal modal={modal} setModal={setModal} />}
         </div>
-      ) : (
-        <p>No user data found</p>
       )}
 
       <button onClick={handleLogout}>Logout</button>
       <button onClick={handlegototchats}>Go to chats.</button>
       <button onClick={handlegototgame}>Go to game.</button>
+
     </div>
   );
 };

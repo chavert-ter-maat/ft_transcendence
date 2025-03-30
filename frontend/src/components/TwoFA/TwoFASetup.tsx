@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import axios from "axios";
+import PopUpModal from '../PopUpModal/PopUpModal'
 
 function TwoFASetup({ tokenContent, setCurrentTwoFAItem }) {
 	const [twoFAData, setTwoFASetupData] = useState(null);
-	const [errorMessage, setErrorMessage] = useState("");
 	const [loading, setLoading] = useState(true);
+	const [modal, setModal] = useState({ show: false, content: "", isError: false })
 
 	async function generateQRCode() {
 		setLoading(true)
@@ -12,9 +13,8 @@ function TwoFASetup({ tokenContent, setCurrentTwoFAItem }) {
 			const response = await axios.get(`http://localhost:3000/api/auth/twofa/generate`);
 			console.log("response:", response.data);
 			setTwoFASetupData(response.data);
-			setErrorMessage("");
 		} catch (e) {
-			setErrorMessage(e.response?.data?.message || "An error occurred");
+			setModal({ show: true, content: e.response?.data?.message || "An error occurred while generating the QR code. Try again.", isError: true });
 		} finally {
 			setLoading(false);
 		}
@@ -26,13 +26,13 @@ function TwoFASetup({ tokenContent, setCurrentTwoFAItem }) {
 				secretKey: twoFAData.secretKey,
 				email: tokenContent.email
 			})
-			setErrorMessage("");
-			console.log("repsonse", response)
+			setModal({ show: true, content: "2FA is successfully set up", isError: false });
+			console.log("response", response)
 			return response?.data;
 		}
 		catch (e) {
 			console.log(e);
-			setErrorMessage(e.response?.data?.message || "Failed to save secret key");
+			setModal({ show: true, content: e.response?.data?.message || "Failed to save secret key", isError: true });
 		};
 	}
 
@@ -47,15 +47,14 @@ function TwoFASetup({ tokenContent, setCurrentTwoFAItem }) {
 				secretKey: twoFAData?.secretKey,
 			})
 			console.log("twoFA verification response: ", response);
-			setErrorMessage("");
 			const savedItem = await saveSecretKeyToDatabase();
 			console.log("saved item", savedItem)
+			setModal({ show: true, content: "2FA is successfully validated", isError: false });
 			setCurrentTwoFAItem(savedItem)
-
 		}
 		catch (e) {
 			console.log("error occurred: ", e);
-			setErrorMessage(e.response?.data?.message || "Verification failed");
+			setModal({ show: true, content: e.response?.data?.message || "Verification failed", isError: true });
 		};
 	}
 
@@ -78,7 +77,7 @@ function TwoFASetup({ tokenContent, setCurrentTwoFAItem }) {
 						<br />
 						<button type="submit">Setup☑️</button>
 					</form>
-					{errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
+					{modal.show && <PopUpModal modal={modal} setModal={setModal} />}
 				</>
 			)}
 

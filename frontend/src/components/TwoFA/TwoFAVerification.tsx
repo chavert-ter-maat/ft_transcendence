@@ -5,8 +5,6 @@ import PopUpModal from '../PopUpModal/PopUpModal'
 
 function VerifyTwoFA() {
 	const [modal, setModal] = useState({ show: false, content: "", isError: false })
-	// const [show, setShow] = useState(false)
-	// const [message, setMessage] = useState("")
 
 	const navigate = useNavigate();
 
@@ -25,13 +23,11 @@ function VerifyTwoFA() {
 			console.log(response)
 			const accessToken = response.data.accessToken;
 			localStorage.setItem("authToken", accessToken)
-			const args = { show: true, content: "Successful validation", isError: false }
-			setModal(args);
+			setModal({ show: true, content: "Successful validation", isError: false });
 			setTimeout(() => navigate('/userpage'), 3000);
 		} catch (error) {
 			console.log(error)
-			const args = { show: true, content: error.response?.data?.message || `Validation failed: ${error}`, isError: true }
-			setModal(args);
+			setModal({ show: true, content: error.response?.data?.message || `Validation failed: ${error}`, isError: true });
 		}
 	};
 
@@ -43,9 +39,7 @@ function VerifyTwoFA() {
 				<br />
 				<button type="submit">Verify</button>
 			</form>
-			{/* {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>} */}
 			{modal.show && <PopUpModal modal={modal} setModal={setModal} />}
-			{/* {successMessage && <p style={{ color: "green" }}>{successMessage}</p>} */}
 		</div>
 	);
 }

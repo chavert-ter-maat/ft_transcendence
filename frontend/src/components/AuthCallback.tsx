@@ -8,7 +8,7 @@ const AuthCallback: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    
+
     const token = urlParams.get('token');
     const error = urlParams.get('error');
 
@@ -27,7 +27,7 @@ const AuthCallback: React.FC = () => {
       navigate('/userpage');
     } else {
       setError('No authentication token received');
-      console.log('No authentication token received blabla');
+      console.log('No authentication token received');
       setTimeout(() => navigate('/login'), 5173);
     }
   }, [navigate]);
@@ -39,7 +39,7 @@ const AuthCallback: React.FC = () => {
   return (
     <div style={{ padding: '20px' }}>
       <h2>Authenticating...</h2>
-      <p>Please wait while we complete your authentication.</p>
+      <p>Please wait while we complete the authentication.</p>
     </div>
   );
 };
