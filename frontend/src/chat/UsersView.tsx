@@ -6,20 +6,20 @@ import { UserStats, UsersViewProps, user_stamp } from './Chat.interface';
 import { HeaderWrap } from "./Header";
 
 interface UserStamp_int {
-	usery:			user_stamp;
-	logged_in_user:	UserStats;
-  }
-
-interface	UserStampList_int {
-	users:			user_stamp[];
-	logged_in_user:	UserStats;
+	usery: user_stamp;
+	logged_in_user: UserStats;
 }
 
-export const GoBackToChat = (	logged_in_user: UserStats,
-		setLoaded: React.Dispatch<React.SetStateAction<boolean>>,
-		setSwitch: React.Dispatch<React.SetStateAction<number>>,
-		setInput: React.Dispatch<React.SetStateAction<string>>,
-		setPassword: React.Dispatch<React.SetStateAction<string>> ) => {
+interface UserStampList_int {
+	users: user_stamp[];
+	logged_in_user: UserStats;
+}
+
+export const GoBackToChat = (logged_in_user: UserStats,
+	setLoaded: React.Dispatch<React.SetStateAction<boolean>>,
+	setSwitch: React.Dispatch<React.SetStateAction<number>>,
+	setInput: React.Dispatch<React.SetStateAction<string>>,
+	setPassword: React.Dispatch<React.SetStateAction<string>>) => {
 	//console.log("Going back to chat:" + logged_in_user.chatname);
 	setSwitch(1);
 	setLoaded(false);
@@ -32,8 +32,8 @@ export const GoBackToChat = (	logged_in_user: UserStats,
 export const UsersView: React.FC<UsersViewProps> = ({ logged_in_user, users_input, setLoaded, setSwitch, input1, password1 }) => {
 	if (!logged_in_user.user)
 		throw new Error("No user");
-	
-	function USERSTAMP_RENDER({usery, logged_in_user}: UserStamp_int ): React.ReactElement {
+
+	function USERSTAMP_RENDER({ usery, logged_in_user }: UserStamp_int): React.ReactElement {
 		// console.log(usery.name_);
 		if (usery.name_ !== logged_in_user.username)
 			return (
@@ -48,15 +48,15 @@ export const UsersView: React.FC<UsersViewProps> = ({ logged_in_user, users_inpu
 					<li className={"App-chat_name"}>{usery.name_}</li>
 					<button onClick={() => ButtonGoAddMuteOrBlock(usery.name_)} className={"App-chat_name_button"}> Go to userpage. </button>
 				</div>
-		)
+			)
 	}
 
-	function USERSTAMP_LIST( {users, logged_in_user} : UserStampList_int ) {
+	function USERSTAMP_LIST({ users, logged_in_user }: UserStampList_int) {
 		return (
 			<section>
 				<h2>{"All chats:"}</h2>
 				{users.map(user =>
-					<USERSTAMP_RENDER key={user.name_} usery={user} logged_in_user={logged_in_user}/>
+					<USERSTAMP_RENDER key={user.name_} usery={user} logged_in_user={logged_in_user} />
 				).reverse()}
 			</section>
 		);
@@ -74,7 +74,7 @@ export const UsersView: React.FC<UsersViewProps> = ({ logged_in_user, users_inpu
 	const makePublic = async (): Promise<boolean> => {
 		try {
 			await axios.post('/api/messages/make_public',
-				{chatname: logged_in_user.chatname,  creator: logged_in_user.username, password_chat: password1.state});
+				{ chatname: logged_in_user.chatname, creator: logged_in_user.username, password_chat: password1.state });
 			//console.log("Password setted:" + response.data.message);
 			return true;
 		} catch (err: any) {
@@ -92,7 +92,7 @@ export const UsersView: React.FC<UsersViewProps> = ({ logged_in_user, users_inpu
 	const addNewUser = async (): Promise<boolean> => {
 		try {
 			await axios.post('/api/messages/add_user',
-				{chatname: logged_in_user.chatname,  creator: logged_in_user.username, add_user: input1.state});
+				{ chatname: logged_in_user.chatname, creator: logged_in_user.username, add_user: input1.state });
 			//console.log("User added:" + response.data.message);
 			return true;
 		} catch (err: any) {
@@ -110,7 +110,7 @@ export const UsersView: React.FC<UsersViewProps> = ({ logged_in_user, users_inpu
 	const leaveChat = async (chatname_leaving: string): Promise<boolean> => {
 		try {
 			await axios.post('/api/messages/leave_chat',
-				{chatname: chatname_leaving,  username: logged_in_user.username, password: logged_in_user.password});
+				{ chatname: chatname_leaving, username: logged_in_user.username, password: logged_in_user.password });
 			//console.log("Chat left:" + response.data.message);
 			setLoaded(false);
 			logged_in_user.loaded = false;
@@ -128,16 +128,15 @@ export const UsersView: React.FC<UsersViewProps> = ({ logged_in_user, users_inpu
 		}
 	}
 
-	async function	setPublic(event: any) {
+	async function setPublic(event: any) {
 		//console.log("Publicize chat:" + logged_in_user.chatname);
 		makePublic();
 		event.preventDefault();
 	}
 
-	async function	addUser(event: any) {
+	async function addUser(event: any) {
 		//console.log("add user input is:" + input1.state + ", chatname:" + logged_in_user.chatname);
-		if (input1.state !== "")
-		{
+		if (input1.state !== "") {
 			addNewUser();
 			input1.setState("");
 		}
@@ -164,7 +163,7 @@ export const UsersView: React.FC<UsersViewProps> = ({ logged_in_user, users_inpu
 				<input type="text" placeholder="Enter username to add to chat" value={input1.state} onChange={(e) => input1.setState(e.target.value)} />
 				<input type="submit" value="Add user" />
 			</form>}
-			{(logged_in_user.page_creator && !logged_in_user.chatname.startsWith("DM"))&& <form onSubmit={setPublic}>
+			{(logged_in_user.page_creator && !logged_in_user.chatname.startsWith("DM")) && <form onSubmit={setPublic}>
 				<input type="password" placeholder="Enter password to chat" value={password1.state} onChange={(e) => password1.setState(e.target.value)} />
 				<input type="submit" value="Set public, with password." />
 			</form>}
@@ -173,7 +172,7 @@ export const UsersView: React.FC<UsersViewProps> = ({ logged_in_user, users_inpu
 
 	return (
 		<div className="App">
-			<HeaderWrap user={logged_in_user.user} insert={JSX_content}/>
+			<HeaderWrap user={logged_in_user.user} insert={JSX_content} />
 			{/* <header className="App-header">
 			<img src={logo} className="App-logo" alt="logo" /> */}
 			{/* <h2>Editing: {logged_in_user.chatname}</h2>
@@ -189,7 +188,7 @@ export const UsersView: React.FC<UsersViewProps> = ({ logged_in_user, users_inpu
 			</form>} */}
 			{/* </header> */}
 			<ol>
-				<USERSTAMP_LIST users={users_input} logged_in_user={logged_in_user}/>
+				<USERSTAMP_LIST users={users_input} logged_in_user={logged_in_user} />
 			</ol>
 		</div>
 	);

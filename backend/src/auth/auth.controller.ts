@@ -35,7 +35,7 @@ export class AuthController {
   async getUserInfo(@Req() req) {
     const userId = req.user.userId;
     if (typeof userId !== 'number') {
-      throw new Error('User ID is invalid');
+      throw new HttpException('User ID is invalid', HttpStatus.BAD_REQUEST);
     }
     return this.authService.getUserInfo(userId);
   }
@@ -45,7 +45,7 @@ export class AuthController {
   async getUserInfoSomeoneElse(@Body() body: { requestedUser: string }) {
     const { requestedUser } = body;
     if (typeof requestedUser !== 'string') { //unnecesary?
-      throw new Error('requestedUser is invalid');
+      throw new HttpException('requestedUser is invalid', HttpStatus.BAD_REQUEST);
     }
     return this.authService.getUserInfoSomeoneElse(requestedUser);
   }
@@ -69,7 +69,7 @@ export class AuthController {
       // Return the avatar URL in the response
       return { avatar: updatedUser.avatar }; // Returning the avatar URL to be used on the front-end
     } catch (error) {
-      throw new Error(`Failed to upload avatar: ${error.message}`);
+      throw new HttpException(`Failed to upload avatar: ${error.message}`, ); 
     }
   }
 

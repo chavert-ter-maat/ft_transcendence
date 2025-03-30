@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, HttpException, HttpStatus } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User } from 'src/auth/auth.model';
 import * as bcrypt from 'bcrypt';
@@ -80,7 +80,7 @@ export class AuthService {
 		} = user;  // Change username to email
 
 		if (!email) {  // Change username to email
-			throw new Error('Email is required to save OAuth tokens.');
+			throw new HttpException('Email is required to save OAuth tokens.', HttpStatus.BAD_REQUEST);
 		}
 
 		let existingUser = await User.findOne({ where: { email } });  // Check for email
@@ -107,7 +107,7 @@ export class AuthService {
 
 	async updateDisplayName(userId: number, displayName: string): Promise<Partial<User>> {
 		if (!displayName) {
-			throw new Error('Display name is required');
+			throw new HttpException('Display name is required', HttpStatus.BAD_REQUEST);
 		}
 		const user = await User.findOne({ where: { userId } });
 		const userWithSameUsername = await User.findOne({ where: { displayName } });
@@ -127,14 +127,15 @@ export class AuthService {
 	async updateAvatar(userId: number, file: Express.Multer.File): Promise<Partial<User>> {
 		if (!file || !file.buffer) {
 			console.log("No file");
-			throw new Error('No file uploaded or file data is missing. Please upload a valid image file.');
+			throw new HttpException('No file uploaded or file data is missing.Please upload a valid image file.', HttpStatus.BAD_REQUEST);
+
 		}
 
 		const allowedExtensions = ['.png'];
 		const fileExtension = path.extname(file.originalname).toLowerCase();
 
 		if (!allowedExtensions.includes(fileExtension)) {
-			throw new Error('Invalid file type. Only images are allowed.');
+			throw new HttpException('Invalid file type. Only images are allowed.', HttpStatus.BAD_REQUEST);
 		}
 		const user = await User.findOne({ where: { userId } });
 		if (!user) {
