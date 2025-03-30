@@ -83,7 +83,7 @@ export class AuthController {
     const { displayName } = body;
 
     if (!displayName || displayName.trim().length === 0) {
-      throw new Error('Display name is required');
+      throw new HttpException("Display name can't be empty", HttpStatus.BAD_REQUEST);
     }
     else if (displayName.trim().length > 128) {
       throw new HttpException("display name can't be longer than 128 characters", HttpStatus.BAD_REQUEST);
