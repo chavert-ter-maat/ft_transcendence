@@ -54,9 +54,9 @@ function App(): JSX.Element {
         <Route
           path="/auth/verify-2fa"
           element={
-            // <SemiProtectedRoute>
-            <VerifyTwoFA />
-            // {/* </SemiProtectedRoute> */}
+            <ProtectedRoute>
+              <VerifyTwoFA />
+            </ProtectedRoute>
           }
         />
       </Routes>

@@ -1,12 +1,21 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from 'react-router-dom';
-import PopUpModal from '../PopUpModal/PopUpModal'
+import PopUpModal from '../PopUpModal/PopUpModal';
+import './TwoFAVerificaiton.css';
 
 function VerifyTwoFA() {
-	const [modal, setModal] = useState({ show: false, content: "", isError: false })
-
+	const [modal, setModal] = useState({ show: false, content: "", isError: false });
+	const urlParams = new URLSearchParams(window.location.search);
+	const sessionId = urlParams.get('sessionId');
 	const navigate = useNavigate();
+
+	useEffect(() => {
+		if (!sessionId) {
+			setModal({ show: true, content: "You don't have 2FA setup, redirecting to the 2FA dashboard", isError: true });
+			setTimeout(() => navigate('/2fa-dashboard'), 3000);
+		}
+	}, [sessionId, navigate]);
 
 	const handleVerification = async (e) => {
 		e.preventDefault();
@@ -14,30 +23,24 @@ function VerifyTwoFA() {
 		const formFields = Object.fromEntries(formData);
 
 		try {
-			const url = new URL(document.URL)
-			const sessionId = url.searchParams.get("sessionId")
 			const response = await axios.post(`http://localhost:3000/api/auth/twofa/validate`, {
 				...formFields,
 				sessionId
 			});
-			console.log(response)
-			const accessToken = response.data.accessToken;
-			localStorage.setItem("authToken", accessToken)
+			localStorage.setItem("authToken", response.data.accessToken);
 			setModal({ show: true, content: "Successful validation", isError: false });
 			setTimeout(() => navigate('/userpage'), 3000);
 		} catch (error) {
-			console.log(error)
 			setModal({ show: true, content: error.response?.data?.message || `Validation failed: ${error}`, isError: true });
 		}
 	};
 
 	return (
-		<div>
-			<h2>Verify Your Token</h2>
-			<form onSubmit={handleVerification}>
-				<input id="2fa-verification" name="token" placeholder="Enter token" type="text" required />
-				<br />
-				<button type="submit">Verify</button>
+		<div className="verify-container">
+			<h2 className="verify-title">Verify Your Token</h2>
+			<form onSubmit={handleVerification} className="verify-form">
+				<input id="2fa-verification" name="token" placeholder="Enter token" type="text" required className="verify-input" />
+				<button type="submit" className="verify-button">Verify</button>
 			</form>
 			{modal.show && <PopUpModal modal={modal} setModal={setModal} />}
 		</div>

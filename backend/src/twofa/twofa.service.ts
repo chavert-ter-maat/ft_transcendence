@@ -62,10 +62,9 @@ export class TwoFAService {
 	async validateTwoFAFirstTime(data): Promise<any> {
 		const user = await User.findOne({ where: { sessionId: data.sessionId } });
 
-		const cryptr = new Cryptr(`ft_transcendence_${user.userId}`);
-		const decryptedSecretKey = cryptr.decrypt(user.twoFASecretKey);
-
 		if (user) {
+			const cryptr = new Cryptr(`ft_transcendence_${user.userId}`);
+			const decryptedSecretKey = cryptr.decrypt(user.twoFASecretKey);
 			const isValidToken = speakeasy.totp.verify({
 				secret: decryptedSecretKey,
 				encoding: 'base32',

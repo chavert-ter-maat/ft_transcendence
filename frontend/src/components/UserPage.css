@@ -1,0 +1,80 @@
+/* UserPage.css */
+
+.user-container {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	height: 100vh;
+	background-color: #f4f4f4;
+	padding: 20px;
+  }
+  
+  .user-title {
+	font-size: 2rem;
+	color: #333;
+	margin-bottom: 20px;
+  }
+  
+  .user-info {
+	background: white;
+	padding: 20px;
+	border-radius: 10px;
+	box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+	width: 400px;
+	text-align: center;
+  }
+  
+  .avatar-section {
+	margin-bottom: 15px;
+  }
+  
+  .avatar {
+	width: 100px;
+	height: 100px;
+	border-radius: 50%;
+  }
+  
+  .info-details p {
+	margin: 5px 0;
+	color: #555;
+  }
+  
+  .input-section {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	margin-top: 15px;
+  }
+  
+  .input-section input {
+	padding: 10px;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+  }
+  
+  .input-section button {
+	background-color: #0070f3;
+	color: white;
+	padding: 10px;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
+  }
+  
+  .button-group {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	margin-top: 20px;
+  }
+  
+  button:hover {
+	opacity: 0.8;
+  }
+  
+  .loading {
+	text-align: center;
+	font-size: 1.5rem;
+  }
+  
