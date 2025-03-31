@@ -59,4 +59,11 @@ export class GameController {
 
     return leaderboardData.sort((a, b) => b.wins - a.wins);
   }
+
+  @Get('leaderboard/:username')
+  async getMatchHistory(
+    @Param('username') username: string,
+  ): Promise<LeaderboardEntryDto[]> {
+    const matches = await this.gameService.getMatchHistory(username);
+  }
 }

@@ -587,6 +587,16 @@ export class GameService {
     return matches;
   }
 
+  async getMatchHistory(username: string) {
+    const matches = await this.matchModel.findAll({
+      where: {
+        [Op.or]: [{ player1Username: username }, { player2Username: username }],
+      },
+    });
+
+    return matches;
+  }
+
   private getPlayerIndex(playerId: string, gameId: string): number {
     const game = this.games.get(gameId);
     if (!game) return -1;
