@@ -1,6 +1,7 @@
 import { Controller, Get } from '@nestjs/common';
 import { GameService } from './game.service';
-import { LeaderboardEntryDto } from './dto/leaderboard-entry.dto';
+import { LeaderboardEntryDto } from './dto/leaderboard.dto';
+import { MatchHistoryEntryDto } from './dto/matchHistory.dto';
 
 @Controller('game')
 export class GameController {
@@ -60,10 +61,10 @@ export class GameController {
     return leaderboardData.sort((a, b) => b.wins - a.wins);
   }
 
-  @Get('leaderboard/:username')
+  @Get('matchHistory/:username')
   async getMatchHistory(
     @Param('username') username: string,
-  ): Promise<LeaderboardEntryDto[]> {
+  ): Promise<MatchHistoryEntryDto[]> {
     const matches = await this.gameService.getMatchHistory(username);
   }
 }

@@ -13,7 +13,7 @@ const MatchHistory: React.FC = () => {
         setLoading(true);
 
         const response = await axios.get<MatchHistoryEntry[]>(
-          "/api/game/matchhistory"
+          "/api/game/matchHistory/username",
         );
 
         if (!Array.isArray(response.data)) {
