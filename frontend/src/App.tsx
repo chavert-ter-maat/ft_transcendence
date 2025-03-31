@@ -11,6 +11,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Chat from "./components/chat/Chat";
 import GameContainer from "./components/game/GameContainer";
 import Leaderboard from "./components/leaderboard/Leaderboard";
+import MatchHistory from "./components/match_history/matchHistory";
 
 const App: React.FC = () => {
   return (
@@ -48,6 +49,14 @@ const App: React.FC = () => {
           element={
             <ProtectedRoute>
               <Leaderboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/matchHistory/:username"
+          element={
+            <ProtectedRoute>
+              <MatchHistory />
             </ProtectedRoute>
           }
         />

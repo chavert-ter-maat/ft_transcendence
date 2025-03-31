@@ -3,5 +3,6 @@ export class MatchHistoryEntryDto {
   player2Username: string;
   player1Score: number;
   player2Score: number;
+  winnerUsername: string;
   matchDate: Date;
 }

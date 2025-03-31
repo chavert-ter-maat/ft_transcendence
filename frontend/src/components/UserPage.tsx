@@ -167,6 +167,12 @@ const UserPage: React.FC = () => {
     }
   };
 
+  const handleGoToMatchHistory = () => {
+    if (user) {
+      navigate(`/matchHistory/${user.username}`, { state: { user: user } });
+    }
+  };
+
   return (
     <div style={{ padding: "20px" }}>
       <SocketStatus isConnected={isConnected} socketId={socketId} />
@@ -231,9 +237,10 @@ const UserPage: React.FC = () => {
       )}
 
       <button onClick={handleLogout}>Logout</button>
-      <button onClick={handlegototchats}>Go to chats.</button>
-      <button onClick={handlegototgame}>Go to game.</button>
-      <button onClick={handleGoToLeaderboard}>Go to leaderboard.</button>
+      <button onClick={handlegototchats}>Chat</button>
+      <button onClick={handlegototgame}>Game</button>
+      <button onClick={handleGoToLeaderboard}>Leaderboard.</button>
+      <button onClick={handleGoToMatchHistory}>Match History</button>
     </div>
   );
 };

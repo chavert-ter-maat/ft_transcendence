@@ -2,18 +2,29 @@ import React, { useEffect, useState } from "react";
 import axios from "../../axios";
 import { MatchHistoryEntry } from "../../types/matchHistory.types";
 
-const MatchHistory: React.FC = () => {
+interface MatchHistoryProps {
+  username: string;
+}
+
+const MatchHistory: React.FC<MatchHistoryProps> = ({ username }) => {
   const [match_history, setMatchhistory] = useState<MatchHistoryEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!username) {
+      setError("Username not provided.");
+      setLoading(false);
+      return;
+    }
+
     const fetchMatchhistory = async () => {
       try {
         setLoading(true);
+        setError(null);
 
         const response = await axios.get<MatchHistoryEntry[]>(
-          "/api/game/matchHistory/username",
+          `/api/game/matchHistory/${username}`,
         );
 
         if (!Array.isArray(response.data)) {
@@ -30,9 +41,9 @@ const MatchHistory: React.FC = () => {
     };
 
     fetchMatchhistory();
-  }, []);
+  }, [username]);
 
-  if (loading) return <div>Loading leaderboard...</div>;
+  if (loading) return <div>Loading match history...</div>;
   if (error) return <div className="error">{error}</div>;
 
   return (
@@ -41,23 +52,25 @@ const MatchHistory: React.FC = () => {
       <table>
         <thead>
           <tr>
+            <th>Match Date:</th>
             <th>Player 1:</th>
             <th>Score:</th>
             <th>Player 2:</th>
             <th>Score:</th>
             <th>Winner:</th>
-            <th>Match Date:</th>
           </tr>
         </thead>
         <tbody>
           {match_history.map((entry, index) => (
-            <tr key={entry.username}>
+            <tr key={index}>
               <td>{entry.player1Username}</td>
               <td>{entry.player1Score}</td>
               <td>{entry.player2Username}</td>
               <td>{entry.player2Score}</td>
               <td>{entry.winnerUsername}</td>
-              <td>{entry.matchDate}</td>
+              <td>
+                {new Date(entry.matchDate).toLocaleDateString()} {new Date(entry.matchDate).toLocaleTimeString()}
+              </td>
             </tr>
           ))}
         </tbody>

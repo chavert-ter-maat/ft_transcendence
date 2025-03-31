@@ -1,5 +1,6 @@
 import { Injectable, Logger, Inject, forwardRef } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
+import { Op } from 'sequelize';
 import { Match } from './entities/match.entity';
 import { QueueService } from './queue/queue.service';
 import { GameGateway } from './game.gateway';
