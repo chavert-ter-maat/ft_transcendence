@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "../../axios";
-import { LeaderboardEntry } from "../../types/leaderboard.types";
+import { MatchHistoryEntry } from "../../types/matchHistory.types";
 
 const MatchHistory: React.FC = () => {
   const [match_history, setMatchhistory] = useState<MatchHistoryEntry[]>([]);
@@ -11,15 +11,15 @@ const MatchHistory: React.FC = () => {
     const fetchMatchhistory = async () => {
       try {
         setLoading(true);
-        
+
         const response = await axios.get<MatchHistoryEntry[]>(
           "/api/game/matchhistory"
         );
-        
+
         if (!Array.isArray(response.data)) {
           throw new Error("Invalid match history data received");
         }
-        
+
         setMatchhistory(response.data);
       } catch (err) {
         setError("Failed to load match history data");
@@ -28,7 +28,7 @@ const MatchHistory: React.FC = () => {
         setLoading(false);
       }
     };
-    
+
     fetchMatchhistory();
   }, []);
 
@@ -46,12 +46,18 @@ const MatchHistory: React.FC = () => {
             <th>Player 2:</th>
             <th>Score:</th>
             <th>Winner:</th>
+            <th>Match Date:</th>
           </tr>
         </thead>
         <tbody>
           {match_history.map((entry, index) => (
             <tr key={entry.username}>
-
+              <td>{entry.player1Username}</td>
+              <td>{entry.player1Score}</td>
+              <td>{entry.player2Username}</td>
+              <td>{entry.player2Score}</td>
+              <td>{entry.winnerUsername}</td>
+              <td>{entry.matchDate}</td>
             </tr>
           ))}
         </tbody>
