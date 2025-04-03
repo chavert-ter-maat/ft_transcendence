@@ -13,20 +13,12 @@ import { AuthModule } from './auth/auth.module';
 import { MessageModule } from './messages/message.module';
 import { TwoFAModule } from './twofa/towfa.module'
 
-//unnecesary?
-// import * as dotenv from 'dotenv';
-
-// dotenv.config();
-//
-
-// console.log("client ID start fuck this pc: ",  process.env.CLIENT_ID);
-
-
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+
     SequelizeModule.forRoot({
       dialect: 'postgres',
       host: process.env.POSTGRES_HOST,
@@ -38,6 +30,7 @@ import { TwoFAModule } from './twofa/towfa.module'
       autoLoadModels: true,
       synchronize: true,
       logging: false,
+      sync: {},
     }),
 
     GameModule,
