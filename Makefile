@@ -4,7 +4,7 @@ include .env
 
 DB_DATA = ${DB_LOCATION}
 
-DOCKER_COMPOSE = docker-compose -f ./docker-compose.yml
+DOCKER_COMPOSE = docker compose -f ./docker-compose.yml
 
 DOCKER = docker
 

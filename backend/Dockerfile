@@ -11,5 +11,5 @@ WORKDIR /app/backend
 COPY package*.json .
 RUN npm install
 COPY . .
-ENV NODE_ENV=development
-CMD ["npm", "run", "start:dev"]
+# ENV NODE_ENV=development
+CMD ["npm", "run", "start:dev", "--debug"]

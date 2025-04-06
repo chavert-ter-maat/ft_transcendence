@@ -3,7 +3,7 @@ services:
   db:
     image: postgres
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER}" ]
       interval: 1s
       timeout: 2s
       retries: 10
@@ -12,9 +12,11 @@ services:
       - .env
     container_name: db
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-    networks:
-      - app-network
+      - "${DB_LOCATION}:/var/lib/postgresql/data"
+    ports:
+      - "5432:5432"
+    # networks:
+    #   - app-network
 
   frontend:
     container_name: frontend
@@ -28,8 +30,8 @@ services:
       - backend
     volumes:
       - ./frontend/src:/app/frontend/src
-    networks:
-      - app-network
+    # networks:
+    #   - app-network
     env_file:
       - .env
     environment:
@@ -57,8 +59,8 @@ services:
       - VITE_HOST_NAME=${HOSTNAME}
     volumes:
       - ./backend/src:/app/backend/src
-    networks:
-      - app-network
+    # networks:
+    #   - app-network
     develop:
       watch:
         - action: sync
@@ -75,14 +77,10 @@ services:
       - .env
     ports:
       - "5050:80"
-    profiles: ["dev"]
-    networks:
-      - app-network
+    profiles: [ "dev" ]
+    # networks:
+    #   - app-network
 
-networks:
-  app-network:
-    driver: bridge
-  
-volumes:
-  postgres_data:
-    driver: local
+    # networks:
+    #   app-network:
+    #     driver: bridge
