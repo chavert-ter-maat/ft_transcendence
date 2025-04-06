@@ -1,7 +1,4 @@
-/* UserPage.css */
-
 .user-page {
-	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 	min-height: 100vh;
 	background: linear-gradient(to bottom right, #f0f4f8, #d9e2ec);
 	display: flex;
