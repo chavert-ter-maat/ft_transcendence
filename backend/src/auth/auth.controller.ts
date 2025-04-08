@@ -138,8 +138,7 @@ export class AuthController {
       // Generate the access token using the saved user's userId
       const { accessToken } = await this.authService.signIn(savedUser);
 
-      const redirectUrl = `${process.env.FRONTEND_URL}/auth/42/callback?token=${accessToken}`;
-      return res.redirect(redirectUrl);
+      const redirectUrl = `http://${hostname}:${process.env.FRONTEND_PORT}/auth/42/callback?token=${accessToken}`; return res.redirect(redirectUrl);
     } catch (error) {
       console.error('Callback error:', error);
       return res.redirect(`http://${hostname}:${process.env.FRONTEND_PORT}/login?auth_error=${error}`);
@@ -163,7 +162,7 @@ export class AuthController {
       return res.redirect(redirectUrl);
     } catch (error) {
       console.error('Callback error:', error);
-      return res.redirect(`http://${hostname}:${process.env.FRONTEND_PORT}/login?error=authentication_failed`);
+      return res.redirect(`http://${hostname}:${process.env.FRONTEND_PORT}/login?auth_error=${error}`);
     }
   }
 }

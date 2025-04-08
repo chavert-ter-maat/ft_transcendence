@@ -1,4 +1,4 @@
-import './popUpModal.css'
+import './PopUpModal.css'
 
 function PopUpModal({ modal, setModal }) {
   return (
