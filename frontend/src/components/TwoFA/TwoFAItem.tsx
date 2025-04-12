@@ -8,7 +8,7 @@ function CurrentTwoFASetup({ currentTwoFAItem, setCurrentTwoFAItem }) {
 		const isConfirmed = confirm("Are you sure you want to delete 2FA?");
 		if (isConfirmed) {
 			try {
-				const response = await axios.delete("http://localhost:3000/api/auth/twofa/item", {
+				const response = await axios.delete(`/api/auth/twofa/item`, {
 					data: { email: currentTwoFAItem.email, secretKey: currentTwoFAItem.twoFASecretKey },
 				});
 				console.log(response);

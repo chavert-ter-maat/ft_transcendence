@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
 import { useNavigate } from 'react-router-dom';
 import PopUpModal from '../PopUpModal/PopUpModal';
 import './TwoFAVerificaiton.css';
+import axios from '../../axios';
 
 function VerifyTwoFA() {
 	const [modal, setModal] = useState({ show: false, content: "", isError: false });
@@ -23,7 +23,7 @@ function VerifyTwoFA() {
 		const formFields = Object.fromEntries(formData);
 
 		try {
-			const response = await axios.post(`http://localhost:3000/api/auth/twofa/validate`, {
+			const response = await axios.post(`/api/auth/twofa/validate`, {
 				...formFields,
 				sessionId
 			});

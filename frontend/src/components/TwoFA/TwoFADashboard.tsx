@@ -1,9 +1,9 @@
-import axios from 'axios';
 import { useEffect, useState } from 'react';
 import TwoFASetup from './TwoFASetup';
 import CurrentTwoFASetup from './TwoFAItem';
 import { jwtDecode } from "jwt-decode";
 import PopUpModal from '../PopUpModal/PopUpModal';
+import axios from '../../axios';
 import './TwoFADashboard.css'; // Import the external CSS file
 
 function TwoFADashboard() {
@@ -19,7 +19,7 @@ function TwoFADashboard() {
 				const token = localStorage.getItem("authToken");
 				const decoded = jwtDecode(token);
 				setTokenContent(decoded);
-				const response = await axios.get("http://localhost:3000/api/auth/twofa/item", {
+				const response = await axios.get(`/api/auth/twofa/item`, {
 					params: { email: decoded.email }
 				});
 

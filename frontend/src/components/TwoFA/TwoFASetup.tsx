@@ -1,7 +1,7 @@
 import { useState } from "react";
-import axios from "axios";
 import PopUpModal from '../PopUpModal/PopUpModal';
 import './TwoFASetup.css'; // Import external CSS
+import axios from '../../axios';
 
 function TwoFASetup({ tokenContent, setCurrentTwoFAItem }) {
 	const [twoFAData, setTwoFASetupData] = useState(null);
@@ -11,7 +11,7 @@ function TwoFASetup({ tokenContent, setCurrentTwoFAItem }) {
 	async function generateQRCode() {
 		setLoading(true);
 		try {
-			const response = await axios.get(`http://localhost:3000/api/auth/twofa/generate`);
+			const response = await axios.get(`/api/auth/twofa/generate`);
 			setTwoFASetupData(response.data);
 		} catch (e) {
 			setModal({ show: true, content: e.response?.data?.message || "An error occurred while generating the QR code. Try again.", isError: true });
@@ -22,7 +22,7 @@ function TwoFASetup({ tokenContent, setCurrentTwoFAItem }) {
 
 	async function saveSecretKeyToDatabase() {
 		try {
-			const response = await axios.post(`http://localhost:3000/api/auth/twofa/save`, {
+			const response = await axios.post(`/api/auth/twofa/save`, {
 				secretKey: twoFAData.secretKey,
 				email: tokenContent.email
 			})
@@ -38,7 +38,7 @@ function TwoFASetup({ tokenContent, setCurrentTwoFAItem }) {
 		const formData = new FormData(e.currentTarget);
 		const formFields = Object.fromEntries(formData);
 		try {
-			const response = await axios.post("http://localhost:3000/api/auth/twofa/setup/validate", {
+			const response = await axios.post("/api/auth/twofa/setup/validate", {
 				...formFields,
 				secretKey: twoFAData?.secretKey,
 			})
