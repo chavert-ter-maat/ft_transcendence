@@ -54,7 +54,6 @@ export class AuthController {
   @Get('42')
   @UseGuards(FortyTwoAuthGuard)
   async fortyTwoAuth() {
-    console.log('aksjdfkajshdflkashfd')
     return;
   }
 
