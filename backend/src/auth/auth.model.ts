@@ -1,22 +1,22 @@
 import {
-  Column,
-  Model,
-  Table,
-  PrimaryKey,
-  AutoIncrement,
-  DataType,
-  BelongsToMany,
+	Column,
+	Model,
+	Table,
+	PrimaryKey,
+	AutoIncrement,
+	DataType,
+	BelongsToMany,
 } from 'sequelize-typescript';
 import { Chat } from '../messages/message.model';
 import { UserChat } from '../messages/userchat.model';
 
 interface BlockUser {
-	username:		string;
-	timestamp:		number;
-	forever:		boolean;
+	username: string;
+	timestamp: number;
+	forever: boolean;
 }
 
-export interface user_stamp	{ name_: string, admin_: boolean, timestamp: string };
+export interface user_stamp { name_: string, admin_: boolean, timestamp: string };
 
 @Table
 export class User extends Model<User> {
@@ -94,7 +94,7 @@ export class User extends Model<User> {
 	})
 	updatedAt: Date;
 
-  	@Column(DataType.STRING)
+	@Column(DataType.STRING)
 	imageType: string;
 
 	@Column(DataType.STRING)
@@ -110,18 +110,38 @@ export class User extends Model<User> {
 	me_stamp: user_stamp;
 
 	@Column({
-		type:			DataType.ARRAY(DataType.JSON),
-		allowNull:		false,
+		type: DataType.ARRAY(DataType.JSON),
+		defaultValue: [],
+		allowNull: true,
 	})
 	public blocked_users!: BlockUser[];
 
 	@Column({
-		type:			DataType.ARRAY(DataType.JSON),
-		allowNull:		false,
+		type: DataType.ARRAY(DataType.JSON),
+		allowNull: false,
+		defaultValue: [],
 	})
 	public friends!: user_stamp[];
-  
-	@BelongsToMany(() => Chat, { 
+
+	@Column({
+		type: DataType.STRING(512),
+		allowNull: true,
+	})
+	twoFASecretKey: string;
+
+	@Column({
+		type: DataType.STRING,
+		allowNull: true,
+	})
+	sessionId: string;
+
+	@Column({
+		type: DataType.STRING,
+		allowNull: true,
+	})
+	accessToken: string;
+
+	@BelongsToMany(() => Chat, {
 		through: () => UserChat,
 		foreignKey: 'userId',
 		otherKey: 'chatId',

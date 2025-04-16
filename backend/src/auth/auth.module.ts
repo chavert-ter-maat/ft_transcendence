@@ -15,11 +15,11 @@ import { FortyTwoStrategy } from './strategies/42.strategy';
     JwtModule.register({
       global: true,
       secret: process.env.JWT_SECRET,
-      signOptions: { expiresIn: '20d' },
+      signOptions: { expiresIn: '1d' },
     }),
     PassportModule,
-    ],
-    providers: [AuthService, FortyTwoStrategy],
-    controllers: [AuthController],
-  })
-export class AuthModule {}
+  ],
+  providers: [AuthService, FortyTwoStrategy],
+  controllers: [AuthController],
+})
+export class AuthModule { }

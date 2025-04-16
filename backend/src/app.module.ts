@@ -11,21 +11,14 @@ import { Chat } from './messages/message.model';
 import { UserChat } from './messages/userchat.model';
 import { AuthModule } from './auth/auth.module';
 import { MessageModule } from './messages/message.module';
-
-//unnecesary?
-// import * as dotenv from 'dotenv';
-
-// dotenv.config();
-//
-
-// console.log("client ID start fuck this pc: ",  process.env.CLIENT_ID);
-
+import { TwoFAModule } from './twofa/towfa.module'
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+
     SequelizeModule.forRoot({
       dialect: 'postgres',
       host: process.env.POSTGRES_HOST,
@@ -37,15 +30,16 @@ import { MessageModule } from './messages/message.module';
       autoLoadModels: true,
       synchronize: true,
       logging: false,
-      sync: { force: true },
+      sync: {},
     }),
 
     GameModule,
     QueueModule,
-	AuthModule,
-	MessageModule,
+    AuthModule,
+    MessageModule,
+    TwoFAModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }

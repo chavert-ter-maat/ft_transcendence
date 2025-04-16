@@ -1,0 +1,51 @@
+/* Login.css */
+
+.login-container {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	height: 100vh;
+	background-color: #f4f4f4;
+  }
+  
+  .login-title {
+	font-size: 2rem;
+	color: #333;
+	margin-bottom: 20px;
+  }
+  
+  .button-container {
+	display: flex;
+	flex-direction: column;
+	gap: 15px;
+  }
+  
+  .login-button {
+	width: 250px;
+	padding: 12px 20px;
+	font-size: 1rem;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
+	transition: 0.3s;
+  }
+  
+  .oauth {
+	background-color: #0070f3;
+	color: white;
+  }
+  
+  .oauth:hover {
+	background-color: #005bb5;
+  }
+  
+  .test-account {
+	background-color: #28a745;
+	color: white;
+  }
+  
+  .test-account:hover {
+	background-color: #218838;
+  }
+  

@@ -14,14 +14,20 @@ async function bootstrap() {
   const frontendPort = configService.get('FRONTEND_PORT');
 
   if (!backendPort || !frontendPort) {
-    logger.error('PORT and FRONT_PORT must be defined in .env');
+    logger.error('BACKEND_PORT and FRONTEND_PORT must be defined in .env');
     process.exit(1);
   }
 
   app.setGlobalPrefix('api'); //necesary?
 
   app.enableCors({
-    origin: true,
+    origin: [
+      `http://localhost:${frontendPort}`,
+      `http://localhost:${backendPort}`,
+      `http://127.0.0.1:${backendPort}`,
+      `http://127.0.0.1:${frontendPort}`,
+      `http://0.0.0.0:${frontendPort}`,
+    ],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
     credentials: true,
     allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],

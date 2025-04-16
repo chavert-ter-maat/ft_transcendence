@@ -6,13 +6,13 @@ import { UserStats, UsersViewProps, user_stamp } from './Chat.interface';
 import { HeaderWrap } from "./Header";
 
 interface UserStamp_int {
-	usery:			user_stamp;
-	logged_in_user:	UserStats;
-  }
+	usery: user_stamp;
+	logged_in_user: UserStats;
+}
 
-interface	UserStampList_int {
-	users:			user_stamp[];
-	logged_in_user:	UserStats;
+interface UserStampList_int {
+	users: user_stamp[];
+	logged_in_user: UserStats;
 }
 
 export const GoBackToChat = (	logged_in_user: UserStats,
@@ -44,15 +44,15 @@ export const UsersView: React.FC<UsersViewProps> = ({ logged_in_user, users_inpu
 					<li className={"App-chat_name"}>{usery.name_}</li>
 					<button onClick={() => ButtonGoAddMuteOrBlock(usery.name_)} className={"App-chat_name_button"}> Go my own page. </button>
 				</div>
-		)
+			)
 	}
 
-	function USERSTAMP_LIST( {users, logged_in_user} : UserStampList_int ) {
+	function USERSTAMP_LIST({ users, logged_in_user }: UserStampList_int) {
 		return (
 			<section>
 				<h2>{"All chats:"}</h2>
 				{users.map(user =>
-					<USERSTAMP_RENDER key={user.name_} usery={user} logged_in_user={logged_in_user}/>
+					<USERSTAMP_RENDER key={user.name_} usery={user} logged_in_user={logged_in_user} />
 				).reverse()}
 			</section>
 		);
@@ -162,7 +162,7 @@ export const UsersView: React.FC<UsersViewProps> = ({ logged_in_user, users_inpu
 		<div className="App">
 			<HeaderWrap user={logged_in_user.user} insert={JSX_content} modal={modal} invite={invite} invited_by={logged_in_user.invited_by}/>
 			<ol>
-				<USERSTAMP_LIST users={users_input} logged_in_user={logged_in_user}/>
+				<USERSTAMP_LIST users={users_input} logged_in_user={logged_in_user} />
 			</ol>
 		</div>
 	);
