@@ -24,5 +24,10 @@ export default tseslint.config(
         { allowConstantExport: true },
       ],
     },
+    root: true,
+    env: {
+      node: true,
+      jest: true,
+    },
   },
 )

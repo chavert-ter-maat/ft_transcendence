@@ -1,47 +1,43 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import PopUpModal from "./PopUpModal/PopUpModal";
 
 const urlParams = new URLSearchParams(window.location.search);
 
 const AuthCallback: React.FC = () => {
   const navigate = useNavigate();
-  const [error, setError] = useState<string | null>(null);
+  const [modal, setModal] = useState({ show: false, content: "", isError: false });
 
   useEffect(() => {
-    const token = urlParams.get("token");
-    const error = urlParams.get("error");
+
+    const token = urlParams.get('token');
+    const error = urlParams.get('error');
 
     if (error) {
-      setError("Authentication failed. Please try again.");
+      setModal({ show: true, content: "Authentication failed. Please try again.", isError: true });
       console.log("Authentication failed. Please try again.");
-      setTimeout(() => navigate("/login"), 5173);
+      setTimeout(() => navigate("/login"), 3000);
       return;
     }
 
+
     console.log("rerender: " + token);
     if (token) {
+      setModal({ show: true, content: "Authentication successful. Redirecting to user page...", isError: false });
       localStorage.setItem("authToken", token);
       console.log("Authentication successful. Redirecting to user page...");
-      console.log(
-        "localStorage.getItem(authToken):",
-        localStorage.getItem("authToken")
-      );
-      navigate("/userpage");
+      setTimeout(() => navigate("/userpage"), 3000);
     } else {
-      setError("No authentication token received");
-      console.log("No authentication token received blabla");
-      setTimeout(() => navigate("/login"), 5173);
+      setModal({ show: true, content: "No authentication token received", isError: true });
+      console.log('No authentication token received');
+      setTimeout(() => navigate('/login'), 3000);
     }
   }, [navigate]);
 
-  if (error) {
-    return <div style={{ padding: "20px", color: "red" }}>{error}</div>;
-  }
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h2>Authenticating...</h2>
-      <p>Please wait while we complete your authentication.</p>
+    <div>
+      {modal.show && <PopUpModal modal={modal} setModal={setModal} />}
     </div>
   );
 };

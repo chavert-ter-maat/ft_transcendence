@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 
@@ -8,20 +8,20 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: process.env.JWT_SECRET || 'your-secret-key',
+      secretOrKey: process.env.JWT_SECRET || 'ftTranscendenceJWTSecretKey',
     });
   }
 
   async validate(payload: any) {
-	const userId = parseInt(payload.userId, 10);
-	
-	if (isNaN(userId)) {
-	  throw new Error('Invalid userId');
-	}
-  
-	return {
-	  userId, // Now this will be a number
-	  username: payload.username
-	};
+    const userId = parseInt(payload.userId, 10);
+
+    if (isNaN(userId)) {
+      throw new HttpException('Invalid userId', HttpStatus.BAD_REQUEST);
+    }
+
+    return {
+      userId,
+      username: payload.username
+    };
   }
 }
