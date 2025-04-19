@@ -1,9 +1,15 @@
 export interface MatchHistoryEntry {
-    player1Username: string;
-    player1Score: number;
-    player2Username: string;
-    player2Score: number;
-    winnerUsername: string;
-    matchDate: string;
-  }
-  
+  gameId: string;
+  opponentUsername: string;
+  userScore: number;
+  opponentScore: number;
+  gameMode: string;
+  startTime: string;
+  endTime: string;
+  result: 'win' | 'loss';
+}
+
+export interface MatchHistoryResponse {
+  matches: MatchHistoryEntry[];
+  total: number;
+}

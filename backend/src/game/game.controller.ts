@@ -1,7 +1,7 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Request } from '@nestjs/common';
 import { GameService } from './game.service';
 import { LeaderboardEntryDto } from './dto/leaderboard.dto';
-import { MatchHistoryEntryDto } from './dto/matchHistory.dto';
+import { MatchHistoryResponseDto } from './dto/matchHistory.dto';
 
 @Controller('game')
 export class GameController {
@@ -61,18 +61,11 @@ export class GameController {
     return leaderboardData.sort((a, b) => b.wins - a.wins);
   }
 
-  @Get('matchHistory/:username')
-  async getMatchHistory(
-    @Param('username') username: string,
-  ): Promise<MatchHistoryEntryDto[]> {
-    const matches = await this.gameService.getMatchHistory(username);
-    return matches.map((match) => ({
-      player1Username: match.player1Username,
-      player2Username: match.player2Username,
-      player1Score: match.player1Score,
-      player2Score: match.player2Score,
-      winnerUsername: match.winnerUsername,
-      matchDate: match.endTime,
-    }));
+  @Get('match-history')
+  async getAuthenticatedUserMatchHistory(
+    @Request() req,
+  ): Promise<MatchHistoryResponseDto> {
+    const username = req.user.username;
+    return this.gameService.getMatchHistory(username);
   }
 }

@@ -1,76 +1,68 @@
 import React, { useEffect, useState } from "react";
 import axios from "../../axios";
-import { MatchHistoryEntry } from "../../types/matchHistory.types";
+import { MatchHistoryEntry, MatchHistoryResponse } from "../../types/matchHistory.types";
 
-interface MatchHistoryProps {
-  username: string;
-}
-
-const MatchHistory: React.FC<MatchHistoryProps> = ({ username }) => {
-  const [match_history, setMatchhistory] = useState<MatchHistoryEntry[]>([]);
+const MatchHistory: React.FC = () => {
+  const [matches, setMatches] = useState<MatchHistoryEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!username) {
-      setError("Username not provided.");
-      setLoading(false);
-      return;
-    }
-
-    const fetchMatchhistory = async () => {
+    const fetchMatchHistory = async () => {
       try {
         setLoading(true);
         setError(null);
 
-        const response = await axios.get<MatchHistoryEntry[]>(
-          `/api/game/matchHistory/${username}`,
+        const response = await axios.get<MatchHistoryResponse>(
+          `/game/match-history`,
         );
 
-        if (!Array.isArray(response.data)) {
-          throw new Error("Invalid match history data received");
+        if (!response.data || !Array.isArray(response.data.matches)) {
+          console.error("Invalid data structure received:", response.data);
+          throw new Error("Invalid match history data received from server.");
         }
 
-        setMatchhistory(response.data);
-      } catch (err) {
-        setError("Failed to load match history data");
-        console.error(err);
+        setMatches(response.data.matches);
+      } catch (err: any) {
+        console.error("Failed to load match history:", err);
+        setError(err.response?.data?.message || err.message || "Failed to load match history data. Please try again later.");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchMatchhistory();
-  }, [username]);
+    fetchMatchHistory();
+  }, []);
 
-  if (loading) return <div>Loading match history...</div>;
-  if (error) return <div className="error">{error}</div>;
+  if (loading) return <div className="loading">Loading match history...</div>;
+  if (error) return <div className="error-message">Error: {error}</div>;
+  if (matches.length === 0) return <div className="no-matches">No match history found.</div>;
 
   return (
-    <div className="match-history">
+    <div className="match-history-container">
       <h2>Match History</h2>
-      <table>
+      <table className="match-history-table">
         <thead>
           <tr>
-            <th>Match Date:</th>
-            <th>Player 1:</th>
-            <th>Score:</th>
-            <th>Player 2:</th>
-            <th>Score:</th>
-            <th>Winner:</th>
+            <th>Date</th>
+            <th>Opponent</th>
+            <th>Your Score</th>
+            <th>Opponent Score</th>
+            <th>Result</th>
+            <th>Mode</th>
           </tr>
         </thead>
         <tbody>
-          {match_history.map((entry, index) => (
-            <tr key={index}>
-              <td>{entry.player1Username}</td>
-              <td>{entry.player1Score}</td>
-              <td>{entry.player2Username}</td>
-              <td>{entry.player2Score}</td>
-              <td>{entry.winnerUsername}</td>
+          {matches.map((entry) => (
+            <tr key={entry.gameId}>
               <td>
-                {new Date(entry.matchDate).toLocaleDateString()} {new Date(entry.matchDate).toLocaleTimeString()}
+                {new Date(entry.startTime).toLocaleDateString()} {new Date(entry.startTime).toLocaleTimeString()}
               </td>
+              <td>{entry.opponentUsername}</td>
+              <td>{entry.userScore}</td>
+              <td>{entry.opponentScore}</td>
+              <td className={`result-${entry.result}`}>{entry.result.toUpperCase()}</td>
+              <td>{entry.gameMode}</td>
             </tr>
           ))}
         </tbody>

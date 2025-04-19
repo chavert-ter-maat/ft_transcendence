@@ -1,8 +1,15 @@
 export class MatchHistoryEntryDto {
-  player1Username: string;
-  player2Username: string;
-  player1Score: number;
-  player2Score: number;
-  winnerUsername: string;
-  matchDate: Date;
+  gameId: string;
+  opponentUsername: string;
+  userScore: number;
+  opponentScore: number;
+  gameMode: string;
+  startTime: Date;
+  endTime: Date;
+  result: 'win' | 'loss';
+}
+
+export class MatchHistoryResponseDto {
+  matches: MatchHistoryEntryDto[];
+  total: number;
 }
