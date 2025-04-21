@@ -87,6 +87,50 @@ export class GameService {
       } catch (error) {
         this.logger.error('Error saving match result:', error);
       }
+    } else if (gameState.gameMode === 'localMultiplayer') {
+      try {
+        const gameId = this.playerGameMap.get(gameState.player1.id);
+        if (gameId) {
+          await this.matchModel.create({
+            gameId,
+            player1Username: gameState.player1.username,
+            player2Username: 'Local Challenger',
+            player1Score: gameState.player1.score,
+            player2Score: gameState.player2.score,
+            gameMode: gameState.gameMode,
+            startTime: gameState.gameStarted,
+            endTime: new Date(),
+            winnerUsername:
+              gameState.player1.score > gameState.player2.score
+                ? gameState.player1.username
+                : gameState.player2.username,
+          });
+        }
+      } catch (error) {
+        this.logger.error('Error saving match result:', error);
+      }
+    } else if (gameState.gameMode === 'singleplayer') {
+      try {
+        const gameId = this.playerGameMap.get(gameState.player1.id);
+        if (gameId) {
+          await this.matchModel.create({
+            gameId,
+            player1Username: gameState.player1.username,
+            player2Username: 'Bot',
+            player1Score: gameState.player1.score,
+            player2Score: gameState.player2.score,
+            gameMode: gameState.gameMode,
+            startTime: gameState.gameStarted,
+            endTime: new Date(),
+            winnerUsername:
+              gameState.player1.score > gameState.player2.score
+                ? gameState.player1.username
+                : gameState.player2.username,
+          });
+        }
+      } catch (error) {
+        this.logger.error('Error saving match result:', error);
+      }
     }
   }
 
