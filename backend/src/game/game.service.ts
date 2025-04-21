@@ -641,7 +641,7 @@ export class GameService {
       where: {
         [Op.or]: [{ player1Username: username }, { player2Username: username }],
       },
-      order: [['endTime', 'DESC']],
+      order: [['startTime', 'DESC']],
     });
 
     const formattedMatches: MatchHistoryEntryDto[] = matches.map((match) => {

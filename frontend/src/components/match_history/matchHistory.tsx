@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "../../axios";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import {
   MatchHistoryEntry,
   MatchHistoryResponse,
@@ -8,6 +8,7 @@ import {
 
 const MatchHistory: React.FC = () => {
   const { username } = useParams<{ username: string }>();
+  const navigate = useNavigate();
   const [matches, setMatches] = useState<MatchHistoryEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -50,6 +51,7 @@ const MatchHistory: React.FC = () => {
 
   return (
     <div className="match-history-container">
+      <button onClick={() => navigate(-1)}>Back</button>
       <h2>Match History</h2>
       <table className="match-history-table">
         <thead>
