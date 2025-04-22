@@ -13,8 +13,8 @@ let socket: Socket | null = null;
 
 const SOCKET_URL = "/";
 
-const MOVE_THROTTLE = 1000/60;
-const STATE_UPDATE_THROTTLE = 1000/60;
+const INPUT_TICKRATE = 1000/60;
+const BACKEND_TICKRATE = 1000/60;
 
 export const connectSocket = (username?: string) => {
   if (!socket && username) {
@@ -119,7 +119,7 @@ export const movePaddle = (
     : "default";
   const lastTime = lastMoveTimes[playerKey];
 
-  if (now - lastTime >= MOVE_THROTTLE) {
+  if (now - lastTime >= INPUT_TICKRATE) {
     const socket = getSocket();
     if (socket) {
       socket.emit("movePaddle", {
@@ -137,7 +137,7 @@ let lastGameStateTime = 0;
 export const onGameStateUpdate = (callback: (gameState: GameState) => void) => {
   socket?.on("gameState", (gameState: GameState) => {
     const now = performance.now();
-    if (now - lastGameStateTime >= STATE_UPDATE_THROTTLE) {
+    if (now - lastGameStateTime >= BACKEND_TICKRATE) {
       callback(gameState);
       lastGameStateTime = now;
     }

@@ -1,13 +1,13 @@
-FROM node:current-slim AS production
+FROM node:lts-slim AS production
 WORKDIR /app/frontend
 COPY package*.json .
-RUN npm install --production
+RUN npm install
 COPY . .
 RUN npm run build
 CMD [ "npm", "run", "preview"]
 
 
-FROM node:current-slim AS development
+FROM node:lts-slim AS development
 WORKDIR /app/frontend
 COPY package*.json .
 RUN npm install

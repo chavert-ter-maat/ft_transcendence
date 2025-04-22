@@ -7,6 +7,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Chat from "./components/chat/Chat";
 import GameContainer from "./components/game/GameContainer";
 import Leaderboard from "./components/leaderboard/Leaderboard";
+import MatchHistory from "./components/match_history/matchHistory";
 import TwoFADashboard from './components/TwoFA/TwoFADashboard';
 import VerifyTwoFA from './components/TwoFA/TwoFAVerification';
 import NotFound from './components/NotFound/NotFound';
@@ -49,6 +50,14 @@ function App(): JSX.Element {
           element={
             <ProtectedRoute>
               <Leaderboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/matchHistory/:username"
+          element={
+            <ProtectedRoute>
+              <MatchHistory />
             </ProtectedRoute>
           }
         />

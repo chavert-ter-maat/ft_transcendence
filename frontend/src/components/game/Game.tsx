@@ -12,7 +12,7 @@ import { GameState, CoordinateCache, GameProps } from "../../types";
 const INTERPOLATION_DELAY = 100;
 const FRAME_RATE = 60;
 const FRAME_TIME = 1000 / FRAME_RATE;
-const SERVER_TICKRATE = 1000 / 30; // Match backend tick rate (30 ticks per second)
+const SERVER_TICKRATE = 1000 / 30;
 
 const Game: React.FC<GameProps> = ({
   userId,
@@ -22,12 +22,12 @@ const Game: React.FC<GameProps> = ({
   onGameStart,
 }) => {
   const [gameId, setGameId] = useState<string>(initialGameId);
-  const [gameState, setGameState] = useState<GameState | null>(null);
   const [winner, setWinner] = useState<string | null>(null);
   const [rematchRequested, setRematchRequested] = useState(false);
   const [rematchError, setRematchError] = useState<string | null>(null);
   const [opponentDisconnected, setOpponentDisconnected] = useState(false);
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
+  const [gameState, setGameState] = useState<GameState | null>(null);
   const [previousGameState, setPreviousGameState] = useState<GameState | null>(
     null
   );
@@ -58,6 +58,10 @@ const Game: React.FC<GameProps> = ({
     });
   }, [gameState]);
 
+  const lerp = (start: number, end: number, factor: number): number => {
+    return start + (end - start) * factor;
+  };
+
   const interpolateState = useCallback(
     (
       prevState: GameState | null,
@@ -75,31 +79,29 @@ const Game: React.FC<GameProps> = ({
           ? nextState.ball
           : {
               ...nextState.ball,
-              x:
-                prevState.ball.x +
-                (nextState.ball.x - prevState.ball.x) * factor,
-              y:
-                prevState.ball.y +
-                (nextState.ball.y - prevState.ball.y) * factor,
+              x: lerp(prevState.ball.x, nextState.ball.x, factor),
+              y: lerp(prevState.ball.y, nextState.ball.y, factor),
             },
         player1: {
           ...nextState.player1,
           paddle: {
             ...nextState.player1.paddle,
-            y:
-              prevState.player1.paddle.y +
-              (nextState.player1.paddle.y - prevState.player1.paddle.y) *
-                factor,
+            y: lerp(
+              prevState.player1.paddle.y,
+              nextState.player1.paddle.y,
+              factor
+            ),
           },
         },
         player2: {
           ...nextState.player2,
           paddle: {
             ...nextState.player2.paddle,
-            y:
-              prevState.player2.paddle.y +
-              (nextState.player2.paddle.y - prevState.player2.paddle.y) *
-                factor,
+            y: lerp(
+              prevState.player2.paddle.y,
+              nextState.player2.paddle.y,
+              factor
+            ),
           },
         },
       };
@@ -252,6 +254,13 @@ const Game: React.FC<GameProps> = ({
 
   const gameLoop = useCallback(() => {
     const now = performance.now();
+    const deltaTime = now - lastFrameTimeRef.current;
+  
+    if (deltaTime < FRAME_TIME) {
+      animationFrameRef.current = requestAnimationFrame(gameLoop);
+      return;
+    }
+
     lastFrameTimeRef.current = now;
 
     processPaddleMovement();

@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "../../axios";
 import { LeaderboardEntry } from "../../types/leaderboard.types";
 
 const Leaderboard: React.FC = () => {
+  const navigate = useNavigate();
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -37,6 +39,7 @@ const Leaderboard: React.FC = () => {
 
   return (
     <div className="leaderboard">
+      <button onClick={() => navigate(-1)}>Back</button>
       <h2>Leaderboard</h2>
       <table>
         <thead>

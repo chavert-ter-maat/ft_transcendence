@@ -1,8 +1,13 @@
 import { Injectable, Logger, Inject, forwardRef } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
+import { Op } from 'sequelize';
 import { Match } from './entities/match.entity';
 import { QueueService } from './queue/queue.service';
 import { GameGateway } from './game.gateway';
+import {
+  MatchHistoryEntryDto,
+  MatchHistoryResponseDto,
+} from './dto/matchHistory.dto';
 import {
   GameState,
   Paddle,
@@ -68,6 +73,50 @@ export class GameService {
             gameId,
             player1Username: gameState.player1.username,
             player2Username: gameState.player2.username,
+            player1Score: gameState.player1.score,
+            player2Score: gameState.player2.score,
+            gameMode: gameState.gameMode,
+            startTime: gameState.gameStarted,
+            endTime: new Date(),
+            winnerUsername:
+              gameState.player1.score > gameState.player2.score
+                ? gameState.player1.username
+                : gameState.player2.username,
+          });
+        }
+      } catch (error) {
+        this.logger.error('Error saving match result:', error);
+      }
+    } else if (gameState.gameMode === 'localMultiplayer') {
+      try {
+        const gameId = this.playerGameMap.get(gameState.player1.id);
+        if (gameId) {
+          await this.matchModel.create({
+            gameId,
+            player1Username: gameState.player1.username,
+            player2Username: 'Local Challenger',
+            player1Score: gameState.player1.score,
+            player2Score: gameState.player2.score,
+            gameMode: gameState.gameMode,
+            startTime: gameState.gameStarted,
+            endTime: new Date(),
+            winnerUsername:
+              gameState.player1.score > gameState.player2.score
+                ? gameState.player1.username
+                : gameState.player2.username,
+          });
+        }
+      } catch (error) {
+        this.logger.error('Error saving match result:', error);
+      }
+    } else if (gameState.gameMode === 'singleplayer') {
+      try {
+        const gameId = this.playerGameMap.get(gameState.player1.id);
+        if (gameId) {
+          await this.matchModel.create({
+            gameId,
+            player1Username: gameState.player1.username,
+            player2Username: 'Bot',
             player1Score: gameState.player1.score,
             player2Score: gameState.player2.score,
             gameMode: gameState.gameMode,
@@ -585,6 +634,36 @@ export class GameService {
       },
     });
     return matches;
+  }
+
+  async getMatchHistory(username: string): Promise<MatchHistoryResponseDto> {
+    const matches = await this.matchModel.findAll({
+      where: {
+        [Op.or]: [{ player1Username: username }, { player2Username: username }],
+      },
+      order: [['startTime', 'DESC']],
+    });
+
+    const formattedMatches: MatchHistoryEntryDto[] = matches.map((match) => {
+      const isPlayer1 = match.player1Username === username;
+      return {
+        gameId: match.gameId,
+        opponentUsername: isPlayer1
+          ? match.player2Username
+          : match.player1Username,
+        userScore: isPlayer1 ? match.player1Score : match.player2Score,
+        opponentScore: isPlayer1 ? match.player2Score : match.player1Score,
+        gameMode: match.gameMode,
+        startTime: match.startTime,
+        endTime: match.endTime,
+        result: match.winnerUsername === username ? 'win' : 'loss',
+      };
+    });
+
+    return {
+      matches: formattedMatches,
+      total: matches.length,
+    };
   }
 
   private getPlayerIndex(playerId: string, gameId: string): number {
