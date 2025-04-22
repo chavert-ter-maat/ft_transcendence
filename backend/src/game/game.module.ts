@@ -6,11 +6,19 @@ import { QueueModule } from './queue/queue.module';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { Match } from './entities/match.entity';
 import { User } from '../auth/auth.model';
+// import { OnlineService } from 'src/messages/online.service';
+// import { MessageService } from 'src/messages/message.service';
+// import { OnlineUsers } from 'src/online_users';
+import { MessageModule } from 'src/messages/message.module';
+import { Chat } from 'src/messages/message.model';
+import { OnlineModule } from 'src/messages/online.module';
 
 @Module({
   imports: [
     forwardRef(() => QueueModule),
-    SequelizeModule.forFeature([Match, User]),
+    SequelizeModule.forFeature([Match, User, Chat]),
+	MessageModule,
+	OnlineModule
   ],
   providers: [
     {
