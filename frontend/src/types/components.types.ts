@@ -18,4 +18,6 @@ export interface LobbyProps {
   queueStatus: string;
   setQueueStatus: React.Dispatch<React.SetStateAction<string>>;
   onBack?: () => void;
+  invitePlayed: boolean
+	setInvitePlayed: React.Dispatch<React.SetStateAction<boolean>>;
 }

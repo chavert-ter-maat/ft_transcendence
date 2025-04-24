@@ -17,6 +17,7 @@ const GameContainer: React.FC = () => {
   const [gameMode, setGameMode] = useState<GameMode>("singleplayer");
   const [gameId, setGameId] = useState("");
   const [queueStatus, setQueueStatus] = useState("inactive");
+  const [invitePlayed, setInvitePlayed] = useState<boolean>(false);
   const { isConnected, socketId } = useSocketStatus(state.user.username);
 
   const handleGameStart = (
@@ -28,8 +29,6 @@ const GameContainer: React.FC = () => {
     setGameStarted(selectedGameId !== "");
   };
 
-  console.log("requested?:", state.requestedUser, state.user.invited);
-
   //if requestedUser set go to lobby with context
   return (
     <div className="app">
@@ -40,6 +39,8 @@ const GameContainer: React.FC = () => {
           queueStatus={queueStatus}
           setQueueStatus={setQueueStatus}
 		  invitedOpponent={""}
+		  invitePlayed={invitePlayed}
+          setInvitePlayed={setInvitePlayed}
         />
       )}
 	  {!gameStarted && state.requestedUser && (
@@ -49,6 +50,8 @@ const GameContainer: React.FC = () => {
           setQueueStatus={setQueueStatus}
 		  invitedOpponent={state.requestedUser?.username}
 		  invited={state.user.invited}
+		  invitePlayed={invitePlayed}
+          setInvitePlayed={setInvitePlayed}
         />
       )}
       {gameStarted && (

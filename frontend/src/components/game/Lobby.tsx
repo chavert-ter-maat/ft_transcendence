@@ -20,6 +20,8 @@ const Lobby: React.FC<LobbyProps> = ({
   setQueueStatus,
   invitedOpponent,
   invited,
+  invitePlayed,
+	setInvitePlayed
 }) => {
 	let start_mode: string = "single player";
 	let customize:	boolean = false;
@@ -96,7 +98,7 @@ const Lobby: React.FC<LobbyProps> = ({
     }
     // setSelectedMode(gameMode);
 	// setSelectedMode("invitedMultiplayer");
-	// setQueueStatus("joining");
+	setQueueStatus("joining");
 	socket.emit("joinGame", { playerId: socket.id, invitedOpponent: invitedOpponent });
   };
 
@@ -116,9 +118,10 @@ const Lobby: React.FC<LobbyProps> = ({
     navigate('/userpage');
   };
 
-  console.log(selectedMode , queueStatus);
-  if (selectedMode === "invitedMultiplayer" && (queueStatus === "inactive" || queueStatus === "idle") && invited){
+  console.log("why oh why?", selectedMode , queueStatus, invitePlayed);
+  if (selectedMode === "invitedMultiplayer" && (queueStatus === "inactive" || queueStatus === "idle") && invited && !invitePlayed){
 	// setShowCustomSetup(false)
+	setInvitePlayed(true);
 	handleInvitedQueue("invitedMultiplayer" as GameMode);
   }
 

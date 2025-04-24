@@ -214,7 +214,7 @@ const Chat: React.FC = () =>  {
 			}))
 		} else if (switchy_state === 4){
 			useEffect(() => {
-				console.log('Shitty login page');
+				console.log('Hitty login page');
 				setUpdate(false);
 			}, [switchy_state, loaded_state, update_state]);
 			return (LoginView({
