@@ -35,6 +35,7 @@ export class GameGateway
   server: Server;
   public connectedSockets = new Map<string, Socket>();
   private usernames = new Map<string, string>();
+  private clientid = new Map<string, string>();
 
   constructor(
     @Inject(forwardRef(() => GameService))
@@ -64,6 +65,7 @@ export class GameGateway
     if (username) {
       this.logger.log(`Setting username for ${client.id}: ${username}`);
       this.usernames.set(client.id, username);
+	  this.clientid.set(username, client.id);
 
       for (const [gameId, game] of this.gameService.getGames()) {
         if (game.player1.id === client.id) {
@@ -83,6 +85,7 @@ export class GameGateway
 	this.onlineService.remove_user(this.usernames.get(client.id));
     this.logger.log(`Client disconnected: ${client.id}`);
     this.connectedSockets.delete(client.id);
+	this.clientid.delete(this.usernames.get(client.id));
     this.usernames.delete(client.id);
     this.queueService.removePlayerFromQueue(client.id);
     this.gameService.handleDisconnect(client.id);
@@ -125,7 +128,10 @@ export class GameGateway
     } else if (data.gameMode === 'remoteMultiplayer') {
       client.emit('queueStatus', { status: 'waiting' });
       this.queueService.addPlayerToQueue(client.id);
-    }
+    } else if (data.invitedOpponent !== ''){
+		client.emit('queueStatus', { status: 'waiting' });
+		this.queueService.startPrivateGame(client.id, this.clientid.get(data.invitedOpponent));
+	}
   }
 
   @SubscribeMessage('movePaddle')

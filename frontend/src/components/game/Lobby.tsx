@@ -13,14 +13,24 @@ import {
   offQueueStatus,
 } from "../../socket";
 
+//enter here set setShowCustomSetup to true and invited something to true
 const Lobby: React.FC<LobbyProps> = ({
   onGameStart,
   queueStatus,
   setQueueStatus,
+  invitedOpponent,
+  invited,
 }) => {
+	let start_mode: string = "single player";
+	let customize:	boolean = false;
+	if (invitedOpponent != "")
+	{
+		start_mode = "invitedMultiplayer";
+		customize = false;
+	}
   const [countdown, setCountdown] = useState<number | null>(null);
-  const [selectedMode, setSelectedMode] = useState<GameMode>("singleplayer");
-  const [showCustomSetup, setShowCustomSetup] = useState(false);
+  const [selectedMode, setSelectedMode] = useState<GameMode>(start_mode);
+  const [showCustomSetup, setShowCustomSetup] = useState(customize);
 
   useEffect(() => {
     const handleCountdown = (data: { gameId: string; waitTime: number }) => {
@@ -67,11 +77,27 @@ const Lobby: React.FC<LobbyProps> = ({
     if (gameMode === "remoteMultiplayer") {
       setQueueStatus("joining");
       socket.emit("joinQueue", { playerId: socket.id });
-    } else {
+    } else if (invitedOpponent) {
+		setSelectedMode("invitedMultiplayer");
+		setQueueStatus("joining");
+    	socket.emit("joinGame", { playerId: socket.id, invitedOpponent: invitedOpponent });
+	} else {
       joinGame(gameMode, undefined, (gameId) => {
         onGameStart(gameMode, gameId);
       });
     }
+  };
+
+  const handleInvitedQueue = (gameMode: GameMode) => {
+    const socket = getSocket();
+    if (!socket || !socket.id) {
+      console.log("socket error");
+      return;
+    }
+    // setSelectedMode(gameMode);
+	// setSelectedMode("invitedMultiplayer");
+	// setQueueStatus("joining");
+	socket.emit("joinGame", { playerId: socket.id, invitedOpponent: invitedOpponent });
   };
 
   const handleLeaveQueue = () => {
@@ -89,6 +115,12 @@ const Lobby: React.FC<LobbyProps> = ({
   const handleGoBack = () => {
     navigate('/userpage');
   };
+
+  console.log(selectedMode , queueStatus);
+  if (selectedMode === "invitedMultiplayer" && (queueStatus === "inactive" || queueStatus === "idle") && invited){
+	// setShowCustomSetup(false)
+	handleInvitedQueue("invitedMultiplayer" as GameMode);
+  }
 
   return (
     <div>
@@ -143,10 +175,33 @@ const Lobby: React.FC<LobbyProps> = ({
           {queueStatus && <p>Status: {queueStatus}</p>}
         </div>
       )}
+
+	  {selectedMode === "invitedMultiplayer" && (
+        <div> {/*className="queue-controls">*/}
+            <>
+              <h2>Invited Multiplayer</h2>
+			  {/* <button
+                onClick={() => handleJoinQueue("invitedMultiplayer" as GameMode)}
+                disabled={queueStatus !== "inactive" && queueStatus !== "idle"}
+              >
+                Join Queue
+              </button> */}
+              <button
+                onClick={() => {
+                  setSelectedMode("singleplayer");
+                  setQueueStatus("inactive");
+                }}
+              >
+                Leave
+              </button>
+            </>
+        </div>
+      )}
+	  
       {countdown !== null && <p>Game starts in: {countdown}</p>}
       {!showCustomSetup && <button onClick={handleGoBack}>Go Back</button>}
     </div>
   );
 };
-
+ 
 export default Lobby;

@@ -69,7 +69,7 @@ export class OnlineService {
 			let status: string = "offline";
 			if (this.online_users.find_online_user(friend.name_))
 				status = this.online_users.find_online_user(friend.name_).location;
-			console.log(this.online_users.find_online_user(friend.name_));
+			// console.log(this.online_users.find_online_user(friend.name_));
 			return { stamp_: friend, status: status};
 		});
 		return (friend_stamp_list);
