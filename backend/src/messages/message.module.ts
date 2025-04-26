@@ -10,9 +10,9 @@ import { SequelizeModule } from '@nestjs/sequelize';
 // import { JwtModule } from '@nestjs/jwt';
 import * as dotenv from 'dotenv';
 // import { PassportModule } from '@nestjs/passport';
-import { OnlineUsers } from '../online_users';
 // import { FortyTwoStrategy } from '../auth/strategies/42.strategy'; // './strategies/42.strategy';
 import { AuthModule } from 'src/auth/auth.module';
+import { OnlineModule } from './online.module';
 
 dotenv.config();
 
@@ -20,6 +20,7 @@ dotenv.config();
 	imports: [
 		SequelizeModule.forFeature([Chat, UserChat ]),
 		AuthModule,
+		OnlineModule,
 		// JwtModule.register({
 		// 	global: true,
 		// 	secret: process.env.JWT_SECRET,
@@ -27,7 +28,7 @@ dotenv.config();
 		// }),
 		// PassportModule,
     ],
-    providers: [MessageService, OnlineUsers],
+    providers: [MessageService],
     controllers: [MessageController],
 	  	// controllers: [MessageController],
 	// providers: [MessageService, OnlineUsers],
