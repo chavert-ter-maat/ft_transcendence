@@ -5,6 +5,7 @@ import { User } from "../global.interface";
 import SocketStatus from "./socketStatus";
 import { useSocketStatus } from "../hooks/useSocketStatus";
 import PopUpModal from "../components/PopUpModal/PopUpModal";
+import { disconnectSocket } from "../socket";
 import "./UserPage.css";
 
 const UserPage: React.FC = () => {
@@ -15,6 +16,7 @@ const UserPage: React.FC = () => {
   const [avatar, setAvatar] = useState<File | null>(null);
   const [modal, setModal] = useState({ show: false, content: "", isError: false });
   const { isConnected, socketId } = useSocketStatus(user?.username);
+  
   const hostname = import.meta.env.VITE_HOSTNAME || "localhost";
   const apiUrl = `http://${hostname}:${import.meta.env.VITE_BACKEND_PORT}`;
 
@@ -37,6 +39,7 @@ const UserPage: React.FC = () => {
   }, [loading]);
 
   const handleLogout = () => {
+    disconnectSocket();
     localStorage.removeItem("authToken");
     navigate("/login");
   };

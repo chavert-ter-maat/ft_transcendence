@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PopUpModal from './PopUpModal/PopUpModal';
-import './Login.css'; // Import the external CSS file
+import SocketStatus from './socketStatus';
+import { useSocketStatus } from '../hooks/useSocketStatus';
+import './Login.css';
 import { parse } from 'dotenv';
 
 const Login: React.FC = () => {
+  const { isConnected, socketId } = useSocketStatus(); 
   const [modal, setModal] = useState({ show: false, content: "", isError: false });
   const hostname = import.meta.env.VITE_HOSTNAME || 'localhost';
   const fortyTwoLoginUrl = `https://api.intra.42.fr/oauth/authorize?client_id=${import.meta.env.VITE_CLIENT_UID_42}&redirect_uri=http%3A%2F%2F${hostname}%3A3000%2Fapi%2Fauth%2F42%2Fcallback&response_type=code`
-  // const fortyTwoLoginUrl = "https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-dd240212b70f3b22fcfaae9aa30a8cbd05ac31f68b19d89aa08a05e0ce387c13&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fapi%2Fauth%2F42%2Fcallback&response_type=code"
   const apiUrl = `http://${hostname}:${import.meta.env.VITE_BACKEND_PORT}`;
 
   useEffect(() => {
@@ -43,6 +45,7 @@ const Login: React.FC = () => {
 
   return (
     <div className="login-container">
+      <SocketStatus isConnected={isConnected} socketId={socketId} />
       <h1 className="login-title">Login</h1>
 
       <div className="button-container">
