@@ -12,3 +12,10 @@ COPY package*.json .
 RUN npm install
 COPY . .
 CMD ["npm", "run", "start:dev", "--debug"]
+
+FROM node:lts-slim AS eval
+WORKDIR /app/backend
+COPY package*.json .
+RUN npm install
+COPY . .
+CMD ["npm", "run", "start:eval"]
