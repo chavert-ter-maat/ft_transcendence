@@ -135,6 +135,8 @@ export class QueueService {
 
       socket1?.join(gameId);
       socket2?.join(gameId);
+
+	  this.gameGateway.server.to(gameId).emit('matchFound', { gameId });
     }, waitTime * 1000);
   }
 }

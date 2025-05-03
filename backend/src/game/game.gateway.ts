@@ -14,6 +14,7 @@ import { GameService } from './game.service';
 import { MovePaddleDto } from './dto/move-paddle.dto';
 import { JoinGameDto } from './dto/joinGame.dto';
 import { QueueService } from 'src/game/queue/queue.service';
+import { OnlineService } from 'src/messages/online.service';
 
 @WebSocketGateway({
   cors: {
@@ -34,12 +35,14 @@ export class GameGateway
   server: Server;
   public connectedSockets = new Map<string, Socket>();
   private usernames = new Map<string, string>();
+  private clientid = new Map<string, string>();
 
   constructor(
     @Inject(forwardRef(() => GameService))
     private readonly gameService: GameService,
     @Inject(forwardRef(() => QueueService))
     private readonly queueService: QueueService,
+	private readonly onlineService: OnlineService,
   ) {}
 
   afterInit(server: Server) {
@@ -53,10 +56,16 @@ export class GameGateway
     this.connectedSockets.set(client.id, client);
 
     const username = client.handshake.auth.username;
+
+	this.onlineService.online_users.add_online_user(username, "", "online");
+	this.onlineService.add_users([[{name_: username, admin_: false, timestamp: Date()}], ""]);
+	this.onlineService.notify_friends(username);
+
     this.logger.log(`Socket ${client.id} auth:`, client.handshake.auth);
     if (username) {
       this.logger.log(`Setting username for ${client.id}: ${username}`);
       this.usernames.set(client.id, username);
+	  this.clientid.set(username, client.id);
 
       for (const [gameId, game] of this.gameService.getGames()) {
         if (game.player1.id === client.id) {
@@ -72,8 +81,11 @@ export class GameGateway
   }
 
   handleDisconnect(client: Socket) {
+	this.onlineService.online_users.remove_user(this.usernames.get(client.id));
+	this.onlineService.remove_user(this.usernames.get(client.id));
     this.logger.log(`Client disconnected: ${client.id}`);
     this.connectedSockets.delete(client.id);
+	this.clientid.delete(this.usernames.get(client.id));
     this.usernames.delete(client.id);
     this.queueService.removePlayerFromQueue(client.id);
     this.gameService.handleDisconnect(client.id);
@@ -97,6 +109,8 @@ export class GameGateway
     @ConnectedSocket() client: Socket,
     @MessageBody() data: JoinGameDto,
   ) {
+	this.onlineService.online_users.find_online_user(this.usernames.get(client.id)).location = "in game";
+	this.onlineService.notify_friends(this.usernames.get(client.id));
     if (data.gameMode === 'singleplayer') {
       const gameId = this.gameService.createSinglePlayerGame(
         client.id,
@@ -114,7 +128,10 @@ export class GameGateway
     } else if (data.gameMode === 'remoteMultiplayer') {
       client.emit('queueStatus', { status: 'waiting' });
       this.queueService.addPlayerToQueue(client.id);
-    }
+    } else if (data.invitedOpponent !== ''){
+		client.emit('queueStatus', { status: 'waiting' });
+		this.queueService.startPrivateGame(client.id, this.clientid.get(data.invitedOpponent));
+	}
   }
 
   @SubscribeMessage('movePaddle')
@@ -131,6 +148,8 @@ export class GameGateway
     @ConnectedSocket() client: Socket,
     @MessageBody() data: { gameId: string },
   ) {
+	this.onlineService.online_users.find_online_user(this.usernames.get(client.id)).location = "online";
+	this.onlineService.notify_friends(this.usernames.get(client.id));
     const gameState = this.gameService.getGameState(data.gameId);
     if (!gameState) return;
 

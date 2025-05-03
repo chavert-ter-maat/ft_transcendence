@@ -59,4 +59,6 @@ export interface CoordinateCache {
 export type GameMode =
   | "singleplayer"
   | "localMultiplayer"
-  | "remoteMultiplayer";
+  | "remoteMultiplayer"
+  | "invitedMultiplayer"
+  ;

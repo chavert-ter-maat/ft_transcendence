@@ -53,7 +53,6 @@ export const FriendsView: React.FC<FriendsViewProps> = ({ logged_in_user, friend
 	}
 
 	function FRIENDSTAMP_LIST( {users, logged_in_user} : FriendStampList_int ) {
-		console.log("who gives a shit if its empty", users);
 		if (!users)
 			return (
 				<section>
