@@ -32,15 +32,15 @@ const Login: React.FC = () => {
     window.location.href = fortyTwoLoginUrl;
   };
 
-  const loginTestAccount = () => {
-    console.log("Redirecting to skip OAuth login and create test account...");
-    window.location.href = `${apiUrl}/api/auth/testAccount`;
-  };
+//   const loginTestAccount = () => {
+//     console.log("Redirecting to skip OAuth login and create test account...");
+//     window.location.href = `${apiUrl}/api/auth/testAccount`;
+//   };
 
-  const loginTestAccount2 = () => {
-    console.log("Redirecting to skip OAuth login and create test account...");
-    window.location.href = `${apiUrl}/api/auth/testAccount2`;
-  }
+//   const loginTestAccount2 = () => {
+//     console.log("Redirecting to skip OAuth login and create test account...");
+//     window.location.href = `${apiUrl}/api/auth/testAccount2`;
+//   }
 
 
   return (
@@ -50,8 +50,8 @@ const Login: React.FC = () => {
 
       <div className="button-container">
         <button className="login-button oauth" onClick={handleOAuthLogin}>Login with 42 OAuth</button>
-        <button className="login-button test-account" onClick={loginTestAccount}>Login with Test Account</button>
-        <button className="login-button test-account" onClick={loginTestAccount2}>Login with Test Account 2</button>
+        {/* <button className="login-button test-account" onClick={loginTestAccount}>Login with Test Account</button>
+        <button className="login-button test-account" onClick={loginTestAccount2}>Login with Test Account 2</button> */}
       </div>
 
       {modal.show && <PopUpModal modal={modal} setModal={setModal} />}

@@ -32,7 +32,7 @@ export class AuthController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('userInfo') //might be security issue? req.user.id can be arbitrarly set or is this protected?
+  @Get('userInfo')
   async getUserInfo(@Req() req) {
     const userId = req.user.userId;
     if (typeof userId !== 'number') {
@@ -45,7 +45,7 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   async getUserInfoSomeoneElse(@Body() body: { requestedUser: string }) {
     const { requestedUser } = body;
-    if (typeof requestedUser !== 'string') { //unnecesary?
+    if (typeof requestedUser !== 'string') {
       throw new HttpException('requestedUser is invalid', HttpStatus.BAD_REQUEST);
     }
     return this.authService.getUserInfoSomeoneElse(requestedUser);
@@ -123,45 +123,45 @@ export class AuthController {
     }
   }
 
-  //REMOVE THIS FUNCTION ITS FOR TESTING AND BYPASSES THE INTRA LOGIN
-  @Get('testAccount')
-  //   @UseGuards(FortyTwoAuthGuard)
-  async callback_test(@Res() res) {
-    try {
-      console.log(process.env.VITE_CLIENT_UID_42);
-      console.log('Callback bypassed for test account:');
+//   //REMOVE THIS FUNCTION ITS FOR TESTING AND BYPASSES THE INTRA LOGIN
+//   @Get('testAccount')
+//   //   @UseGuards(FortyTwoAuthGuard)
+//   async callback_test(@Res() res) {
+//     try {
+//       console.log(process.env.VITE_CLIENT_UID_42);
+//       console.log('Callback bypassed for test account:');
 
-      // Save the OAuth tokens and ensure the user is created in the database
-      const savedUser = await this.authService.saveToDatabase({ email: "test.test", username: "testAccount", displayName: null, avatar: null, oauthToken: null, oauthRefreshToken: null, oauthExpiresAt: null, provider: '42' });
+//       // Save the OAuth tokens and ensure the user is created in the database
+//       const savedUser = await this.authService.saveToDatabase({ email: "test.test", username: "testAccount", displayName: null, avatar: null, oauthToken: null, oauthRefreshToken: null, oauthExpiresAt: null, provider: '42' });
 
-      // Generate the access token using the saved user's userId
-      const { accessToken } = await this.authService.signIn(savedUser);
+//       // Generate the access token using the saved user's userId
+//       const { accessToken } = await this.authService.signIn(savedUser);
 
-      const redirectUrl = `http://${hostname}:${process.env.FRONTEND_PORT}/auth/42/callback?token=${accessToken}`; return res.redirect(redirectUrl);
-    } catch (error) {
-      console.error('Callback error:', error);
-      return res.redirect(`http://${hostname}:${process.env.FRONTEND_PORT}/login?auth_error=${error}`);
-    }
-  }
+//       const redirectUrl = `http://${hostname}:${process.env.FRONTEND_PORT}/auth/42/callback?token=${accessToken}`; return res.redirect(redirectUrl);
+//     } catch (error) {
+//       console.error('Callback error:', error);
+//       return res.redirect(`http://${hostname}:${process.env.FRONTEND_PORT}/login?auth_error=${error}`);
+//     }
+//   }
 
-  @Get('testAccount2')
-  //   @UseGuards(FortyTwoAuthGuard)
-  async callback_test2(@Res() res) {
-    try {
-      console.log(process.env.VITE_CLIENT_UID_42);
-      console.log('Callback bypassed for test account :');
+//   @Get('testAccount2')
+//   //   @UseGuards(FortyTwoAuthGuard)
+//   async callback_test2(@Res() res) {
+//     try {
+//       console.log(process.env.VITE_CLIENT_UID_42);
+//       console.log('Callback bypassed for test account :');
 
-      // Save the OAuth tokens and ensure the user is created in the database
-      const savedUser = await this.authService.saveToDatabase({ email: "test.test2", username: "testAccount2", displayName: null, avatar: null, oauthToken: null, oauthRefreshToken: null, oauthExpiresAt: null, provider: '42' });
+//       // Save the OAuth tokens and ensure the user is created in the database
+//       const savedUser = await this.authService.saveToDatabase({ email: "test.test2", username: "testAccount2", displayName: null, avatar: null, oauthToken: null, oauthRefreshToken: null, oauthExpiresAt: null, provider: '42' });
 
-      // Generate the access token using the saved user's userId
-      const { accessToken } = await this.authService.signIn(savedUser);
+//       // Generate the access token using the saved user's userId
+//       const { accessToken } = await this.authService.signIn(savedUser);
 
-      const redirectUrl = `http://${hostname}:${process.env.FRONTEND_PORT}/auth/42/callback?token=${accessToken}`;
-      return res.redirect(redirectUrl);
-    } catch (error) {
-      console.error('Callback error:', error);
-      return res.redirect(`http://${hostname}:${process.env.FRONTEND_PORT}/login?auth_error=${error}`);
-    }
-  }
+//       const redirectUrl = `http://${hostname}:${process.env.FRONTEND_PORT}/auth/42/callback?token=${accessToken}`;
+//       return res.redirect(redirectUrl);
+//     } catch (error) {
+//       console.error('Callback error:', error);
+//       return res.redirect(`http://${hostname}:${process.env.FRONTEND_PORT}/login?auth_error=${error}`);
+//     }
+//   }
 }
