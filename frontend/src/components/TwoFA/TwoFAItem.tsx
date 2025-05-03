@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import axios from "../../axios"
 import './TwoFAItem.css';
 
 function CurrentTwoFASetup({ currentTwoFAItem, setCurrentTwoFAItem }) {

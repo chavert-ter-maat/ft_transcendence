@@ -5,7 +5,7 @@ import * as bcrypt from 'bcrypt';
 import * as path from 'path';
 
 type AuthInput = { email: string; password: string };
-type AuthResult = { accessToken: string; email: string }; 
+type AuthResult = { accessToken: string; email: string };
 
 @Injectable()
 export class AuthService {
@@ -26,7 +26,7 @@ export class AuthService {
 	async getUserInfo(userId: number): Promise<Partial<User>> {
 		const user = await User.findOne({
 			where: { userId },
-			attributes: ['userId', 'email', 'username', 'provider', 'oauthToken', 'oauthRefreshToken', 'avatar', 'displayName', 'imageName', 'imageType', 'imageData'],  // Add all attributes you want
+			attributes: ['userId', 'email', 'username', 'provider', 'oauthToken', 'oauthRefreshToken', 'avatar', 'displayName', 'imageName', 'imageType', 'imageData'],
 		});
 
 		if (!user) {
@@ -40,7 +40,7 @@ export class AuthService {
 	async getUserInfoSomeoneElse(username: string): Promise<Partial<User>> {
 		const user = await User.findOne({
 			where: { username },
-			attributes: ['username', 'provider', 'avatar', 'displayName', 'imageName', 'imageType', 'imageData'],  // Add all attributes you want
+			attributes: ['username', 'provider', 'avatar', 'displayName', 'imageName', 'imageType', 'imageData'],
 		});
 
 		if (!user) {
@@ -52,23 +52,22 @@ export class AuthService {
 	}
 
 
-	async createUser(email: string, password: string): Promise<User> { 
+	async createUser(email: string, password: string): Promise<User> {
 		const salt = await bcrypt.genSalt(10);
 		const hashedPassword = await bcrypt.hash(password, salt);
-		const user = await User.create({ email, password: hashedPassword, blocked_users: [], friends: [] }); 
+		const user = await User.create({ email, password: hashedPassword, blocked_users: [], friends: [] });
 		return user;
 	}
 
 	async signIn(user: User): Promise<AuthResult> {
 		console.log("user", user)
-		const payload = { userId: user.userId, email: user.email };  // Change username to email
+		const payload = { userId: user.userId, email: user.email };
 		const accessToken = this.jwtService.sign(payload);
 
-		return { accessToken, email: user.email };  // Change username to email
+		return { accessToken, email: user.email };
 	}
 
 	async saveToDatabase(user: any): Promise<User> {
-		// console.log('user to be saved:', user);
 
 		const {
 			email,
@@ -77,18 +76,17 @@ export class AuthService {
 			oauthRefreshToken = null,
 			oauthExpiresAt = null,
 			provider = '42'
-		} = user;  // Change username to email
+		} = user; 
 		const me_stamp: user_stamp = { name_: user.username, admin_: false, timestamp: Date() }
 
-		if (!email) {  // Change username to email
+		if (!email) {  
 			throw new HttpException('Email is required to save OAuth tokens.', HttpStatus.BAD_REQUEST);
 		}
 
-		let existingUser = await User.findOne({ where: { email } });  // Check for email
+		let existingUser = await User.findOne({ where: { email } });
 
 		if (!existingUser) {
 			console.log("user not found, creating a new one")
-			// Create the user if it doesn't exist
 			user = await User.create({
 				...user, me_stamp
 			});
@@ -149,7 +147,6 @@ export class AuthService {
 		return { userId: user.userId, avatar: user.avatar };
 	}
 
-	// Combines file upload with database update
 	async updateUserAvatar(userId: number, file: Express.Multer.File): Promise<Partial<User>> {
 		return this.updateAvatar(userId, file);
 	}

@@ -1,5 +1,3 @@
-// src/auth/guards/42-auth.guards.ts
-
 import { Injectable } from '@nestjs/common';
 import { CanActivate } from '@nestjs/common';
 import { ExecutionContext } from '@nestjs/common';

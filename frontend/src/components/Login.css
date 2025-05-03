@@ -1,5 +1,3 @@
-/* Login.css */
-
 .login-container {
 	display: flex;
 	flex-direction: column;
@@ -38,14 +36,5 @@
   
   .oauth:hover {
 	background-color: #005bb5;
-  }
-  
-  .test-account {
-	background-color: #28a745;
-	color: white;
-  }
-  
-  .test-account:hover {
-	background-color: #218838;
   }
   

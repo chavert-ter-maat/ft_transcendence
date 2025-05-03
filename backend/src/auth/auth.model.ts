@@ -70,9 +70,9 @@ export class User extends Model<User> {
 
 	@Column({
 		type: DataType.STRING,
-		allowNull: true, // Display name is optional
+		allowNull: true,
 	})
-	displayName: string; // New column added here
+	displayName: string;
 
 	@Column({
 		type: DataType.DATE,
@@ -83,9 +83,9 @@ export class User extends Model<User> {
 
 	@Column({
 		type: DataType.STRING,
-		allowNull: true, // Avatar field is optional
+		allowNull: true,
 	})
-	avatar: string; // Add avatar field
+	avatar: string;
 
 	@Column({
 		type: DataType.DATE,

@@ -48,8 +48,8 @@ export class GameService {
     setInterval(() => {
       this.logger.log(
         `[METRICS] Active Games: ${this.games.size} | ` +
-          `Player Mappings: ${this.playerGameMap.size} | ` +
-          `Queue Length: ${this.queueService.queueLength}`,
+        `Player Mappings: ${this.playerGameMap.size} | ` +
+        `Queue Length: ${this.queueService.queueLength}`,
       );
     }, 60000);
   }
@@ -236,7 +236,7 @@ export class GameService {
   }
 
   createPrivateGame(player1Id: string, player2Id: string): string {
-	const gameId = uuid();
+    const gameId = uuid();
     const gameState = this.initializeGameState('remoteMultiplayer', true);
 
     const player1Username = this.gameGateway.getUsernameById(player1Id);
@@ -599,7 +599,7 @@ export class GameService {
         gameMode === 'localMultiplayer'
           ? 'Local Challenger'
           : this.gameGateway.getUsernameById(existingGame.player2.id) ||
-            'Unknown';
+          'Unknown';
       this.playerGameMap.delete(existingGame.player1.id);
       this.playerGameMap.delete(existingGame.player2.id);
       this.playerGameMap.set(existingGame.player1.id, newGameId);

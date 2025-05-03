@@ -4,7 +4,7 @@ import CurrentTwoFASetup from './TwoFAItem';
 import { jwtDecode } from "jwt-decode";
 import PopUpModal from '../PopUpModal/PopUpModal';
 import axios from '../../axios';
-import './TwoFADashboard.css'; // Import the external CSS file
+import './TwoFADashboard.css';
 
 function TwoFADashboard() {
 	const [currentTwoFAItem, setCurrentTwoFAItem] = useState(null);

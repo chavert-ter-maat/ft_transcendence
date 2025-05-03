@@ -1,55 +1,55 @@
 .instructions {
-  display: block; /* Ensure it's visible when toggled */
-  color: #555; /* Soft color for readability */
-  font-size: 0.9em; /* Slightly smaller font for instructions */
-  margin-top: 5px; /* Add space above the instructions */
+  display: block; 
+  color: #555;
+  font-size: 0.9em;
+  margin-top: 5px; 
 }
 
 .offscreen {
-  display: none; /* Keeps it hidden when not in use */
+  display: none; 
 }
 
 .info-icon {
-  margin-left: 5px; /* Space between input and icon */
-  cursor: pointer; /* Change cursor to pointer */
-  width: 20px; /* Set a fixed width */
-  height: 20px; /* Set a fixed height */
-  transition: opacity 0.2s ease; /* Add a transition for smooth effect */
+  margin-left: 5px;
+  cursor: pointer; 
+  width: 20px; 
+  height: 20px; 
+  transition: opacity 0.2s ease; 
 }
 
 .info-icon:hover {
-  opacity: 0.7; /* Slightly fade on hover for interaction feedback */
+  opacity: 0.7; 
 }
 
 .registration-box {
-  width: 400px; /* Set the desired fixed width */
-  padding: 20px; /* Add some padding */
-  border: 1px solid #ccc; /* Optional: add a border */
-  border-radius: 8px; /* Optional: add rounded corners */
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Optional: add a shadow */
-  background-color: #ffffff; /* Optional: set background color */
-  margin: 20px auto; /* Center the box horizontally */
+  width: 400px; 
+  padding: 20px; 
+  border: 1px solid #ccc; 
+  border-radius: 8px; 
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); 
+  background-color: #ffffff; 
+  margin: 20px auto; 
 }
 
 button {
-  min-width: 150px; /* Set a minimum width for buttons */
-  padding: 10px; /* Ensure padding is consistent */
-  background-color: #007BFF; /* Button background color */
-  color: white; /* Button text color */
-  border: none; /* Remove default border */
-  border-radius: 4px; /* Rounded corners for button */
-  cursor: pointer; /* Pointer cursor for buttons */
-  transition: background-color 0.3s ease; /* Smooth background color transition */
+  min-width: 150px; 
+  padding: 10px; 
+  background-color: #007BFF; 
+  color: white; 
+  border: none; 
+  border-radius: 4px; 
+  cursor: pointer; 
+  transition: background-color 0.3s ease; 
 }
 
 button:hover {
-  background-color: #0056b3; /* Darker shade on hover */
+  background-color: #0056b3; 
 }
 
 .hide {
-  visibility: hidden; /* Keep space occupied but hide the element */
-  opacity: 0; /* Make it fully transparent */
-  transition: opacity 0.2s ease; /* Smooth transition */
+  visibility: hidden; 
+  opacity: 0; 
+  transition: opacity 0.2s ease; 
 }
 
 .valid {
@@ -61,22 +61,22 @@ button:hover {
 }
 
 label {
-  display: inline-block; /* Ensure it behaves like a block element */
-  width: 120px; /* Set a fixed width based on your layout */
-  margin-bottom: 10px; /* Optional: add some space below the label */
-  color: #333; /* Slightly darker label color for contrast */
-  font-weight: bold; /* Bold labels for better visibility */
+  display: inline-block; 
+  width: 120px; 
+  margin-bottom: 10px; 
+  color: #333; 
+  font-weight: bold; 
 }
 
 input {
-  width: calc(100% - 130px); /* Adjust width to accommodate label */
-  padding: 8px; /* Add some padding for inputs */
-  border: 1px solid #ccc; /* Border for inputs */
-  border-radius: 4px; /* Rounded corners for inputs */
-  transition: border-color 0.3s ease; /* Smooth border color transition */
+  width: calc(100% - 130px); 
+  padding: 8px; 
+  border: 1px solid #ccc; 
+  border-radius: 4px; 
+  transition: border-color 0.3s ease; 
 }
 
 input:focus {
-  border-color: #007BFF; /* Change border color on focus */
-  outline: none; /* Remove default outline */
+  border-color: #007BFF; 
+  outline: none; 
 }

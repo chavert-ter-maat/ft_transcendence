@@ -6,10 +6,10 @@ export interface User {
   oauthRefreshToken: string;
   provider: string;
   displayName: string;
-  avatar?: string; // Add avatar field to the User model
+  avatar?: string;
   imageType: string;
   imageName?: string;
   imageData?: ArrayBuffer;
   imageString?: string;
-  invited?:		boolean;
+  invited?: boolean;
 }

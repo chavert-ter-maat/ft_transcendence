@@ -13,15 +13,15 @@ const Leaderboard: React.FC = () => {
     const fetchLeaderboard = async () => {
       try {
         setLoading(true);
-        
+
         const response = await axios.get<LeaderboardEntry[]>(
           "/api/game/leaderboard"
         );
-        
+
         if (!Array.isArray(response.data)) {
           throw new Error("Invalid leaderboard data received");
         }
-        
+
         setLeaderboard(response.data);
       } catch (err) {
         setError("Failed to load leaderboard data");
@@ -30,7 +30,7 @@ const Leaderboard: React.FC = () => {
         setLoading(false);
       }
     };
-    
+
     fetchLeaderboard();
   }, []);
 

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import PopUpModal from '../PopUpModal/PopUpModal';
-import './TwoFASetup.css'; // Import external CSS
+import './TwoFASetup.css';
 import axios from '../../axios';
 
 function TwoFASetup({ tokenContent, setCurrentTwoFAItem }) {

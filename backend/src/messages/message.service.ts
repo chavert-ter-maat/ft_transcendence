@@ -4,6 +4,7 @@ import { Chat } from './message.model';
 import { User } from '../auth/auth.model';
 import * as bcrypt from 'bcrypt';
 
+
 interface chat_stamp	{ name_: string, unread_: number, timestamp: string, users: string[], index: number, DM: boolean};
 interface message_stamp	{ message_: string, name_: string, user_ : string, timestamp: string, pic_: string, key_: number };
 interface user_stamp	{ name_: string, admin_: boolean, timestamp: string };

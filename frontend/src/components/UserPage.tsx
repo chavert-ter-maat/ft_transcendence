@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import axios from "../axios";
 import { useNavigate } from "react-router-dom";
 import { User } from "../global.interface";
 import SocketStatus from "./socketStatus";
@@ -16,16 +16,12 @@ const UserPage: React.FC = () => {
   const [avatar, setAvatar] = useState<File | null>(null);
   const [modal, setModal] = useState({ show: false, content: "", isError: false });
   const { isConnected, socketId } = useSocketStatus(user?.username);
-  
-  const hostname = import.meta.env.VITE_HOSTNAME || "localhost";
-  const apiUrl = `http://${hostname}:${import.meta.env.VITE_BACKEND_PORT}`;
-
   useEffect(() => {
     const fetchUserData = async () => {
       try {
         const token = localStorage.getItem("authToken");
         if (!token) throw new Error("No auth token found");
-        const response = await axios.get(`${apiUrl}/api/auth/userInfo`, {
+        const response = await axios.get(`/api/auth/userInfo`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setUser(response.data);
@@ -49,7 +45,7 @@ const UserPage: React.FC = () => {
     try {
       const token = localStorage.getItem("authToken");
       if (!token) throw new Error("No authToken found");
-      await axios.post(`${apiUrl}/api/auth/set-display-name`, { displayName: newDisplayName }, {
+      await axios.post(`/api/auth/set-display-name`, { displayName: newDisplayName }, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setModal({ show: true, content: "Display name updated successfully", isError: false });
@@ -76,7 +72,7 @@ const UserPage: React.FC = () => {
       if (!token) throw new Error("No authToken found");
       const formData = new FormData();
       formData.append("avatar", avatar);
-      const response = await axios.post(`${apiUrl}/api/auth/upload-avatar`, formData, {
+      const response = await axios.post(`/api/auth/upload-avatar`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "multipart/form-data",

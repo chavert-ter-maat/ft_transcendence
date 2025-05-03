@@ -1,5 +1,3 @@
-// src/auth/auth.module.ts
-
 import { Module } from '@nestjs/common';
 import { MessageService } from './message.service';
 import { MessageController } from './message.controller';
@@ -14,11 +12,11 @@ dotenv.config();
 
 @Module({
 	imports: [
-		SequelizeModule.forFeature([Chat, UserChat ]),
+		SequelizeModule.forFeature([Chat, UserChat]),
 		AuthModule,
 		OnlineModule,
-    ],
-    providers: [MessageService],
-    controllers: [MessageController],
+	],
+	providers: [MessageService],
+	controllers: [MessageController],
 })
-export class MessageModule {}
+export class MessageModule { }

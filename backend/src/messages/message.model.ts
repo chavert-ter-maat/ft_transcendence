@@ -1,40 +1,40 @@
 import { Column, Model, Table, BelongsTo, DataType, HasMany, BelongsToMany } from 'sequelize-typescript';
 import { User } from '../auth/auth.model';
-import { UserChat } from './userchat.model'; 
+import { UserChat } from './userchat.model';
 
-interface message_stamp { message_: string, name_: string, user_ : string, timestamp: string, pic_: string, key_: number };
-interface user_stamp	{ name_: string, admin_: boolean, timestamp: string };
+interface message_stamp { message_: string, name_: string, user_: string, timestamp: string, pic_: string, key_: number };
+interface user_stamp { name_: string, admin_: boolean, timestamp: string };
 
 interface MutedUser {
-	username:		string;
-	timestamp:		number;
-	forever:		boolean;
+	username: string;
+	timestamp: number;
+	forever: boolean;
 }
 
 interface ChatAtributes {
-	chatId:			number;
-	chatname:		string;
-	creator:		string;
-	admins:			string[];
-	banned_users:	string[];
-	messages:		message_stamp[];
-	user_stamps:	user_stamp[];
-	muted_users:	MutedUser[];
-	password:		string;
-	public:			boolean;
-	DM:				boolean;
-	last_edit:		string;
+	chatId: number;
+	chatname: string;
+	creator: string;
+	admins: string[];
+	banned_users: string[];
+	messages: message_stamp[];
+	user_stamps: user_stamp[];
+	muted_users: MutedUser[];
+	password: string;
+	public: boolean;
+	DM: boolean;
+	last_edit: string;
 }
 
-@Table // ({ tableName: 'Chats' })
+@Table
 export class Chat extends Model<ChatAtributes> implements ChatAtributes {
 	@Column({
-		type:			DataType.INTEGER,
-		primaryKey:		true,
-		autoIncrement:	true,
+		type: DataType.INTEGER,
+		primaryKey: true,
+		autoIncrement: true,
 	})
 	public chatId!: number;
-	
+
 	@Column({
 		type: DataType.STRING,
 		allowNull: false,
@@ -107,7 +107,7 @@ export class Chat extends Model<ChatAtributes> implements ChatAtributes {
 	})
 	public last_edit!: string;
 
-	@BelongsToMany(() => User, { 
+	@BelongsToMany(() => User, {
 		through: () => UserChat,
 		foreignKey: 'chatId',
 		otherKey: 'userId',
