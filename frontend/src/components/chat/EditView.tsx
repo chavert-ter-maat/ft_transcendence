@@ -144,6 +144,7 @@ export const EditView: React.FC<EditViewProps> = ({ logged_in_user, setLoaded, s
 		if (logged_in_user && invited.data.invited)
 		{
 			setSwitch(9);
+			console.log("TWICE LAUNCHED, AGIAN?");
 			navigate('/game', {state: {user: logged_in_user, requestedUser: requestedUserInfo} });
 		}
 	};

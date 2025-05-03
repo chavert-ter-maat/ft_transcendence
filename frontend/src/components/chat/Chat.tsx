@@ -30,7 +30,8 @@ let logged_in_user: UserStats = {
 	page_admin:		false,
 	page_creator:	false,
 	selected_user:	"",
-	invited_by:		""
+	invited_by:		"",
+	invited:		false,
 }
 
 let switchy_var:	number	= 0;
@@ -68,6 +69,7 @@ const Chat: React.FC = () =>  {
 						{requestedUser: response.data.invite});
 					requestedUserInfo = responseInfo.data;
 					logged_in_user.invited_by = requestedUserInfo.username;
+					logged_in_user.invited = true;
 					inviteModalSet(true);
 				}
 				return (response.data.notification);
@@ -151,12 +153,14 @@ const Chat: React.FC = () =>  {
 	
 		if (inviteAccept)
 		{
-			inviteAcceptSet(false);
-			setSwitch(9);
+		// 	inviteAcceptSet(false);
+		// 	setSwitch(9);
+			console.log("TWICE LAUNCHED?");
 			navigate('/game', {state: {user: logged_in_user, requestedUser: requestedUserInfo} });
 		}
 	
 		useEffect(() => {
+			console.log("why twice Effect?");
 			const id: number = Math.random();
 			const updateData = async () => {
 				console.log("Apply for update", update_state, id);
@@ -166,6 +170,13 @@ const Chat: React.FC = () =>  {
 					console.log("reload_call return value:", rere.valueOf, id);
 					setUpdate(true);
 					setLoaded(false);
+				}
+				if (inviteAccept)
+				{
+					inviteAcceptSet(false);
+					setSwitch(9);
+					// console.log("TWICE LAUNCHED?");
+					// navigate('/game', {state: {user: logged_in_user, requestedUser: requestedUserInfo} });
 				}
 			}
 			if (request_state)
@@ -203,7 +214,7 @@ const Chat: React.FC = () =>  {
 			}))
 		} else if (switchy_state === 4){
 			useEffect(() => {
-				console.log('Shitty login page');
+				console.log('Hitty login page');
 				setUpdate(false);
 			}, [switchy_state, loaded_state, update_state]);
 			return (LoginView({

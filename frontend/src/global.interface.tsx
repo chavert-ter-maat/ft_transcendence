@@ -11,4 +11,5 @@ export interface User {
   imageName?: string;
   imageData?: ArrayBuffer;
   imageString?: string;
+  invited?:		boolean;
 }

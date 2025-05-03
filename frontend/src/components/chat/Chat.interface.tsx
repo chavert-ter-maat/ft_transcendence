@@ -47,6 +47,7 @@ export interface UserStats {
 	invited_by:		string;
 	user?:			User;
 	friend_view:	boolean;
+	invited:		boolean;
 }
 
 export interface StringState {

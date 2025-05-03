@@ -11,10 +11,13 @@ import { User } from "../../global.interface";
 const GameContainer: React.FC = () => {
   const state = useLocation().state as { user: User; requestedUser: User };
 
+  //should have been effect
+
   const [gameStarted, setGameStarted] = useState(false);
   const [gameMode, setGameMode] = useState<GameMode>("singleplayer");
   const [gameId, setGameId] = useState("");
   const [queueStatus, setQueueStatus] = useState("inactive");
+  const [invitePlayed, setInvitePlayed] = useState<boolean>(false);
   const { isConnected, socketId } = useSocketStatus(state.user.username);
 
   const handleGameStart = (
@@ -26,14 +29,29 @@ const GameContainer: React.FC = () => {
     setGameStarted(selectedGameId !== "");
   };
 
+  //if requestedUser set go to lobby with context
   return (
     <div className="app">
       <SocketStatus isConnected={isConnected} socketId={socketId} />
-      {!gameStarted && (
+      {!gameStarted && !state.requestedUser && (
         <Lobby
           onGameStart={handleGameStart}
           queueStatus={queueStatus}
           setQueueStatus={setQueueStatus}
+		  invitedOpponent={""}
+		  invitePlayed={invitePlayed}
+          setInvitePlayed={setInvitePlayed}
+        />
+      )}
+	  {!gameStarted && state.requestedUser && (
+        <Lobby
+          onGameStart={handleGameStart}
+          queueStatus={queueStatus}
+          setQueueStatus={setQueueStatus}
+		  invitedOpponent={state.requestedUser?.username}
+		  invited={state.user.invited}
+		  invitePlayed={invitePlayed}
+          setInvitePlayed={setInvitePlayed}
         />
       )}
       {gameStarted && (

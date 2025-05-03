@@ -236,8 +236,9 @@ export class GameService {
   }
 
   createPrivateGame(player1Id: string, player2Id: string): string {
-    const gameId = uuid();
-    const gameState = this.initializeGameState('privateMatch', true);
+	console.log("fuck i wanna be done.");
+	const gameId = uuid();
+    const gameState = this.initializeGameState('remoteMultiplayer', true);
 
     const player1Username = this.gameGateway.getUsernameById(player1Id);
     const player2Username = this.gameGateway.getUsernameById(player2Id);
@@ -249,10 +250,29 @@ export class GameService {
     gameState.player2.username = player2Username || 'Unknown';
 
     this.games.set(gameId, gameState);
+
     this.playerGameMap.set(player1Id, gameId);
     this.playerGameMap.set(player2Id, gameId);
     this.startGameLoop(gameId);
     return gameId;
+    // const gameId = uuid();
+    // const gameState = this.initializeGameState('remoteMultiplayer', true);
+
+    // const player1Username = this.gameGateway.getUsernameById(player1Id);
+    // const player2Username = this.gameGateway.getUsernameById(player2Id);
+
+    // gameState.player1.id = player1Id;
+    // gameState.player1.username = player1Username || 'Unknown';
+
+    // gameState.player2.id = player2Id;
+    // gameState.player2.username = player2Username || 'Unknown';
+
+    // this.games.set(gameId, gameState);
+
+    // this.playerGameMap.set(player1Id, gameId);
+    // this.playerGameMap.set(player2Id, gameId);
+    // this.startGameLoop(gameId);
+    // return gameId;
   }
 
   getGames(): Map<string, GameState> {

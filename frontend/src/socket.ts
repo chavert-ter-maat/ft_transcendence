@@ -93,7 +93,8 @@ export const joinGame = (
   callback: (gameId: string) => void
 ) => {
   socket?.emit("joinGame", { gameMode, ...gameOptions });
-  if (gameMode === "remoteMultiplayer") {
+  console.log("fuck a di da di da do do")
+  if (gameMode === "remoteMultiplayer") { // || gameMode === "invitedMultiplayer") {
     socket?.once("matchFound", (data: MatchFoundData) => {
       callback(data.gameId);
     });

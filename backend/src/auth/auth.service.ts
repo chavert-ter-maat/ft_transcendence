@@ -33,7 +33,7 @@ export class AuthService {
 			throw new UnauthorizedException('User not found');
 		}
 		if (user.imageData)
-			user.imageString = this.arrayBufferToBase64(user.imageData); //shitty placed
+			user.imageString = this.arrayBufferToBase64(user.imageData); //hitty placed
 		return user;
 	}
 
@@ -47,7 +47,7 @@ export class AuthService {
 			throw new UnauthorizedException('User not found');
 		}
 		if (user.imageData)
-			user.imageString = this.arrayBufferToBase64(user.imageData); //shitty placed
+			user.imageString = this.arrayBufferToBase64(user.imageData); //hitty placed
 		return user;
 	}
 
