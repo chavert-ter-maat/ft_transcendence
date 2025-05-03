@@ -1,4 +1,3 @@
-// import logo from './8589-screaming-cat.png';
 import './App.css';
 import React from 'react';
 import axios from '../../axios';
@@ -75,9 +74,9 @@ export const UsersView: React.FC<UsersViewProps> = ({ logged_in_user, users_inpu
 			if (!err?.response) {
 				console.log('No server response.');
 			} else if (err.response?.status === 409) {
-				console.log('Chats does not exists, please create.'); // login?
+				console.log('Chats does not exists, please create.');
 			} else {
-				console.log('You no admin.'); // not able to login or blocked
+				console.log('You no admin.');
 			}
 			return false;
 		}
@@ -92,9 +91,9 @@ export const UsersView: React.FC<UsersViewProps> = ({ logged_in_user, users_inpu
 			if (!err?.response) {
 				console.log('No server response.');
 			} else if (err.response?.status === 409) {
-				console.log('User exists, please login.'); // login?
+				console.log('User exists, please login.');
 			} else {
-				console.log('You no admin.'); // not able to login or blocked
+				console.log('You no admin.');
 			}
 			return false;
 		}
@@ -110,9 +109,9 @@ export const UsersView: React.FC<UsersViewProps> = ({ logged_in_user, users_inpu
 			if (!err?.response) {
 				console.log('No server response.');
 			} else if (err.response?.status === 409) {
-				console.log('User exists, please login.'); // login?
+				console.log('User exists, please login.');
 			} else {
-				console.log('You no admin.'); // not able to login or blocked
+				console.log('You no admin.');
 			}
 			return false;
 		}
@@ -135,7 +134,6 @@ export const UsersView: React.FC<UsersViewProps> = ({ logged_in_user, users_inpu
 	function LeaveChat() {
 		leaveChat(logged_in_user.chatname);
 		logged_in_user.chatname = "";
-		// messages_input = []; might be needed
 		setSwitch(0);
 		input_field1.current.value = "";
 		password_field.current.value = "";

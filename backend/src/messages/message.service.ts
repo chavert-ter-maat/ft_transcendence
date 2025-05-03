@@ -3,8 +3,6 @@ import { InjectModel } from '@nestjs/sequelize';
 import { Chat } from './message.model';
 import { User } from '../auth/auth.model';
 import * as bcrypt from 'bcrypt';
-// import { JwtService } from '@nestjs/jwt';
-
 
 interface chat_stamp	{ name_: string, unread_: number, timestamp: string, users: string[], index: number, DM: boolean};
 interface message_stamp	{ message_: string, name_: string, user_ : string, timestamp: string, pic_: string, key_: number };
@@ -44,8 +42,6 @@ export class MessageService {
 		const user = await this.get_user(username);
 		if (!user)
 			return null;
-		// if (this.check_bad_input(chatname))
-		// 	return (null);
 		const existingChat = await this.userChat.findOne({
 			where: { chatname },
 			include: [{
@@ -119,7 +115,7 @@ export class MessageService {
 		{
 			const add_user = await this.check_block(username, add_username);
 			if (!add_user || add_username === user.username)
-				return (false);//throw new NotFoundException("User not found");
+				return (false);
 			return (true);
 		}
 		return (false);
@@ -157,7 +153,7 @@ export class MessageService {
 			if (!existingChatNotLoggedIn)
 				throw new UnauthorizedException("Doesn't exist");
 			if (!existingChatNotLoggedIn.public)
-				throw new UnauthorizedException("Private chat"); // might be too much info
+				throw new UnauthorizedException("Private chat");
 			else
 			{
 				if (!existingChatNotLoggedIn.password || existingChatNotLoggedIn.password == password)
@@ -232,7 +228,7 @@ export class MessageService {
 		});
 		if (existingChatUser)
 			return (false);
-		await (existingChat as any).addUser(add_user); //not supposed to be like this, according to 
+		await (existingChat as any).addUser(add_user);
 		existingChat.user_stamps.push({name_: add_username, admin_: false, timestamp: Date()});
 		existingChat.last_edit = Date();
 		existingChat.changed('user_stamps', true);

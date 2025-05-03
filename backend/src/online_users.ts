@@ -54,7 +54,6 @@ export class OnlineUsers{
 	remove_disconnected_users( remove_before: number ): ConnUser[]{
 		this.connected_users.forEach(conn_user => {if (conn_user.timestamp < remove_before && conn_user.location == "chat") { conn_user.location = "online" } })
 		const disconnected_users: ConnUser[] = this.connected_users.filter((conn_user) => conn_user.timestamp < remove_before);
-		// this.connected_users = this.connected_users.filter((conn_user) => conn_user.timestamp >= remove_before);
 		return (disconnected_users);
 	}
 	remove_user( username: string )

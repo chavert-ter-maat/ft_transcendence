@@ -56,9 +56,9 @@ export const EditView: React.FC<EditViewProps> = ({ logged_in_user, setLoaded, s
 			if (!err?.response) {
 				console.log('No server response.');
 			} else if (err.response?.status === 409) {
-				console.log('User exists, please login.'); // login?
+				console.log('User exists, please login.');
 			} else {
-				console.log('You no admin.'); // not able to login or blocked
+				console.log('You no admin.'); 
 			}
 			return false;
 		}
@@ -74,9 +74,9 @@ export const EditView: React.FC<EditViewProps> = ({ logged_in_user, setLoaded, s
 			if (!err?.response) {
 				console.log('No server response.');
 			} else if (err.response?.status === 409) {
-				console.log('User exists, please login.'); // login?
+				console.log('User exists, please login.');
 			} else {
-				console.log('You no admin.'); // not able to login or blocked
+				console.log('You no admin.');
 			}
 			return false;
 		}
@@ -92,9 +92,9 @@ export const EditView: React.FC<EditViewProps> = ({ logged_in_user, setLoaded, s
 			if (!err?.response) {
 				console.log('No server response.');
 			} else if (err.response?.status === 409) {
-				console.log('User exists, please login.'); // login?
+				console.log('User exists, please login.');
 			} else {
-				console.log('You no admin.'); // not able to login or blocked
+				console.log('You no admin.');
 			}
 			return false;
 		}
@@ -110,9 +110,9 @@ export const EditView: React.FC<EditViewProps> = ({ logged_in_user, setLoaded, s
 			if (!err?.response) {
 				console.log('No server response.');
 			} else if (err.response?.status === 409) {
-				console.log('User exists, please login.'); // login?
+				console.log('User exists, please login.');
 			} else {
-				console.log('You no admin.'); // not able to login or blocked
+				console.log('You no admin.');
 			}
 			return false;
 		}
@@ -128,30 +128,27 @@ export const EditView: React.FC<EditViewProps> = ({ logged_in_user, setLoaded, s
 			if (!err?.response) {
 				console.log('No server response.');
 			} else if (err.response?.status === 409) {
-				console.log('User exists, please login.'); // login?
+				console.log('User exists, please login.');
 			} else {
-				console.log('You no admin.'); // not able to login or blocked
+				console.log('You no admin.');
 			}
 			return false;
 		}
 	}
 
-	// @mhaan handle to go to invite player for game. Invite can be pushed as an message?
 	const  inviteforgame = async () => {
 		const invited = await axios.post('/api/messages/invite_friend',
 			{chatname: logged_in_user.chatname,  creator: logged_in_user.username, add_user: requestedUserInfo.username});
-		// console.log("invited hwats happenibg is istr goerhf to shuret rhert e?", invited.data.d);
 		if (logged_in_user && invited.data.invited)
 		{
 			setSwitch(9);
-			console.log("TWICE LAUNCHED, AGIAN?");
 			navigate('/game', {state: {user: logged_in_user, requestedUser: requestedUserInfo} });
 		}
 	};
 
 	const Unfriend = async (remove_user_name: string): Promise<boolean> => {
 			try {
-				await axios.post('/api/messages/remove_friend', //has to be added
+				await axios.post('/api/messages/remove_friend',
 					{chatname: logged_in_user.chatname,  creator: logged_in_user.username, add_user: remove_user_name});
 				GoBackToFriendsView(logged_in_user, setLoaded, setSwitch, input_field1, input_field2);
 				return true;
@@ -159,15 +156,14 @@ export const EditView: React.FC<EditViewProps> = ({ logged_in_user, setLoaded, s
 				if (!err?.response) {
 					console.log('No server response.');
 				} else if (err.response?.status === 409) {
-					console.log('User exists, please login.'); // login?
+					console.log('User exists, please login.');
 				} else {
-					console.log('You no admin.'); // not able to login or blocked
+					console.log('You no admin.');
 				}
 				return false;
 			}
 		}
 
-	// console.log("friend_view:\n", logged_in_user.friend_view);
 	const self_view : boolean = logged_in_user.selected_user === logged_in_user.username;
 
 	const JSX_content = (
@@ -176,7 +172,7 @@ export const EditView: React.FC<EditViewProps> = ({ logged_in_user, setLoaded, s
 		<h1>aka: {requestedUserInfo?.displayName || "display name not set loaded"}</h1>
 		{requestedUserInfo?.imageName ? (
             <img
-				src={"data:image/png;base64, " + requestedUserInfo.imageString} // Assuming the backend serves the avatar image, don't like this
+				src={"data:image/png;base64, " + requestedUserInfo.imageString}
               alt={requestedUserInfo.imageName}
               style={{ width: '100px', height: '100px', borderRadius: '50%' }}
             />
