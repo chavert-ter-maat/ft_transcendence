@@ -5,8 +5,11 @@ import { jwtDecode } from "jwt-decode";
 import PopUpModal from '../PopUpModal/PopUpModal';
 import axios from '../../axios';
 import './TwoFADashboard.css';
+import { useNavigate } from "react-router-dom";
+
 
 function TwoFADashboard() {
+	const navigate = useNavigate();
 	const [currentTwoFAItem, setCurrentTwoFAItem] = useState(null);
 	const [tokenContent, setTokenContent] = useState(null);
 	const [loading, setLoading] = useState(true);
@@ -38,6 +41,7 @@ function TwoFADashboard() {
 	return (
 		<div className="twofa-dashboard-container">
 			<h1 className="twofa-dashboard-title">2FA Dashboard</h1>
+			
 			{loading ? (
 				<p className="loading-text">Loading...</p>
 			) : (currentTwoFAItem && currentTwoFAItem?.twoFASecretKey) ? (
@@ -49,6 +53,7 @@ function TwoFADashboard() {
 				<TwoFASetup tokenContent={tokenContent} setCurrentTwoFAItem={setCurrentTwoFAItem} />
 			)}
 			{modal.show && <PopUpModal modal={modal} setModal={setModal} />}
+			<button onClick={() => navigate(-1)}>Back</button>
 		</div>
 	);
 }
