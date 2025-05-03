@@ -27,6 +27,8 @@ async function bootstrap() {
       `http://127.0.0.1:${backendPort}`,
       `http://127.0.0.1:${frontendPort}`,
       `http://0.0.0.0:${frontendPort}`,
+      `http://${process.env.VITE_HOSTNAME}:${frontendPort}`,
+      `http://${process.env.VITE_HOSTNAME}:${backendPort}`,
     ],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
     credentials: true,
