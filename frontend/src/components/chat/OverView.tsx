@@ -14,7 +14,6 @@ interface ChatStamp_int {
 
 function CHATSTAMP_RENDER({chatey, logged_in_user, setLoaded, setSwitch}: ChatStamp_int ): React.ReactElement {
 	let buttonname: string = chatey.name_;
-	// console.log(chatey.name_);
 	if (chatey.DM)
 		buttonname = chatey.name_.replace("_" + logged_in_user.username, "");
 	return (
@@ -58,13 +57,13 @@ export const addNewChat = async (	logged_in_user: UserStats, DM: boolean,
 		if (!err?.response) {
 			console.log('No server response.');
 		} else if (err.response?.status === 409) {
-			console.log('Chat exists, please login.'); // login?
+			console.log('Chat exists, please login.');
 		} 
 		else if (err.response?.status === 401)	{
 			console.log("Log in for chat:" + err.response.message);
 			return 2;
 		} else {
-			console.log('This is a private chat.'); // not able to login or blocked
+			console.log('This is a private chat.');
 		}
 		return 0;
 	}
@@ -84,7 +83,6 @@ const GoToChat = (	logged_in_user: UserStats,
 }
 
 export const ChatOverviewPage: React.FC<ChatOverviewProps> = ({ logged_in_user, chats_input, setLoaded, setSwitch, modal, invite, input_field1, input_field2 }) => {
-	// const navigate = useNavigate();
 	if (!logged_in_user.user)
 		throw new Error("No user");
 

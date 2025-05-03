@@ -42,7 +42,6 @@ let invite_modal:	boolean = false;
 let invite_accept:	boolean = false;
 
 const Chat: React.FC = () =>  {
-	//might have to be an fetch for the user data
 	const state = useLocation().state as {user: User};
 	const navigate = useNavigate();
 
@@ -94,7 +93,7 @@ const Chat: React.FC = () =>  {
 
 	const getFriends = async (): Promise<void> => {
 		try {
-			const response = await axios.post('/api/messages/get_friends', //needs to be added
+			const response = await axios.post('/api/messages/get_friends',
 				{username: logged_in_user.username,  password: "", chatname: logged_in_user.chatname});
 			friends_input = response.data.array_;
 			setLoaded(true);
@@ -129,7 +128,6 @@ const Chat: React.FC = () =>  {
 
 	const getUsers = async (): Promise<void> => {
 		try {
-			// console.log("applied for users", logged_in_user.chatname, logged_in_user.username);
 			const response = await axios.post('/api/messages/get_users',
 				{username: logged_in_user.username, chatname: logged_in_user.chatname, password: ""});
 			users_input = response.data.array;
@@ -137,10 +135,9 @@ const Chat: React.FC = () =>  {
 			logged_in_user.page_creator = response.data.creator_;
 			setLoaded(true);
 		} catch (error: any) {
-			console.log("Que passa, error in getting users?");//alert(error.response?.data.message || 'Login failed');
+			console.log("Error in getting users");
 		}
 		logged_in_user.loading = false;
-		// console.log('User page loaded or whatverr');
 	}
 
 	if (state)
@@ -153,21 +150,15 @@ const Chat: React.FC = () =>  {
 	
 		if (inviteAccept)
 		{
-		// 	inviteAcceptSet(false);
-		// 	setSwitch(9);
-			console.log("TWICE LAUNCHED?");
 			navigate('/game', {state: {user: logged_in_user, requestedUser: requestedUserInfo} });
 		}
 	
 		useEffect(() => {
-			console.log("why twice Effect?");
 			const id: number = Math.random();
 			const updateData = async () => {
-				console.log("Apply for update", update_state, id);
 				const rere = await reload_call();
 				if (rere)
 				{
-					console.log("reload_call return value:", rere.valueOf, id);
 					setUpdate(true);
 					setLoaded(false);
 				}
@@ -175,16 +166,12 @@ const Chat: React.FC = () =>  {
 				{
 					inviteAcceptSet(false);
 					setSwitch(9);
-					// console.log("TWICE LAUNCHED?");
-					// navigate('/game', {state: {user: logged_in_user, requestedUser: requestedUserInfo} });
 				}
 			}
 			if (request_state)
 			{
-				// updateData();
-				console.log("Launching interval:", id);
 				const interval = setInterval(updateData, 1000);
-				return () => {clearInterval(interval); console.log("Clearing interval:", id); }
+				return () => {clearInterval(interval);}
 			}
 		}, [request_state])
 	
@@ -214,7 +201,7 @@ const Chat: React.FC = () =>  {
 			}))
 		} else if (switchy_state === 4){
 			useEffect(() => {
-				console.log('Hitty login page');
+				console.log('Login page');
 				setUpdate(false);
 			}, [switchy_state, loaded_state, update_state]);
 			return (LoginView({

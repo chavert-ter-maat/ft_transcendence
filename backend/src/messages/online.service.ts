@@ -17,7 +17,6 @@ export class OnlineService {
 
 	remove_user(user: string): void
 	{
-		// console.log("\nREMOVE USER???\n", user, "\n\n\n");
 		let i: number = 0;
 		while (i < this.notify_users.length)
 		{
@@ -31,9 +30,7 @@ export class OnlineService {
 	add_users( user_input: [user_stamp[], string]): string
 	{
 		let i_ru: number = 0;
-		// console.log("\nADDING USER:\n\n", user_input[0], "}{", user_input[1]);
 		const online_relevant_users = this.online_users.find_online_users_by_channel(user_input[1]);
-		// console.log("\nONLINE USERS:\n\n", this.online_users.connected_users);
 		while (i_ru < user_input[0].length)
 		{
 				if (!this.notify_users.includes(user_input[0][i_ru].name_)
@@ -41,7 +38,6 @@ export class OnlineService {
 					this.notify_users.push(user_input[0][i_ru].name_);
 			i_ru++;
 		}
-		// console.log("\nONLINE USERS:\n\n", this.online_users.connected_users);
 		return (user_input[1]);
 	}
 
@@ -52,7 +48,7 @@ export class OnlineService {
 		friend_array.filter(friend => friend.status === "chat").forEach(friend => this.add_users([[{name_: friend.stamp_.name_, admin_: false, timestamp: Date()}], ""]) );
 	}
 
-	async check_notification(sleep_ms: number, username: string): Promise<boolean> // might have to protect from unauthroized usage
+	async check_notification(sleep_ms: number, username: string): Promise<boolean>
 	{
 		if (this.online_users.find_online_user(username)?.invited_by && this.online_users.find_online_user(username)?.invited_by !== "")
 			return (true);
@@ -69,7 +65,6 @@ export class OnlineService {
 			let status: string = "offline";
 			if (this.online_users.find_online_user(friend.name_))
 				status = this.online_users.find_online_user(friend.name_).location;
-			// console.log(this.online_users.find_online_user(friend.name_));
 			return { stamp_: friend, status: status};
 		});
 		return (friend_stamp_list);

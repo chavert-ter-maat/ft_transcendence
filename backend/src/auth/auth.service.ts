@@ -4,8 +4,8 @@ import { User, user_stamp } from 'src/auth/auth.model';
 import * as bcrypt from 'bcrypt';
 import * as path from 'path';
 
-type AuthInput = { email: string; password: string };  // Change username to email
-type AuthResult = { accessToken: string; email: string };  // Change username to email
+type AuthInput = { email: string; password: string };
+type AuthResult = { accessToken: string; email: string }; 
 
 @Injectable()
 export class AuthService {
@@ -33,7 +33,7 @@ export class AuthService {
 			throw new UnauthorizedException('User not found');
 		}
 		if (user.imageData)
-			user.imageString = this.arrayBufferToBase64(user.imageData); //hitty placed
+			user.imageString = this.arrayBufferToBase64(user.imageData);
 		return user;
 	}
 
@@ -47,15 +47,15 @@ export class AuthService {
 			throw new UnauthorizedException('User not found');
 		}
 		if (user.imageData)
-			user.imageString = this.arrayBufferToBase64(user.imageData); //hitty placed
+			user.imageString = this.arrayBufferToBase64(user.imageData);
 		return user;
 	}
 
 
-	async createUser(email: string, password: string): Promise<User> {  // Change username to email
+	async createUser(email: string, password: string): Promise<User> { 
 		const salt = await bcrypt.genSalt(10);
 		const hashedPassword = await bcrypt.hash(password, salt);
-		const user = await User.create({ email, password: hashedPassword, blocked_users: [], friends: [] });  // Change username to email
+		const user = await User.create({ email, password: hashedPassword, blocked_users: [], friends: [] }); 
 		return user;
 	}
 

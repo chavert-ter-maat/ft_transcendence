@@ -11,17 +11,11 @@ interface FriendStamp_int {
 	logged_in_user:	UserStats;
   }
 
-// interface	UserStampList_int {
-// 	users:			user_stamp[];
-// 	logged_in_user:	UserStats;
-// }
-
 interface	FriendStampList_int {
 	users:			friend_stamp[];
 	logged_in_user:	UserStats;
 }
 
-// duplicated from MessageView
 export const goToFriends = (	logged_in_user: UserStats,
 		setLoaded: React.Dispatch<React.SetStateAction<boolean>>,
 		setSwitch: React.Dispatch<React.SetStateAction<number>>) => {
@@ -40,7 +34,6 @@ export const FriendsView: React.FC<FriendsViewProps> = ({ logged_in_user, friend
 				<div>
 					<li className={"App-chat_name"}>{usery.stamp_.name_ + " : " + usery.status}</li>
 					<button onClick={() => ButtonGoAddMuteOrBlock(usery.stamp_.name_)} className={"App-chat_name_button"}> Go to user. </button>
-					{/* <button onClick={() => Unfriend(usery.name_)} className={"App-chat_name_button"}> Unfriend user. </button> */}
 				</div>
 			)
 		else
@@ -79,16 +72,16 @@ export const FriendsView: React.FC<FriendsViewProps> = ({ logged_in_user, friend
 
 	const addNewFriend = async (): Promise<boolean> => {
 		try {
-			await axios.post('/api/messages/add_friend', //has to be added
+			await axios.post('/api/messages/add_friend',
 				{chatname: logged_in_user.chatname,  creator: logged_in_user.username, add_user: input_field1.current.value});
 			return true;
 		} catch (err: any) {
 			if (!err?.response) {
 				console.log('No server response.');
 			} else if (err.response?.status === 409) {
-				console.log('User exists, please login.'); // login?
+				console.log('User exists, please login.');
 			} else {
-				console.log('You no admin.'); // not able to login or blocked
+				console.log('You no admin.');
 			}
 			return false;
 		}
@@ -114,7 +107,6 @@ export const FriendsView: React.FC<FriendsViewProps> = ({ logged_in_user, friend
 		</>
 	);
 
-	console.log("FRIENDSTAMP_LIST users=", friends_input);
 	return (
 		<div className="App">
 			<HeaderWrap user={logged_in_user.user} insert={JSX_content} modal={modal} invite={invite} invited_by={logged_in_user.invited_by}/>

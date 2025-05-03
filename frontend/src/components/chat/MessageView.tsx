@@ -74,15 +74,15 @@ export const MessagesView: React.FC<MessagesViewProps> = ({ logged_in_user, mess
 			if (!err?.response) {
 				console.log('No server response.');
 			} else if (err.response?.status === 409) {
-				console.log('Chat exists, please login.'); // login?
+				console.log('Chat exists, please login.');
 			} else {
-				console.log('This is a private chat.'); // not able to login or blocked
+				console.log('This is a private chat.');
 			}
 			return false;
 		}
 	}
 
-	function	enterOnMessage(event: any) { //any is bad practice
+	function	enterOnMessage(event: any) {
 		if (input_field1.current.value !== "")
 			addNewMessage();
 		input_field1.current.value = "";
