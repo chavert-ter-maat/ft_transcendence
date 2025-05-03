@@ -17,7 +17,10 @@ up:
 dev:
 	@mkdir -p $(DB_DATA)
 	NODE_ENV=development HOSTNAME=$(shell hostname) ${DOCKER_COMPOSE} --profile dev up
-#NODE_ENV=development ${DOCKER_COMPOSE} --profile dev up
+
+eval:
+	@mkdir -p $(DB_DATA)
+	NODE_ENV=eval HOSTNAME=$(shell hostname) ${DOCKER_COMPOSE} --profile eval up
 
 test: down build up
 
